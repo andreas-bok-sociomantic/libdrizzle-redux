@@ -25,6 +25,17 @@ libdrizzle_libdrizzle_redux_la_LIBADD=
 libdrizzle_libdrizzle_redux_la_LDFLAGS=
 libdrizzle_libdrizzle_redux_la_CFLAGS= -DBUILDING_LIBDRIZZLE
 libdrizzle_libdrizzle_redux_la_CXXFLAGS= -DBUILDING_LIBDRIZZLE
+# Paths for new binlog api
+
+noinst_HEADERS+= libdrizzle/binlogevent/event_data.h
+noinst_HEADERS+= libdrizzle/binlogevent/event_header.h
+noinst_HEADERS+= libdrizzle/binlogevent/helper.h
+noinst_HEADERS+= libdrizzle/binlogevent/row_event.h
+noinst_HEADERS+= libdrizzle/binlogevent/table_map_event.h
+noinst_HEADERS+= libdrizzle/binlogevent/event_interface.h
+noinst_HEADERS+= libdrizzle/binlogevent/query_event.h
+noinst_HEADERS+= libdrizzle/binlogevent/row_iterator.h
+noinst_HEADERS+= libdrizzle/binlogevent/column_value.h
 
 libdrizzle_libdrizzle_redux_la_CFLAGS+= @OPENSSL_INCLUDES@
 libdrizzle_libdrizzle_redux_la_CXXFLAGS+= @OPENSSL_INCLUDES@
@@ -64,5 +75,16 @@ libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/sha1.cc
 libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/state.cc
 libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/statement.cc
 libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/statement_param.cc
+
+# paths for new binlog api
+
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/event_data.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/event_header.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/helper.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/query_event.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/row_event.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/xid_event.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/row_iterator.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/table_map_event.cc
 
 libdrizzle_libdrizzle_redux_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}
