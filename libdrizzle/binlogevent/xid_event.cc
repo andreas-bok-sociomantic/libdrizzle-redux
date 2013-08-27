@@ -1,0 +1,64 @@
+#include<iostream>
+#include <libdrizzle-5.1/libdrizzle.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <inttypes.h>
+#include<string.h>
+
+#include"xid_event.h"
+
+
+#ifndef HELPER
+#define HELPER
+
+#include"helper.h"
+
+#endif
+
+using namespace std;
+using namespace binlogevent;
+
+
+
+void XidEvent::initWithData(const unsigned char* data)
+{
+
+	int start_pos = header.setHeader(data);
+
+	setXid(getByte8(start_pos,data));
+}
+
+// getters
+
+uint32_t XidEvent::getTimestamp()
+{
+	return  header.timestamp;
+}
+enum_event_type XidEvent::getType()
+{
+	return header.type; 
+}
+uint32_t XidEvent::getServerId()
+{
+	return header.server_id;
+}
+uint32_t XidEvent::getLogPos()
+{
+	return header.log_pos;
+}
+uint16_t XidEvent::getFlagH()
+{
+	return header.flag; 
+}
+uint64_t XidEvent::getXid()
+{
+	return Xid;
+}
+
+//setters
+
+void XidEvent::setXid(uint64_t value)
+{
+	Xid = value;
+}
