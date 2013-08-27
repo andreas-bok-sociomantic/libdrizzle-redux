@@ -5,6 +5,7 @@
 #include"table_map_event.h"
 #include"write_row_event.h"
 #include"query_event.h"
+#include"xid_event.h"
 
 
 using namespace std;
@@ -34,6 +35,8 @@ namespace binlogevent
 			void getTableMap(TableMapEvent&  tableMap);
 			void getWriteEvent(WriteEvent&  writeEvent);
 			void getQueryEvent(QueryEvent&  queryEvent);
+			void getXidEvent(XidEvent&  xidEvent);
+
 
 		private:
 			/* Raw Event Data  */

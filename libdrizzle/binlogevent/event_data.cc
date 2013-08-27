@@ -23,3 +23,7 @@ void EventData::getQueryEvent(QueryEvent& queryEvent)
 {
 	queryEvent.initWithData(_data);
 }
+void EventData::getXidEvent(XidEvent& xidEvent)
+{
+	xidEvent.initWithData(_data);
+}

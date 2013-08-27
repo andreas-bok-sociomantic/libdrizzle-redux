@@ -30,6 +30,7 @@ namespace binlogevent
 			friend class TableMapEvent;
 			friend class WriteEvent;
 			friend class QueryEvent;
+			friend class XidEvent;
 
 		private:
 			uint32_t timestamp; // timestamp of event
