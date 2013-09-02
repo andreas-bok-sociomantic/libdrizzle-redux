@@ -1,3 +1,14 @@
+/* 
+ * Copyright (C) 2013 Drizzle Developer Group
+ * Copyright (C) 2013 Kuldeep Porwal
+ * All rights reserved.
+ *
+ * Use and distribution licensed under the BSD license.  See
+ * the COPYING file in the parent directory for full text.
+ *
+ * summary: Returns objects of every event
+ *
+ */
 #include<iostream>
 #include <libdrizzle-5.1/libdrizzle.h>
 #include <stdio.h>
