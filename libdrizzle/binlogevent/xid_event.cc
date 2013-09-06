@@ -48,7 +48,7 @@ uint32_t XidEvent::getTimestamp()
 }
 enum_event_type XidEvent::getType()
 {
-	return header.type; 
+	return (enum_event_type)header.type; 
 }
 uint32_t XidEvent::getServerId()
 {

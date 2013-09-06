@@ -10,17 +10,29 @@
  *
  */
 #include<iostream>
+#include<string>
 namespace binlogevent
 {
 	class ColumnValue
 	{
 		public:
-			ColumnValue(int p_start,int p_end)
+			ColumnValue(std::string st,int val,bool _bool,int col_n)
 			{
-				start=p_start;
-				end=p_end;
+				str=st;
+				value=val;
+				is_null = _bool;
+				col_num = col_n;
 			}
-			int start;
-			int end;
+				
+			std::string getString() {return str;  } // Check: str.empty() is true so int value otherwise string value.
+			int    getInt()    {return value;}
+			bool isNull() { return is_null;}
+			int getColumnNum() {return col_num;}
+
+		private:
+			std::string str;
+			int value;
+			bool is_null;
+			int col_num;
 	};
 }

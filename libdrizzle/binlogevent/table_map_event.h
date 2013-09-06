@@ -17,7 +17,12 @@
 #include"event_interface.h"
 #endif
 using namespace std;
+#ifndef HELPER
+#define HELPER
 
+#include"helper.h"
+
+#endif
 
 //using namespace binlogevent;
 namespace binlogevent
@@ -107,6 +112,12 @@ namespace binlogevent
 			 * @retval array of column definitions, one byte per field type  
 			 */
 			 uint8_t * getColumnTypeDef();
+			
+			 /**
+			 * @retval enum {INT,STRING} as a type of column  
+			 */
+
+			 enum_col_type getColType(int colNo);
 
 			//setters
 
