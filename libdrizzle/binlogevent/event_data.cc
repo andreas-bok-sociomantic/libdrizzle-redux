@@ -26,7 +26,7 @@ void EventData::getTableMap(TableMapEvent& tableMap)
 	tableMap.initWithData(_data);
 }
 
-void EventData::getWriteEvent(WriteEvent& writeEvent)
+void EventData::getRowEvent(RowEvent& writeEvent)
 {
 	writeEvent.initWithData(_data);
 }

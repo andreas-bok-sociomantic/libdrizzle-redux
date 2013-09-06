@@ -24,12 +24,6 @@
 
 #endif
 
-#ifndef HELPER
-#define HELPER
-
-#include"helper.h"
-
-#endif
 
 using namespace std;
 using namespace binlogevent;
@@ -106,7 +100,7 @@ uint32_t TableMapEvent::getTimestamp()
 }
 enum_event_type TableMapEvent::getType()
 {
-	return header.type; 
+	return (enum_event_type)header.type; 
 }
 uint32_t TableMapEvent::getServerId()
 {
@@ -152,6 +146,20 @@ uint8_t * TableMapEvent::getColumnTypeDef()
 {
 	return column_type_def;
 }
+
+enum_col_type TableMapEvent::getColType(int colNo)
+{
+	enum_field_bytes num;
+	num = lookup_field_bytes((enum_field_types)column_type_def[colNo]);
+	switch(num)
+	{
+		 case LEN_ENC_STR:
+			 return (enum_col_type)1;
+		 default:
+			 return (enum_col_type)2;
+	}
+}
+
 
 //setters
 
