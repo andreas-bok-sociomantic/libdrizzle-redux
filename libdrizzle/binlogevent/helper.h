@@ -51,8 +51,13 @@ typedef enum{
 	TABLE_MAP_EVENT = 19,
 	WRITE_ROWS_EVENTv1 = 23,
 	UPDATE_ROWS_EVENTv1,
-	DELETE_ROWS_EVENTv1,
+	DELETE_ROWS_EVENTv1
 }enum_event_type;
+
+typedef enum{
+	STRING = 1,
+	INT = 2
+}enum_col_type;
 
 
 
@@ -124,6 +129,9 @@ char * getString(int pos,int len,const unsigned char * data);
 uint64_t getEncodedLen(int& pos,const unsigned char * data);
 
 int lookup_metadata_field_size(enum_field_types field_type);
+
+
+int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit);
 
 enum_field_bytes lookup_field_bytes(enum_field_types field_type);
 

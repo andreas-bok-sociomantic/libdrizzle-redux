@@ -16,6 +16,7 @@ using namespace std;
 namespace binlogevent
 {
 	typedef vector<vector<ColumnValue> > RowVector;
+	typedef vector<ColumnValue> Row;
 
 	class RowIterator
 	{
@@ -23,6 +24,7 @@ namespace binlogevent
 			void next();
 			bool hasNext();
 			void setCount(int value);
+			int getPos();
 
 			vector<vector<ColumnValue> > vec_rows;
 			vector<ColumnValue> vec_col_val;

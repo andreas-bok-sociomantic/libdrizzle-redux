@@ -99,12 +99,15 @@ namespace binlogevent
 			uint64_t getColumnCount();
 			
 			/**
-			  * @retval array of column definitions, one byte per field type  
+			  * @retval bitmap of column present
 			  */
 			
-			int * getColumnPresentBitmap();
+			bool * getColumnPresentBitmap();
 
 			RowVector getRows();
+			
+			//RowVector getAllRows();
+			//Row getRow();
 
 			
 
@@ -128,7 +131,7 @@ namespace binlogevent
 			  *
 			  * @param[in] bitmap Array 
 			  */
-			void setColumnPresentBitmap(int * value);
+			void setColumnPresentBitmap(bool * value);
 			
 			/** set null_bitmap.
 			  *
@@ -146,7 +149,7 @@ namespace binlogevent
 			uint64_t table_id;  
 			uint16_t flag; //post header
 			uint64_t column_count; 
-			int * column_bitmap;
+			bool * column_bitmap;
 			bool * column_null_bitmap;
 			bool * null_bitmap;
 			RowIterator rows;

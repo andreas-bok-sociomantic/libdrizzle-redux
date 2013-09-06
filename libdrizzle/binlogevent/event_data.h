@@ -14,7 +14,7 @@
 #include<inttypes.h>
 
 #include"table_map_event.h"
-#include"write_row_event.h"
+#include"row_event.h"
 #include"query_event.h"
 #include"xid_event.h"
 
@@ -44,7 +44,7 @@ namespace binlogevent
 			  */
 
 			void getTableMap(TableMapEvent&  tableMap);
-			void getWriteEvent(WriteEvent&  writeEvent);
+			void getRowEvent(RowEvent&  writeEvent);
 			void getQueryEvent(QueryEvent&  queryEvent);
 			void getXidEvent(XidEvent&  xidEvent);
 

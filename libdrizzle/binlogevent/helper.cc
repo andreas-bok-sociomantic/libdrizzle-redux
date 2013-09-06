@@ -128,7 +128,29 @@ bool getNextBit(uint8_t& val)
 	val = val >> 1;
 	return (val & 1);
 }
+int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit)
+{
+	int count=0;
+	for(int i=0;i<_byte;i++)
+	{   
+		if(8*i>=_bit)
+			break;
+		uint8_t number= (uint8_t)data[start_pos+i];
+		arr[8*i] = (int)number&(int)1;
+		if(arr[8*i]==0)
+			count++;
+		for(int val=1;val<8;val++)
+		{   
+			if((8*i+val) >= _bit)
+				break;
+			arr[8*i+val] = getNextBit(number);
+			if(arr[8*i+val]==0)
+				count++;
+		}   
+	}
+	return count; // count where bit in not set. (0)
 
+}
 int lookup_metadata_field_size(enum_field_types field_type)
 {
 	switch (field_type)

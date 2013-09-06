@@ -13,12 +13,13 @@
 #include<cstring>
 #include<inttypes.h>
 
-#ifndef table_map
-#define table_map
+#ifndef HELPER
+#define HELPER
 
-//#include"table_map_event.h"
+#include"helper.h"
 
 #endif
+
 
 using namespace std;
 
@@ -39,7 +40,7 @@ namespace binlogevent
 			int setHeader(unsigned const char* data);
 
 			friend class TableMapEvent;
-			friend class WriteEvent;
+			friend class RowEvent;
 			friend class QueryEvent;
 			friend class XidEvent;
 

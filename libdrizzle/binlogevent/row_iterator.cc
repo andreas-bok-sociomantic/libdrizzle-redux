@@ -32,3 +32,8 @@ void RowIterator::setCurrentPos(int value)
 {
 	current_pos= value;
 }
+
+int RowIterator::getPos()
+{
+	return current_pos;
+}

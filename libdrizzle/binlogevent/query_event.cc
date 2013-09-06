@@ -23,7 +23,7 @@
 #include"query_event.h"
 
 #endif
-#include"helper.h"
+//#include"helper.h"
 
 using namespace std;
 using namespace binlogevent;
