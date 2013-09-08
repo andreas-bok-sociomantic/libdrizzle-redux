@@ -32,22 +32,34 @@ using namespace binlogevent;
 
 void QueryEvent::initWithData(const unsigned char* data)
 {
-
+	uint64_t tmp;
 	int start_pos = header.setHeader(data);
-
-	setProxyId(getByte4(start_pos,data)); 
+	if(start_pos==-1)
+		return;
+	
+	tmp = getByte4(start_pos,data); 
+	if(tmp==UINT_MAX)
+		return;
+	setProxyId((uint32_t)tmp); 
 	start_pos+=4;// 4 byte for proxy id.
 
-	setExecutionTime(getByte4(start_pos,data));
+	tmp = getByte4(start_pos,data); 
+	if(tmp==UINT_MAX)
+		return;
+	setExecutionTime((uint32_t)tmp);
 	start_pos+=4;// 4 byte for execution time.
 
+	if(sizeof(data)-start_pos<1)
+		return;
 	setSchemaLength((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for schema length.
 
-	setErrorCode(getByte2(start_pos,data));
+	tmp = getByte2(start_pos,data); 
+	if(tmp==USHRT_MAX)
+		return;
+	setErrorCode((uint16_t)tmp);
 	start_pos+=2;// 2 byte for error code.
 	
-
 }
 
 // getters

@@ -26,7 +26,7 @@ namespace binlogevent
 	{
 		public:
 
-			XidEvent() : Xid(0)
+			XidEvent() : Xid(-1)
 		{
 		}
 

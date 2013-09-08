@@ -18,6 +18,7 @@
 #include<string.h>
 
 #ifndef table_map
+
 #define table_map
 
 #include"table_map_event.h"
@@ -32,44 +33,74 @@ using namespace binlogevent;
 
 void TableMapEvent::initWithData(const unsigned char* data)
 {
-
+	uint64_t tmp;
+	char *tmp_char;
+	int tmp_int;
 	int start_pos = header.setHeader(data);
+	if(start_pos==-1)
+		return;
 
-	setTableId(getByte6(start_pos,data));
+	tmp = getByte6(start_pos,data);	
+	if(tmp==UINT_MAX)
+		return;
+	setTableId((uint64_t)tmp);
 	start_pos+=6;// 6 byte for table id.
 	
-	setFlagPh(getByte2(start_pos,data));
+	tmp = getByte2(start_pos,data);	
+	if(tmp==USHRT_MAX)
+		return;
+	setFlagPh((uint16_t)tmp);
 	start_pos+=2;// 2 byte for post-header flag.
-	
+
+	if(sizeof(data)-start_pos<1)
+		return;
 	setSchemaNameLen((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for schema name length.
 	
-	setSchemaName(getString(start_pos,schema_name_len,data));
+	tmp_char = getString(start_pos,schema_name_len,data);
+	if(tmp_char==NULL)
+		return;
+	setSchemaName(tmp_char);
 	start_pos+= schema_name_len; //schema_name_len byte for schema name.
 
 	//  data[start_pos+getSchemaNameLen()] is Null
 	start_pos+=1; //  +1 for Null.
 	
+	if(sizeof(data)-start_pos<1)
+		return;
 	setTableNameLen((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for table name length.
 	
-	setTableName(getString(start_pos,table_name_len,data));
+	tmp_char = getString(start_pos,schema_name_len,data);
+	if(tmp_char==NULL)
+		return;
+	setTableName(tmp_char);
 	start_pos+=table_name_len+1; // +1 for null
 
+	tmp_int = getEncodedLen(start_pos,data);
+	if(tmp_int==0)
+		return;
 	setColumnCount(getEncodedLen(start_pos,data)); // start_pos will also get updated
 
-	uint8_t *tmp = (uint8_t *)(malloc(sizeof(uint8_t)*getColumnCount()));
+
+	if(sizeof(data)-start_pos<getColumnCount())
+		return;
+	uint8_t *tmp_array = (uint8_t *)(malloc(sizeof(uint8_t)*getColumnCount()));
 	for(int i=0;i<getColumnCount();i++)
 	{
-		tmp[i]=(uint8_t)data[start_pos+i];
+		tmp_array[i]=(uint8_t)data[start_pos+i];
 	}
-	setColumnTypeDef(tmp);
+	setColumnTypeDef(tmp_array);
 	start_pos+=column_count;
 
-	int metaSize= getEncodedLen(start_pos,data);
-	
-	uint64_t *column_meta_data = (uint64_t *)(malloc(sizeof(uint64_t)*column_count));
 
+	int metaSize= getEncodedLen(start_pos,data);
+	if(metaSize==0)
+		return;
+	uint64_t *column_meta_data = (uint64_t *)(malloc(sizeof(uint64_t)*column_count));
+	
+	if(sizeof(data)-start_pos<column_count)
+		return;
 	for(int col=0;col<column_count;col++)
 	{
 		int type= column_type_def[col];

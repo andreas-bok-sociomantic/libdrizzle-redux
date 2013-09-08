@@ -29,10 +29,10 @@ namespace binlogevent
 		public:
 
 //			QueryEvent(TableMapEvent& tableMap) : table_id(0),
-			QueryEvent() : proxy_id(0),
-					execution_time(0),
-					schema_length(0),
-					error_code(0)
+			QueryEvent() : proxy_id(-1),
+					execution_time(-1),
+					schema_length(-1),
+					error_code(-1)
 			{
 			}	
 
