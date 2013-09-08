@@ -36,8 +36,14 @@ void XidEvent::initWithData(const unsigned char* data)
 {
 
 	int start_pos = header.setHeader(data);
+	if(start_pos==-1)
+		return;
+	uint64_t tmp;
 
-	setXid(getByte8(start_pos,data));
+	tmp=getByte8(start_pos,data);
+	if(tmp==UINT_MAX)
+		return;
+	setXid((uint64_t)tmp);
 }
 
 // getters

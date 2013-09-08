@@ -39,50 +39,50 @@ using namespace binlogevent;
 
 void RowEvent::initWithData(const unsigned char* data)
 {
-
+	uint64_t tmp;
+	int tmp_int;
 	int start_pos = header.setHeader(data);
+	if(start_pos==-1)
+		return;
 
-	setTableId(getByte6(start_pos,data)); 
+	tmp = getByte6(start_pos,data);
+	if(tmp==UINT_MAX)
+		return;
+	setTableId((uint64_t)tmp); 
 	start_pos+=6;// 6 byte for table id.
 
-	setFlagPh(getByte2(start_pos,data));
+	tmp = getByte2(start_pos,data);
+	if(tmp==USHRT_MAX)
+		return;
+	setFlagPh((uint16_t)tmp);
 	start_pos+=2;// 2 byte for post-header flag.
 
-	setColumnCount(getEncodedLen(start_pos,data)); // start_pos will also get updated
+	tmp_int = getEncodedLen(start_pos,data);
+	if(tmp_int==0)
+		return;
+	setColumnCount(tmp_int); // start_pos will also get updated
 
 	int size= (column_count+7)/8; // length of present column bitmap1
 	
 	int count_cnp=0;  // count of column not present
-	int *tmp = (int *)(malloc(sizeof(int)*size));
-	for(int i=0;i<size;i++)
-	{
-		tmp[i]=(int)data[start_pos+i];
-	}
 
 	bool tmp_present[column_count]; // bit array of column bitmap1
-	count_cnp = getBoolArray(tmp_present,data,start_pos,size,column_count);
+	count_cnp = getBoolArray(tmp_present,data,start_pos,size,column_count); // return -1 when data problem 
+
+	if(count_cnp==-1)
+		return;
+	
 	setColumnPresentBitmap(tmp_present);
 	
 	start_pos+=size;	//null-bitmap
 	size= (column_count-count_cnp+7)/8; // length of null bitmap in bytes 
 
 	bool tmp_bool[column_count-count_cnp];
-	int count_null = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp));
-/*	
-	for(int i=0;i<size;i++)
-	{
-		if(8*i>=column_count)
-			break;
-		uint8_t number= (uint8_t)data[start_pos+i];
-		tmp_bool[8*i] = (int)number&(int)1;
-		for(int val=1;val<8;val++)
-		{
-			if((8*i+val) >= column_count)
-				break;
-			tmp_bool[8*i+val] = getNextBit(number);
-		}
-	}
-*/
+	int count_null = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp)); // return -1 when data problem 
+	
+	if(count_cnp==-1)
+		return;
+	
 	setNullBitmap(tmp_bool);
 
 	start_pos+=size;
@@ -92,7 +92,7 @@ void RowEvent::initWithData(const unsigned char* data)
 	{
 		rows.vec_col_val.clear();
 		string str_col_val; // column value as string
-		int    int_col_val; // column value as int
+		unsigned int    int_col_val; // column value as int
 		for(int val=0;val<column_count;val++)
 		{
 			if(column_bitmap[val]==0)
@@ -101,7 +101,7 @@ void RowEvent::initWithData(const unsigned char* data)
 			if(null_bitmap[val]==1)
 			{
 				str_col_val.clear();
-				int_col_val = INT_MIN;
+				int_col_val = UINT_MAX;
 				ColumnValue value(str_col_val,int_col_val,1,val); // 1 -> null, val is column number
 				rows.vec_col_val.push_back(value);
 				continue;
@@ -116,8 +116,15 @@ void RowEvent::initWithData(const unsigned char* data)
 					{
 						int len;
 						len=getEncodedLen(start_pos,data);
+						if(len==0)
+						{
+							return;
+						}
 						str_col_val.clear();
 						len=start_pos+len-1;
+
+						if(sizeof(data)-start_pos<len)
+							return;
 						for(int it=start_pos;it<=len;it++) // Formation of  string
 						{
 							str_col_val.push_back(data[it]);
@@ -129,6 +136,8 @@ void RowEvent::initWithData(const unsigned char* data)
 					}
 				case READ_1_BYTE:
 					{
+						if(sizeof(data)-start_pos<1)
+							return;
 						str_col_val.clear();
 						int_col_val = (uint8_t)data[start_pos];
 						ColumnValue value(str_col_val,int_col_val,0,val);
@@ -140,6 +149,8 @@ void RowEvent::initWithData(const unsigned char* data)
 					{
 						str_col_val.clear();
 						int_col_val = getByte2(start_pos,data);
+						if(int_col_val==USHRT_MAX)
+							return;
 						ColumnValue value(str_col_val,int_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_2_BYTE;
@@ -149,6 +160,8 @@ void RowEvent::initWithData(const unsigned char* data)
 					{
 						str_col_val.clear();
 						int_col_val = getByte4(start_pos,data);
+						if(int_col_val==UINT_MAX)
+							return;
 						ColumnValue value(str_col_val,int_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_4_BYTE;
@@ -158,6 +171,8 @@ void RowEvent::initWithData(const unsigned char* data)
 					{
 						str_col_val.clear();
 						int_col_val = getByte8(start_pos,data);
+						if(int_col_val==UINT_MAX)
+							return;
 						ColumnValue value(str_col_val,int_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_8_BYTE;
@@ -168,6 +183,7 @@ void RowEvent::initWithData(const unsigned char* data)
 
 			}
 		}
+		
 		rows.vec_rows.push_back(rows.vec_col_val);
 		if(header.event_size==start_pos)
 		{

@@ -8,6 +8,7 @@
  *
  *
  */
+#include<limits.h>
 typedef enum{
 	MYSQL_TYPE_DECIMAL,
 	MYSQL_TYPE_TINY,
@@ -58,7 +59,6 @@ typedef enum{
 	STRING = 1,
 	INT = 2
 }enum_col_type;
-
 
 
 #define mask(__b) \

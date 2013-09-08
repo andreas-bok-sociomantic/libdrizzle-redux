@@ -29,10 +29,12 @@ namespace binlogevent
 	{
 		public:
 
-			RowEvent(uint8_t *col_type) : table_id(0),
-					flag(0),
-					column_count(0),
-					column_bitmap(0)
+			RowEvent(uint8_t *col_type) : 
+					table_id(-1),
+					flag(-1),
+					column_count(-1),
+					column_null_bitmap(NULL),
+					column_bitmap(NULL)
 			{
 				column_type=col_type;
 			}	

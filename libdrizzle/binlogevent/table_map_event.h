@@ -31,14 +31,15 @@ namespace binlogevent
 	{
 		public:
 
-			TableMapEvent() : table_id(0),
-			flag(0),
-			schema_name_len(0),
+			TableMapEvent() : table_id(-1),
+			flag(-1),
+			schema_name_len(-1),
 			schema_name(NULL),
-			table_name_len(0),
+			table_name_len(-1),
 			table_name(NULL),
-			column_count(0),
-			column_type_def(NULL)
+			column_count(-1),
+			column_type_def(NULL),
+			column_meta_data(NULL)
 		{
 		}
 

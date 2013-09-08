@@ -16,7 +16,7 @@ namespace binlogevent
 	class ColumnValue
 	{
 		public:
-			ColumnValue(std::string st,int val,bool _bool,int col_n)
+			ColumnValue(std::string st,unsigned int val,bool _bool,int col_n)
 			{
 				str=st;
 				value=val;
@@ -31,7 +31,7 @@ namespace binlogevent
 
 		private:
 			std::string str;
-			int value;
+			unsigned int value;
 			bool is_null;
 			int col_num;
 	};

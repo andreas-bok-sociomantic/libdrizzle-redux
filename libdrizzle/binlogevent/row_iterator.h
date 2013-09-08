@@ -21,6 +21,11 @@ namespace binlogevent
 	class RowIterator
 	{
 		public:
+			RowIterator():
+				count(-1),
+				current_pos(-1)
+		{
+		}
 			void next();
 			bool hasNext();
 			void setCount(int value);
