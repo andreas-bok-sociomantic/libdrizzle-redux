@@ -29,7 +29,13 @@ namespace binlogevent
 	{
 		public:
 
-			EventHeader()
+			EventHeader():
+				timestamp(-1),
+				type(-1),
+				server_id(-1),
+				event_size(-1),
+				log_pos(-1),
+				flag(-1)
 			{
 			}
 

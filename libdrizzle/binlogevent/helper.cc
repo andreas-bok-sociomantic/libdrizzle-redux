@@ -22,8 +22,12 @@ using namespace std;
 
 uint32_t getByte4(int pos,const unsigned char* data)
 {
+	if(sizeof(data)-pos<4)
+	{
+		return UINT_MAX;
+	}
 	uint32_t tmpMask = mask(32); // all 32 bits set to 1		
-
+	
 	tmpMask=((uint32_t)data[pos]&tmpMask);
 	tmpMask=((uint32_t)data[pos+1]<<8|tmpMask);
 	tmpMask=((uint32_t)data[pos+2]<<16|tmpMask);
@@ -34,6 +38,10 @@ uint32_t getByte4(int pos,const unsigned char* data)
 
 uint32_t getByte3(int pos,const unsigned char* data)
 {
+	if(sizeof(data)-pos<3)
+	{
+		return UINT_MAX;
+	}
 	uint32_t tmpMask = mask(32); // all 32 bits set to 1		
 
 	tmpMask=((uint32_t)data[pos]&tmpMask);
@@ -45,6 +53,10 @@ uint32_t getByte3(int pos,const unsigned char* data)
 
 uint16_t getByte2(int pos,const unsigned char* data)
 {
+	if(sizeof(data)-pos<2)
+	{
+		return USHRT_MAX;
+	}
 	uint16_t tmpMask = mask(16); // all 16 bits set to 1		
 
 	tmpMask=((uint16_t)data[pos]&tmpMask);
@@ -56,6 +68,10 @@ uint16_t getByte2(int pos,const unsigned char* data)
 
 uint64_t getByte6(int pos,const unsigned char* data)
 {
+	if(sizeof(data)-pos<6)
+	{
+		return UINT_MAX;
+	}
 	uint64_t tmpMask = mask(64); // all 64 bits set to 1		
 
 	tmpMask=((uint64_t)data[pos]&tmpMask);
@@ -70,6 +86,10 @@ uint64_t getByte6(int pos,const unsigned char* data)
 
 uint64_t getByte8(int pos,const unsigned char* data)
 {
+	if(sizeof(data)-pos<8)
+	{
+		return UINT_MAX;
+	}
 	uint64_t tmpMask = mask(64); // all 64 bits set to 1		
 
 	tmpMask=((uint64_t)data[pos]&tmpMask);
@@ -86,6 +106,10 @@ uint64_t getByte8(int pos,const unsigned char* data)
 
 char * getString(int pos,int len,const unsigned char * data)
 {
+	if(sizeof(data)-pos<len)
+	{
+		return NULL;
+	}
 	char *tmp = (char *)malloc(sizeof(char)*(len));
 	int i;
 	for(i=pos;i<pos+len;i++)
@@ -99,7 +123,17 @@ char * getString(int pos,int len,const unsigned char * data)
 uint64_t getEncodedLen(int& pos, const unsigned char *data)
 {
 	uint64_t len=0;
+	if(sizeof(data)-pos<1)
+	{
+		return 0;
+	}
+
 	int colBytes = bytes_col_count((uint32_t)data[pos]);
+	if(sizeof(data)-pos-1<colBytes)
+	{
+		pos++;
+		return 0;
+	}
 	switch(colBytes)
 	{   
 		case 1:
@@ -130,6 +164,10 @@ bool getNextBit(uint8_t& val)
 }
 int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit)
 {
+	if(sizeof(data)-start_pos<_byte)
+	{
+		return -1;
+	}
 	int count=0;
 	for(int i=0;i<_byte;i++)
 	{   
