@@ -20,7 +20,8 @@
 
 using namespace std;
 
-
+#ifndef QUERY_EVENT
+#define QUERY_EVENT
 //using namespace binlogevent;
 namespace binlogevent
 {
@@ -46,7 +47,8 @@ namespace binlogevent
 			  *
 			  * @param[in] data Raw data from binglog.
 			  */
-			virtual void initWithData(const unsigned char * data);
+			DRIZZLE_API
+			void initWithData(const unsigned char * data);
 
 			//getters
 
@@ -54,51 +56,61 @@ namespace binlogevent
 			  * @retval timestamp of event.
 			  */
 			
+			DRIZZLE_API
 			uint32_t getTimestamp();
 			/**
 			  * @retval type of event.
 			  */
 			
+			DRIZZLE_API
 			uint8_t getType();
 			
 			/**
 			  * @retval server-id of the originating mysql-server. Used to filter out events in circular replication.
 			  */
+			DRIZZLE_API
 			uint32_t getServerId();
 			
 			/**
 			  * @retval of size of event.
 			  */
+			DRIZZLE_API
 			uint32_t getEventSize();
 			/**
 			  * @retval of position of the next event .
 			  */
+			DRIZZLE_API
 			uint32_t getLogPos();
 			
 			/**
 			  * @retval Binlog Event Flag from header
 			  */
+			DRIZZLE_API
 			uint16_t getFlagH();
 
 			/**
 			  * @retval proxy id. 
 			  */
 		
+			DRIZZLE_API
 			uint32_t getProxyId();
 			
 			/**
 			  * @retval execution time.
 			  */
+			DRIZZLE_API
 			uint32_t getExecutionTime();
 			
 			/**
 			  *@retval schema length.
 			  */
+			DRIZZLE_API
 			uint8_t getSchemaLength();
 			
 			/**
 			  *@retval error code.
 			  */
+			DRIZZLE_API
 			uint16_t getErrorCode();
 			
 			
@@ -109,24 +121,28 @@ namespace binlogevent
 			  *@param[in] value Proxy Id of slave
 			  */
 
+			DRIZZLE_API
 			void setProxyId(uint32_t value);
 			
 			/** set execution time.
 			  *
 			  * @param[in] value Execution time of query.
 			  */
+			DRIZZLE_API
 			void setExecutionTime(uint32_t value);
 			
 			/** set schema length
 			  *
 			  * @param[in] value Schema length of query.
 			  */
+			DRIZZLE_API
 			void setSchemaLength(uint8_t value);
 			
 			/** set error code.
 			  *
 			  * @param[in] value Error code if any error occurred.
 			  */
+			DRIZZLE_API
 			void setErrorCode(uint16_t value);
 
 
@@ -140,3 +156,4 @@ namespace binlogevent
 
 	}; // query event
 } /*namespace binlogevent*/
+#endif

@@ -10,8 +10,9 @@
  *
  */
 
+#include "config.h"
 #include<iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
+#include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -20,7 +21,7 @@
 
 #ifndef event_header
 #define event_header
-#include"event_header.h"
+#include<libdrizzle-5.1/event_header.h>
 #endif
 
 using namespace std;
@@ -36,7 +37,7 @@ int EventHeader::setHeader(const unsigned char* data)
 		return -1;
 	start_pos+=4; // 4 byte for timestamp.
 	
-	if(sizeof(data)-start_pos<0)
+	if((int)(sizeof(data) - start_pos) < 0)
 		return -1;
 	int tmp=(uint8_t)data[start_pos];
 	type= (enum_event_type)tmp;

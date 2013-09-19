@@ -18,6 +18,7 @@ noinst_HEADERS+= libdrizzle/state.h
 noinst_HEADERS+= libdrizzle/statement_local.h
 noinst_HEADERS+= libdrizzle/structs.h
 noinst_HEADERS+= libdrizzle/windows.hpp
+noinst_HEADERS+= libdrizzle/commonapi.h
 
 lib_LTLIBRARIES+= libdrizzle/libdrizzle-redux.la
 libdrizzle_libdrizzle_redux_la_SOURCES=
@@ -25,17 +26,8 @@ libdrizzle_libdrizzle_redux_la_LIBADD=
 libdrizzle_libdrizzle_redux_la_LDFLAGS=
 libdrizzle_libdrizzle_redux_la_CFLAGS= -DBUILDING_LIBDRIZZLE
 libdrizzle_libdrizzle_redux_la_CXXFLAGS= -DBUILDING_LIBDRIZZLE
-# Paths for new binlog api
 
-noinst_HEADERS+= libdrizzle/binlogevent/event_data.h
-noinst_HEADERS+= libdrizzle/binlogevent/event_header.h
-noinst_HEADERS+= libdrizzle/binlogevent/helper.h
-noinst_HEADERS+= libdrizzle/binlogevent/row_event.h
-noinst_HEADERS+= libdrizzle/binlogevent/table_map_event.h
-noinst_HEADERS+= libdrizzle/binlogevent/event_interface.h
-noinst_HEADERS+= libdrizzle/binlogevent/query_event.h
-noinst_HEADERS+= libdrizzle/binlogevent/row_iterator.h
-noinst_HEADERS+= libdrizzle/binlogevent/column_value.h
+# Paths for new binlog api
 
 libdrizzle_libdrizzle_redux_la_CFLAGS+= @OPENSSL_INCLUDES@
 libdrizzle_libdrizzle_redux_la_CXXFLAGS+= @OPENSSL_INCLUDES@

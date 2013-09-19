@@ -13,6 +13,9 @@
 #include<vector>
 
 using namespace std;
+
+#ifndef ROW_ITERATOR
+#define ROW_ITERATOR
 namespace binlogevent
 {
 	typedef vector<vector<ColumnValue> > RowVector;
@@ -39,3 +42,4 @@ namespace binlogevent
 			int current_pos;
 	};
 }
+#endif
