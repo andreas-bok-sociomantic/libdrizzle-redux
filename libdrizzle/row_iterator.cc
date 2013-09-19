@@ -9,7 +9,8 @@
  * summary: utility functions to get each row of Row event
  * 
  */
-#include"row_iterator.h"
+#include "config.h"
+#include<libdrizzle-5.1/row_iterator.h>
 
 using namespace binlogevent;
 

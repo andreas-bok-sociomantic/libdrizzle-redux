@@ -67,6 +67,7 @@
 #include <libdrizzle-5.1/statement.h>
 #include <libdrizzle-5.1/version.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif

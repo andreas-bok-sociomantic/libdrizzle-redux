@@ -24,3 +24,18 @@ nobase_include_HEADERS+= libdrizzle-5.1/structs.h
 nobase_include_HEADERS+= libdrizzle-5.1/verbose.h
 nobase_include_HEADERS+= libdrizzle-5.1/visibility.h
 nobase_include_HEADERS+= libdrizzle-5.1/version.h
+
+nobase_include_HEADERS+= libdrizzle-5.1/binlogapi.h
+nobase_include_HEADERS+= libdrizzle-5.1/binlog_client.h
+
+nobase_include_HEADERS+= libdrizzle-5.1/event_data.h
+nobase_include_HEADERS+= libdrizzle-5.1/event_header.h
+nobase_include_HEADERS+= libdrizzle-5.1/helper.h
+nobase_include_HEADERS+= libdrizzle-5.1/row_event.h
+nobase_include_HEADERS+= libdrizzle-5.1/table_map_event.h
+nobase_include_HEADERS+= libdrizzle-5.1/event_interface.h
+nobase_include_HEADERS+= libdrizzle-5.1/query_event.h
+nobase_include_HEADERS+= libdrizzle-5.1/xid_event.h
+nobase_include_HEADERS+= libdrizzle-5.1/row_iterator.h
+nobase_include_HEADERS+= libdrizzle-5.1/column_value.h
+

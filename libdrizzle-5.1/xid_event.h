@@ -18,7 +18,8 @@
 #endif
 using namespace std;
 
-
+#ifndef XID_EVENT
+#define XID_EVENT
 //using namespace binlogevent;
 namespace binlogevent
 {
@@ -41,7 +42,8 @@ namespace binlogevent
 			 *
 			 * @param[in] data Raw data from binglog.
 			 */
-			virtual void initWithData(const unsigned char * data);
+			DRIZZLE_API
+			void initWithData(const unsigned char * data);
 
 
 			//getters
@@ -49,32 +51,39 @@ namespace binlogevent
 			/**
 			 * @retval timestamp of event.
 			 */
+			DRIZZLE_API
 			uint32_t getTimestamp();
 			/**
 			 * @retval type of event.
 			 */
+			DRIZZLE_API
 			enum_event_type getType();
 			/**
 			 * @retval server-id of the originating mysql-server. Used to filter out events in circular replication.
 			 */
+			DRIZZLE_API
 			uint32_t getServerId();
 			/**
 			 * @retval of position of the next event .
 			 */
+			DRIZZLE_API
 			uint32_t getLogPos();
 			/**
 			 * @retval Binlog Event Flag from header
 			 */
+			DRIZZLE_API
 			uint16_t getFlagH();
 			
 			/**
 			 * @retval transaction id 
 			 */
+			DRIZZLE_API
 			uint64_t getXid();
 			
 			/**
 			 * set transaction id 
 			 */
+			DRIZZLE_API
 			void setXid(uint64_t value);
 
 
@@ -83,3 +92,4 @@ namespace binlogevent
 
 	}; // Xidevent 
 } /*namespace binlogevent*/
+#endif

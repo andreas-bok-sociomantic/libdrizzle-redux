@@ -9,21 +9,23 @@
  * summary: parse table map event
  *
  */
+#include "config.h"
 #include<iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
+#include "libdrizzle/common.h"
+#include "libdrizzle/commonapi.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
 #include<string.h>
 
-#ifndef table_map
+/*#ifndef table_map
 
 #define table_map
 
-#include"table_map_event.h"
+#include<libdrizzle-5.1/table_map_event.h>
 
-#endif
+#endif*/
 
 
 using namespace std;
@@ -86,7 +88,7 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	if(sizeof(data)-start_pos<getColumnCount())
 		return;
 	uint8_t *tmp_array = (uint8_t *)(malloc(sizeof(uint8_t)*getColumnCount()));
-	for(int i=0;i<getColumnCount();i++)
+	for(uint64_t i=0;i<getColumnCount();i++)
 	{
 		tmp_array[i]=(uint8_t)data[start_pos+i];
 	}
@@ -97,11 +99,11 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	int metaSize= getEncodedLen(start_pos,data);
 	if(metaSize==0)
 		return;
-	uint64_t *column_meta_data = (uint64_t *)(malloc(sizeof(uint64_t)*column_count));
+	column_meta_data = (uint64_t *)(malloc(sizeof(uint64_t)*column_count));
 	
 	if(sizeof(data)-start_pos<column_count)
 		return;
-	for(int col=0;col<column_count;col++)
+	for(uint64_t col=0;col<column_count;col++)
 	{
 		int type= column_type_def[col];
 		int nextBytes= lookup_metadata_field_size((enum_field_types)type);
@@ -186,6 +188,11 @@ enum_col_type TableMapEvent::getColType(int colNo)
 	{
 		 case LEN_ENC_STR:
 			 return (enum_col_type)1;
+		 case READ_1_BYTE:
+		 case READ_2_BYTE:
+		 case READ_4_BYTE:
+		 case READ_8_BYTE:
+		 case NOT_FOUND:
 		 default:
 			 return (enum_col_type)2;
 	}
