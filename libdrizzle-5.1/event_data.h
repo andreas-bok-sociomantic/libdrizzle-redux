@@ -42,10 +42,17 @@ namespace binlogevent
 			  *
 			  * @param[in] tableMap A reference to TableMapEvent object.
 			  */
-
-			void getTableMap(TableMapEvent&  tableMap);
-			void getRowEvent(RowEvent&  writeEvent);
+			DRIZZLE_API
+				void getTableMap(TableMapEvent&  tableMap);
+			DRIZZLE_API
+			void getWriteEvent(RowEvent&  writeEvent);
+			DRIZZLE_API
+			void getUpdateEvent(RowEvent&  updateEvent);
+			DRIZZLE_API
+			void getDeleteEvent(RowEvent&  deleteEvent);
+			DRIZZLE_API
 			void getQueryEvent(QueryEvent&  queryEvent);
+			DRIZZLE_API
 			void getXidEvent(XidEvent&  xidEvent);
 
 

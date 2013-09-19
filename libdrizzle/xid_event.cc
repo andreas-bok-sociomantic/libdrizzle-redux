@@ -9,21 +9,22 @@
  * summary: parse xid event
  *
  */
+#include "config.h"
 #include<iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
+#include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
 #include<string.h>
 
-#include"xid_event.h"
+#include<libdrizzle-5.1/xid_event.h>
 
 
 #ifndef HELPER
 #define HELPER
 
-#include"helper.h"
+#include<libdrizzle-5.1/helper.h>
 
 #endif
 

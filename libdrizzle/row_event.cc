@@ -10,8 +10,9 @@
  *
  */
 
+#include "config.h"
 #include<iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
+#include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -21,14 +22,14 @@
 #ifndef row_event
 #define row_event
 
-#include"row_event.h"
+#include<libdrizzle-5.1/row_event.h>
 
 #endif
 
 #ifndef HELPER
 #define HELPER
 
-#include"helper.h"
+#include<libdrizzle-5.1/helper.h>
 
 #endif
 
@@ -39,6 +40,8 @@ using namespace binlogevent;
 
 void RowEvent::initWithData(const unsigned char* data)
 {
+	if(row_event_type<0)  // Event type not exist
+		return;
 	uint64_t tmp;
 	int tmp_int;
 	int start_pos = header.setHeader(data);
@@ -78,7 +81,7 @@ void RowEvent::initWithData(const unsigned char* data)
 	size= (column_count-count_cnp+7)/8; // length of null bitmap in bytes 
 
 	bool tmp_bool[column_count-count_cnp];
-	int count_null = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp)); // return -1 when data problem 
+	count_cnp = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp)); // return -1 when data problem 
 	
 	if(count_cnp==-1)
 		return;
@@ -92,8 +95,8 @@ void RowEvent::initWithData(const unsigned char* data)
 	{
 		rows.vec_col_val.clear();
 		string str_col_val; // column value as string
-		unsigned int    int_col_val; // column value as int
-		for(int val=0;val<column_count;val++)
+		unsigned int    int_col_val = UINT_MAX; // column value as int
+		for(uint64_t val=0;val<column_count;val++)
 		{
 			if(column_bitmap[val]==0)
 				continue;
@@ -101,8 +104,7 @@ void RowEvent::initWithData(const unsigned char* data)
 			if(null_bitmap[val]==1)
 			{
 				str_col_val.clear();
-				int_col_val = UINT_MAX;
-				ColumnValue value(str_col_val,int_col_val,1,val); // 1 -> null, val is column number
+				ColumnValue value(str_col_val,1,val); // 1 -> null, val is column number
 				rows.vec_col_val.push_back(value);
 				continue;
 
@@ -123,24 +125,25 @@ void RowEvent::initWithData(const unsigned char* data)
 						str_col_val.clear();
 						len=start_pos+len-1;
 
-						if(sizeof(data)-start_pos<len)
+						if((int)sizeof(data)-start_pos<len)
 							return;
 						for(int it=start_pos;it<=len;it++) // Formation of  string
 						{
 							str_col_val.push_back(data[it]);
 						}
-						ColumnValue value(str_col_val,int_col_val,0,val);  // 0 -> not null
+						ColumnValue value(str_col_val,0,val);  // 0 -> not null
 						rows.vec_col_val.push_back(value);
 						start_pos+=len; //length of string
 						break;
 					}
 				case READ_1_BYTE:
 					{
-						if(sizeof(data)-start_pos<1)
+						if((int)sizeof(data)-start_pos<1)
 							return;
 						str_col_val.clear();
 						int_col_val = (uint8_t)data[start_pos];
-						ColumnValue value(str_col_val,int_col_val,0,val);
+						str_col_val = getIntToStr(int_col_val);
+						ColumnValue value(str_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_1_BYTE;
 						break;
@@ -151,7 +154,8 @@ void RowEvent::initWithData(const unsigned char* data)
 						int_col_val = getByte2(start_pos,data);
 						if(int_col_val==USHRT_MAX)
 							return;
-						ColumnValue value(str_col_val,int_col_val,0,val);
+						str_col_val = getIntToStr(int_col_val);
+						ColumnValue value(str_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_2_BYTE;
 						break;
@@ -162,7 +166,8 @@ void RowEvent::initWithData(const unsigned char* data)
 						int_col_val = getByte4(start_pos,data);
 						if(int_col_val==UINT_MAX)
 							return;
-						ColumnValue value(str_col_val,int_col_val,0,val);
+						str_col_val = getIntToStr(int_col_val);
+						ColumnValue value(str_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_4_BYTE;
 						break;
@@ -173,9 +178,14 @@ void RowEvent::initWithData(const unsigned char* data)
 						int_col_val = getByte8(start_pos,data);
 						if(int_col_val==UINT_MAX)
 							return;
-						ColumnValue value(str_col_val,int_col_val,0,val);
+						str_col_val = getIntToStr(int_col_val);
+						ColumnValue value(str_col_val,0,val);
 						rows.vec_col_val.push_back(value);
 						start_pos+=(int)READ_8_BYTE;
+						break;
+					}
+				case NOT_FOUND:
+					{
 						break;
 					}
 
@@ -185,7 +195,7 @@ void RowEvent::initWithData(const unsigned char* data)
 		}
 		
 		rows.vec_rows.push_back(rows.vec_col_val);
-		if(header.event_size==start_pos)
+		if((int)header.event_size==start_pos)
 		{
 			rows.setCount(rows.vec_rows.size());
 			break;
@@ -197,7 +207,10 @@ void RowEvent::initWithData(const unsigned char* data)
 }
 
 // getters
-
+int RowEvent::getRowEventType()
+{
+	        return row_event_type;
+}
 uint32_t RowEvent::getTimestamp()
 {
 	return  header.timestamp;
@@ -259,7 +272,11 @@ RowVector RowEvent::getAllRows()
 
 
 //setters
-
+//setters
+void RowEvent::setRowEventType(int value)
+{
+	        row_event_type=value;
+}
 void RowEvent::setTableId(uint64_t value)
 {
 	table_id = value;

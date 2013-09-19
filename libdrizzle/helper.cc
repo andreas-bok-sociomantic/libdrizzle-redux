@@ -9,20 +9,22 @@
  * summary: Utility functions to parse event data
  *
  */
+#include "config.h"
 #include<iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
+#include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
 #include<string.h>
-#include"helper.h"
+#include<sstream>
+#include<libdrizzle-5.1/helper.h>
 
 using namespace std;
 
 uint32_t getByte4(int pos,const unsigned char* data)
 {
-	if(sizeof(data)-pos<4)
+	if((int)(sizeof(data)-pos)<4)
 	{
 		return UINT_MAX;
 	}
@@ -38,7 +40,7 @@ uint32_t getByte4(int pos,const unsigned char* data)
 
 uint32_t getByte3(int pos,const unsigned char* data)
 {
-	if(sizeof(data)-pos<3)
+	if((int)(sizeof(data)-pos)<3)
 	{
 		return UINT_MAX;
 	}
@@ -53,7 +55,7 @@ uint32_t getByte3(int pos,const unsigned char* data)
 
 uint16_t getByte2(int pos,const unsigned char* data)
 {
-	if(sizeof(data)-pos<2)
+	if((int)sizeof(data)-pos<2)
 	{
 		return USHRT_MAX;
 	}
@@ -68,7 +70,7 @@ uint16_t getByte2(int pos,const unsigned char* data)
 
 uint64_t getByte6(int pos,const unsigned char* data)
 {
-	if(sizeof(data)-pos<6)
+	if((int)sizeof(data)-pos<6)
 	{
 		return UINT_MAX;
 	}
@@ -86,7 +88,7 @@ uint64_t getByte6(int pos,const unsigned char* data)
 
 uint64_t getByte8(int pos,const unsigned char* data)
 {
-	if(sizeof(data)-pos<8)
+	if((int)sizeof(data)-pos<8)
 	{
 		return UINT_MAX;
 	}
@@ -106,7 +108,7 @@ uint64_t getByte8(int pos,const unsigned char* data)
 
 char * getString(int pos,int len,const unsigned char * data)
 {
-	if(sizeof(data)-pos<len)
+	if((int)sizeof(data)-pos<len)
 	{
 		return NULL;
 	}
@@ -120,16 +122,24 @@ char * getString(int pos,int len,const unsigned char * data)
 	return tmp;
 }
 
+std::string getIntToStr(uint64_t num)
+{
+	std::stringstream ss;
+	ss << num;
+	std::string str=ss.str();
+	return str;
+}
+
 uint64_t getEncodedLen(int& pos, const unsigned char *data)
 {
 	uint64_t len=0;
-	if(sizeof(data)-pos<1)
+	if((int)sizeof(data)-pos<1)
 	{
 		return 0;
 	}
 
 	int colBytes = bytes_col_count((uint32_t)data[pos]);
-	if(sizeof(data)-pos-1<colBytes)
+	if((int)sizeof(data)-pos-1<colBytes)
 	{
 		pos++;
 		return 0;
@@ -164,7 +174,7 @@ bool getNextBit(uint8_t& val)
 }
 int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit)
 {
-	if(sizeof(data)-start_pos<_byte)
+	if((int)sizeof(data)-start_pos<_byte)
 	{
 		return -1;
 	}
@@ -212,7 +222,7 @@ int lookup_metadata_field_size(enum_field_types field_type)
 		case MYSQL_TYPE_SHORT:
 		case MYSQL_TYPE_INT24:
 		case MYSQL_TYPE_LONG:
-		case MYSQL_TYPE_NULL:
+		case MYSQL_TYPE_LONGLONG:
 		case MYSQL_TYPE_NEWDATE:
 		case MYSQL_TYPE_DATE:
 		case MYSQL_TYPE_TIME:
@@ -221,6 +231,7 @@ int lookup_metadata_field_size(enum_field_types field_type)
 		case MYSQL_TYPE_TINY_BLOB:
 		case MYSQL_TYPE_MEDIUM_BLOB:
 		case MYSQL_TYPE_LONG_BLOB:
+		case MYSQL_TYPE_NULL:
 		default:
 			return 0;
 	}
@@ -263,12 +274,12 @@ enum_field_bytes lookup_field_bytes(enum_field_types field_type)
 		case MYSQL_TYPE_DOUBLE:
 		case MYSQL_TYPE_LONGLONG:
 			return READ_8_BYTE;
-	//	case MYSQL_TYPE_NULL: ???
-
-
+		
+		case MYSQL_TYPE_NULL:
 		case MYSQL_TYPE_ENUM:
 		case MYSQL_TYPE_SET:
 		case MYSQL_TYPE_GEOMETRY:
+		default:
 			return NOT_FOUND;
 
 	}

@@ -24,6 +24,8 @@ using namespace std;
 
 #endif
 
+#ifndef TABLE_MAP
+#define TABLE_MAP
 //using namespace binlogevent;
 namespace binlogevent
 {
@@ -54,7 +56,8 @@ namespace binlogevent
 			 *
 			 * @param[in] data Raw data from binglog.
 			 */
-			virtual void initWithData(const unsigned char * data);
+			DRIZZLE_API
+			void initWithData(const unsigned char * data);
 
 
 			//getters
@@ -62,108 +65,130 @@ namespace binlogevent
 			/**
 			 * @retval timestamp of event.
 			 */
+			DRIZZLE_API
 			uint32_t getTimestamp();
 			/**
 			 * @retval type of event.
 			 */
+			DRIZZLE_API
 			enum_event_type getType();
 			/**
 			 * @retval server-id of the originating mysql-server. Used to filter out events in circular replication.
 			 */
+			DRIZZLE_API
 			uint32_t getServerId();
 			/**
 			 * @retval of position of the next event .
 			 */
+			DRIZZLE_API
 			uint32_t getLogPos();
 			/**
 			 * @retval Binlog Event Flag from header
 			 */
+			DRIZZLE_API
 			uint16_t getFlagH();
 			
 			/**
 			 * @retval numeric table id 
 			 */
+			DRIZZLE_API
 			uint64_t getTableId();
 			/**
 			 * @retval flag of post header 
 			 */
+			DRIZZLE_API
 			uint16_t getFlagPh();
 			/**
 			 * @retval length of the schema name 
 			 */
+			DRIZZLE_API
 			int getSchemaNameLen();
 			/**
 			 * @retval schema name 
 			 */
+			DRIZZLE_API
 			char * getSchemaName();
 			/**
 			 * @retval length of table name
 			 */
+			DRIZZLE_API
 			int getTableNameLen();
 			/**
 			 * @retval table name 
 			 */
+			DRIZZLE_API
 			char * getTableName();
 			/**
 			 * In funtion : conversion of length-encoded integer into its numeric value
 			 * @retval number of columns in the table map  
 			 */
+			DRIZZLE_API
 			uint64_t getColumnCount();
 			/**
 			 * @retval array of column definitions, one byte per field type  
 			 */
+			DRIZZLE_API
 			 uint8_t * getColumnTypeDef();
 			
 			 /**
 			 * @retval enum {INT,STRING} as a type of column  
 			 */
 
+			DRIZZLE_API
 			 enum_col_type getColType(int colNo);
 
 			//setters
 
+			DRIZZLE_API
 			void setTableId(uint64_t value);
 			/**
 			 * set flag_ph.
 			 *
 			 * @param[in] value Post header flag.
 			 */
+			DRIZZLE_API
 			void setFlagPh(uint16_t value);
 			/**
 			 * set schema_name_len.
 			 *
 			 * @param[in] value Length of the schema name. 
 			 */
+			DRIZZLE_API
 			void setSchemaNameLen(uint8_t value);
 			/**
 			 * set schema_name.
 			 *
 			 * @param[in] value Schema Name or Database name.
 			 */
+			DRIZZLE_API
 			void setSchemaName(char *value);
 			/**
 			 * set table_name_len.
 			 *
 			 * @param[in] value Table name length.
 			 */
+			DRIZZLE_API
 			void setTableNameLen(uint8_t value);
 			/**
 			 * set table_name.
 			 *
 			 * @param[in] value Table name.
 			 */
+			DRIZZLE_API
 			void setTableName(char *value);
 			/**
 			 * set column_count.
 			 *
 			 * @param[in] value Column count in table map.
 			 */
+			DRIZZLE_API
 			void setColumnCount(uint64_t value);
 			/**
 			 * set column_type_def.
 			 *
 			 * @param[in] value Array of column definitions, one byte per field type
 			 */
+			DRIZZLE_API
 			void setColumnTypeDef(uint8_t * value);
 
 
@@ -181,3 +206,4 @@ namespace binlogevent
 
 	}; // tablemapevent
 } /*namespace binlogevent*/
+#endif

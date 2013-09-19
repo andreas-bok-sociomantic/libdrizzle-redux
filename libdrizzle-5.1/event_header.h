@@ -23,6 +23,9 @@
 
 using namespace std;
 
+#ifndef EVENT_HEADER
+#define EVENT_HEADER
+
 namespace binlogevent
 {
 	class EventHeader 
@@ -43,6 +46,7 @@ namespace binlogevent
 			{
 			}
 
+ 			DRIZZLE_API
 			int setHeader(unsigned const char* data);
 
 			friend class TableMapEvent;
@@ -61,4 +65,4 @@ namespace binlogevent
 
 	};
 } /*namespace binlogevent*/
-
+#endif

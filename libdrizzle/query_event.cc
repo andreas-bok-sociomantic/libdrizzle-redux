@@ -9,8 +9,9 @@
  * summary: parse query event
  *
  */
+#include "config.h"
 #include<iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
+#include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -20,7 +21,7 @@
 #ifndef write_map
 #define write_map
 
-#include"query_event.h"
+#include<libdrizzle-5.1/query_event.h>
 
 #endif
 //#include"helper.h"

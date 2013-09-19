@@ -67,6 +67,7 @@
 #include <libdrizzle-redux/statement.h>
 #include <libdrizzle-redux/version.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif

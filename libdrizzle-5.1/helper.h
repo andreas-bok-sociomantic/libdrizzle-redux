@@ -8,7 +8,11 @@
  *
  *
  */
+
 #include<limits.h>
+
+#ifndef HELPERS
+#define HELPERS
 typedef enum{
 	MYSQL_TYPE_DECIMAL,
 	MYSQL_TYPE_TINY,
@@ -72,6 +76,7 @@ typedef enum{
 	 ((uint64_t)(__b)==0xfc ? 2 : \
 	  ((uint64_t)(__b)==0xfd ? 3 : 8)))
 
+DRIZZLE_API
 bool getNextBit(uint8_t& val);
 /**
  * get 2 byte number from raw data
@@ -81,6 +86,7 @@ bool getNextBit(uint8_t& val);
  *
  *@retval 2 byte number
  */
+ DRIZZLE_API
 uint16_t getByte2(int pos,const unsigned char* data);
 /**
  * get 4 byte number from raw data
@@ -90,6 +96,7 @@ uint16_t getByte2(int pos,const unsigned char* data);
  *
  *@retval 4 byte number
  */
+ DRIZZLE_API
 uint32_t getByte4(int pos,const unsigned char* data);
 /**
  * get 3 byte number from raw data
@@ -99,6 +106,7 @@ uint32_t getByte4(int pos,const unsigned char* data);
  *
  *@retval 3 byte number
  */
+ DRIZZLE_API
 uint32_t getByte3(int pos,const unsigned char* data);
 /**
  * get 6 byte number from raw data
@@ -108,6 +116,7 @@ uint32_t getByte3(int pos,const unsigned char* data);
  *
  *@retval 6 byte number
  */
+ DRIZZLE_API
 uint64_t getByte6(int pos,const unsigned char* data);
 /**
  * get 8 byte number from raw data
@@ -117,6 +126,7 @@ uint64_t getByte6(int pos,const unsigned char* data);
  *
  *@retval 8 byte number
  */
+ DRIZZLE_API
 uint64_t getByte8(int pos,const unsigned char* data);
 /** gets the string of specified length
   *
@@ -124,14 +134,22 @@ uint64_t getByte8(int pos,const unsigned char* data);
   * @param[in] len Length of string
   * @param[in] data Raw data from binglog.
   */
+ DRIZZLE_API
 char * getString(int pos,int len,const unsigned char * data);
 
+ DRIZZLE_API
 uint64_t getEncodedLen(int& pos,const unsigned char * data);
 
+ DRIZZLE_API
 int lookup_metadata_field_size(enum_field_types field_type);
 
+ DRIZZLE_API
+std::string getIntToStr(uint64_t num);
 
+ DRIZZLE_API
 int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit);
 
+ DRIZZLE_API
 enum_field_bytes lookup_field_bytes(enum_field_types field_type);
 
+#endif

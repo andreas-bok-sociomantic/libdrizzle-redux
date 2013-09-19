@@ -21,6 +21,9 @@
 using namespace std;
 //using namespace binlogevent;
 
+#ifndef EVENT_INTERFACE
+#define EVENT_INTERFACE
+
 namespace binlogevent
 {
 	class Events
@@ -31,7 +34,7 @@ namespace binlogevent
 			Events()
 			{
 			}
-			virtual ~Events()
+			~Events()
 			{
 			}
 
@@ -40,10 +43,9 @@ namespace binlogevent
 			 *
 			 * @param[in] data Raw event data.
 			 */
-			virtual void initWithData(const unsigned char *data)=0;
 
 			EventHeader header;
 
 	};
 }  
-
+#endif
