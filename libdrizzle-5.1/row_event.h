@@ -134,41 +134,32 @@ namespace binlogevent
 
 			//setters
 
-			DRIZZLE_API
 			void setTableId(uint64_t value);
 			
 			/** set flag_ph.
 			  *
 			  * @param[in] value Post header flag.
 			  */
-			DRIZZLE_API
 			void setFlagPh(uint16_t value);
 			
 			/** set column_count.
 			  *
 			  * @param[in] value Column count in table map.
 			  */
-			DRIZZLE_API
 			void setColumnCount(uint64_t value);
 			
 			/** set column_bitmap.
 			  *
 			  * @param[in] bitmap Array 
 			  */
-			DRIZZLE_API
 			void setColumnPresentBitmap(bool * value);
 			
 			/** set null_bitmap.
 			  *
 			  * @param[in] null bitmap Array 
 			  */
-			DRIZZLE_API
 			void setNullBitmap(bool * value);
 
-			DRIZZLE_API
-			void setRowsCount(int value);
-
-			DRIZZLE_API
 			void setRowEventType(int value);
 
 

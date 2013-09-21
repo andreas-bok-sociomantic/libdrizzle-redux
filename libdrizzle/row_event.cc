@@ -68,8 +68,8 @@ void RowEvent::initWithData(const unsigned char* data)
 	int size= (column_count+7)/8; // length of present column bitmap1
 	
 	int count_cnp=0;  // count of column not present
-
-	bool tmp_present[column_count]; // bit array of column bitmap1
+	
+	bool *tmp_present = new bool(column_count); // bit array of column bitmap1
 	count_cnp = getBoolArray(tmp_present,data,start_pos,size,column_count); // return -1 when data problem 
 
 	if(count_cnp==-1)
@@ -80,7 +80,7 @@ void RowEvent::initWithData(const unsigned char* data)
 	start_pos+=size;	//null-bitmap
 	size= (column_count-count_cnp+7)/8; // length of null bitmap in bytes 
 
-	bool tmp_bool[column_count-count_cnp];
+	bool *tmp_bool = new bool(column_count-count_cnp);
 	count_cnp = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp)); // return -1 when data problem 
 	
 	if(count_cnp==-1)
@@ -197,7 +197,6 @@ void RowEvent::initWithData(const unsigned char* data)
 		rows.vec_rows.push_back(rows.vec_col_val);
 		if((int)header.event_size==start_pos)
 		{
-			rows.setCount(rows.vec_rows.size());
 			break;
 		}
 	}
@@ -253,7 +252,6 @@ bool * RowEvent::getColumnPresentBitmap()
 }
 RowVector RowEvent::getRows()
 {
-	rows.setCurrentPos(0);
 	return rows.vec_rows;
 }
 
@@ -296,9 +294,4 @@ void RowEvent::setColumnPresentBitmap(bool * value)
 void RowEvent::setNullBitmap(bool * value)
 {
 	null_bitmap = value;
-}
-
-void RowEvent::setRowsCount(int value)
-{
-	rows.setCount(value);
 }

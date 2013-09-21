@@ -24,22 +24,12 @@ namespace binlogevent
 	class RowIterator
 	{
 		public:
-			RowIterator():
-				count(-1),
-				current_pos(-1)
-		{
-		}
-			void next();
-			bool hasNext();
-			void setCount(int value);
-			int getPos();
-
+			RowIterator()
+			{
+			}
 			vector<vector<ColumnValue> > vec_rows;
 			vector<ColumnValue> vec_col_val;
-			void setCurrentPos(int value);
-		private:	
-			int count;
-			int current_pos;
+//			RowVector
 	};
 }
 #endif
