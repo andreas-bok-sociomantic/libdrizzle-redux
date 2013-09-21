@@ -116,33 +116,29 @@ namespace binlogevent
 			
 
 			//setters
-			/** set slave proxy Id
+			/** set master proxy Id
 			  *
-			  *@param[in] value Proxy Id of slave
+			  *@param[in] value Proxy Id of master
 			  */
 
-			DRIZZLE_API
 			void setProxyId(uint32_t value);
 			
 			/** set execution time.
 			  *
 			  * @param[in] value Execution time of query.
 			  */
-			DRIZZLE_API
 			void setExecutionTime(uint32_t value);
 			
 			/** set schema length
 			  *
 			  * @param[in] value Schema length of query.
 			  */
-			DRIZZLE_API
 			void setSchemaLength(uint8_t value);
 			
 			/** set error code.
 			  *
 			  * @param[in] value Error code if any error occurred.
 			  */
-			DRIZZLE_API
 			void setErrorCode(uint16_t value);
 
 

@@ -83,7 +83,7 @@ namespace binlogevent
 			/**
 			 * set transaction id 
 			 */
-			DRIZZLE_API
+			//DRIZZLE_API
 			void setXid(uint64_t value);
 
 
