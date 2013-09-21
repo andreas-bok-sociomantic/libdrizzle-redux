@@ -23,6 +23,11 @@
 using namespace std;
 using namespace binlogevent;
 
+void EventData::setData(const unsigned char* data)
+{
+	_data=data;
+}
+
 void EventData::getTableMap(TableMapEvent& tableMap)
 {
 	tableMap.initWithData(_data);

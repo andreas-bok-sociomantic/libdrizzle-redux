@@ -46,7 +46,6 @@ namespace binlogevent
 			{
 			}
 
- 			DRIZZLE_API
 			int setHeader(unsigned const char* data);
 
 			friend class TableMapEvent;

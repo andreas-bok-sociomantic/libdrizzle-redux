@@ -153,42 +153,36 @@ namespace binlogevent
 			 *
 			 * @param[in] value Length of the schema name. 
 			 */
-			DRIZZLE_API
 			void setSchemaNameLen(uint8_t value);
 			/**
 			 * set schema_name.
 			 *
 			 * @param[in] value Schema Name or Database name.
 			 */
-			DRIZZLE_API
 			void setSchemaName(char *value);
 			/**
 			 * set table_name_len.
 			 *
 			 * @param[in] value Table name length.
 			 */
-			DRIZZLE_API
 			void setTableNameLen(uint8_t value);
 			/**
 			 * set table_name.
 			 *
 			 * @param[in] value Table name.
 			 */
-			DRIZZLE_API
 			void setTableName(char *value);
 			/**
 			 * set column_count.
 			 *
 			 * @param[in] value Column count in table map.
 			 */
-			DRIZZLE_API
 			void setColumnCount(uint64_t value);
 			/**
 			 * set column_type_def.
 			 *
 			 * @param[in] value Array of column definitions, one byte per field type
 			 */
-			DRIZZLE_API
 			void setColumnTypeDef(uint8_t * value);
 
 
