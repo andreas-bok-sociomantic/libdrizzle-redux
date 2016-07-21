@@ -1283,10 +1283,10 @@ drizzle_return_t drizzle_state_read(drizzle_st *con)
     errno= translate_windows_error();
 #endif // defined _WIN32 || defined __CYGWIN__
 
-    drizzle_log_debug(con, "read fd=%d avail= %zd recv=%zd ssl= %d errno=%s",
+    drizzle_log_debug(con, "read fd=%d avail= %zd recv=%zd ssl= %d errno=%d: %s",
                       con->fd, available_buffer, read_size,
                       (con->ssl_state == DRIZZLE_SSL_STATE_HANDSHAKE_COMPLETE) ? 1 : 0,
-                      strerror(errno));
+                      errno, strerror(errno));
 
     if (read_size == 0)
     {
