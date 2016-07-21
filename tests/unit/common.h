@@ -48,15 +48,30 @@
 #define VARIABLE_IS_NOT_USED
 #endif
 
+#define POLLIN 0x0001
+#define POLLOUT 0x0004
+#define POLLERR 0x0008
+#define POLLHUP   0x010   /* Hung up.  */
+#define POLLNVAL  0x020   /* Invalid polling request.  */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern drizzle_st *con;
+extern drizzle_options_st *opts;
 
 /* Common connection setup used by the unit tests. 
  */
 extern void set_up_connection(void);
+
+/* Sets up a drizzle connection
+ *
+ * @param ev_watch_fn user specified callback function
+ * @param ev_context  user specified context
+ * @param non_block   flag for setting connection non-blocking
+ */
+extern void set_up_connection_advanced(drizzle_event_watch_fn *ev_watch_fn, void *cxt, bool _non_blocking);
 
 extern void close_connection_on_exit(void);
 
