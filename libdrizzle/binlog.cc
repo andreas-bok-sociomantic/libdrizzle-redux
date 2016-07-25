@@ -63,6 +63,7 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
   binlog->error_fn= error_fn;
   binlog->binlog_context= context;
   binlog->verify_checksums= verify_checksums;
+  binlog->state= DRIZZLE_BINLOG_STATE_INIT_COMPLETE;
 
   return binlog;
 }

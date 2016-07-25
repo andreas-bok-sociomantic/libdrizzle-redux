@@ -434,13 +434,15 @@ struct drizzle_binlog_st
   bool verify_checksums;
   bool has_checksums;
   drizzle_st *con;
+  drizzle_binlog_state_t state;
   drizzle_binlog_st() :
     binlog_fn(NULL),
     error_fn(NULL),
     binlog_context(NULL),
     verify_checksums(false),
     has_checksums(false),
-    con(NULL)
+    con(NULL),
+    state(DRIZZLE_BINLOG_STATE_NONE)
   { }
 };
 
