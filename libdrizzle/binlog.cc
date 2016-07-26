@@ -150,6 +150,11 @@ drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
   return drizzle_state_loop(con);
 }
 
+drizzle_binlog_state_t drizzle_binlog_get_state(drizzle_binlog_st *binlog)
+{
+  return binlog->state;
+}
+
 uint32_t drizzle_binlog_event_timestamp(drizzle_binlog_event_st *event)
 {
   if (event == NULL)

@@ -91,6 +91,15 @@ drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
                                         uint32_t start_position);
 
 /**
+ * Returns current state of the binlog
+ *
+ * @param[in] binlog instance of binlog
+ * @return binlog state
+*/
+DRIZZLE_API
+drizzle_binlog_state_t drizzle_binlog_get_state(drizzle_binlog_st *binlog);
+
+/**
 * Get the timestamp for the event received by the event callback
 *
 * @param[in] event The event from the binlog stream
