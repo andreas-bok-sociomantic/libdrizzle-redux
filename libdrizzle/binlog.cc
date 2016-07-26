@@ -147,6 +147,117 @@ drizzle_return_t drizzle_state_binlog_set_checksum(drizzle_st *con)
   return drizzle_state_loop(con);
 }
 
+
+drizzle_return_t drizzle_state_binlog_connect(drizzle_st *con)
+{
+  if (con == NULL)
+  {
+    return DRIZZLE_RETURN_INVALID_ARGUMENT;
+  }
+
+  con->push_state(drizzle_state_read);
+
+  drizzle_log_debug(con, _FN_IN_ " drizzle_state_binlog_connect stack_size=%ld", con->state_stack_count());
+
+  drizzle_return_t ret;
+  drizzle_result_st *result;
+
+  if (ret != DRIZZLE_RETURN_OK)
+  {
+    result= drizzle_command_write(con, NULL, DRIZZLE_COMMAND_BINLOG_DUMP,
+    con->binlog->data, con->binlog->filename_len, con->binlog->filename_len, &ret);
+    drizzle_result_free(result);
+    drizzle_log_debug(con, "drizzle_state_binlog_connect, state=%d ret=%s, result=%d", con->binlog->state, drizzle_strerror(ret), (result == NULL));
+
+    con->push_state(drizzle_state_binlog_connect);
+  }
+  else
+  {
+    con->clear_state();
+    con->binlog->state=DRIZZLE_BINLOG_STATE_PREPARE_COMPLETE;
+  }
+
+  drizzle_log_debug(con, _FN_OUT_ " drizzle_state_binlog_connect ret=%s, stack_size=%ld",
+    drizzle_strerror(ret), con->state_stack_count());
+
+  return drizzle_state_loop(con);
+}
+
+drizzle_return_t drizzle_binlog_connect(drizzle_binlog_st *binlog, uint32_t server_id,
+                                          const char *file, uint32_t start_position);
+drizzle_return_t drizzle_binlog_connect(drizzle_binlog_st *binlog, uint32_t server_id,
+                                          const char *file, uint32_t start_position)
+{
+  drizzle_st *con = binlog->con;
+//  unsigned char data[128];
+  unsigned char *ptr;
+  uint8_t len= 0, fn_len= 0;
+  drizzle_result_st *result;
+  drizzle_return_t ret;
+
+  ptr= binlog->data;
+
+  drizzle_log_debug(con, _FN_IN_ " drizzle_binlog_connect file=%s stack_size=%ld",
+    file, binlog->con->state_stack_count());
+
+  // Start position less than binlog magic size is wrong
+  if (start_position < 4)
+    start_position = 4;
+
+  // Start position
+  drizzle_set_byte4(ptr, start_position);
+  ptr+= 4;
+  // Binlog flags
+  drizzle_set_byte2(ptr, 0);
+  ptr+= 2;
+  // Server ID
+  drizzle_set_byte4(ptr, server_id);
+  ptr+= 4;
+
+  len= 4 +  // Start position
+       2 +  // Binlog flags
+       4;   // Server ID
+
+  // Prevent buffer overflow with long binlog filenames
+  if (file)
+  {
+    if (strlen(file) >= (size_t)(128 - len))
+    {
+      fn_len= 128 - len;
+    }
+    else
+    {
+      fn_len = strlen(file);
+    }
+    len+= fn_len;
+    memcpy(ptr, file, fn_len);
+  }
+  binlog->filename_len = len;
+
+  if (drizzle_options_get_non_blocking(&binlog->con->options))
+  {
+    con->push_state(drizzle_state_binlog_connect);
+    return drizzle_state_loop(con);
+  }
+  else
+  {
+    result= drizzle_command_write(con, NULL, DRIZZLE_COMMAND_BINLOG_DUMP,
+                                   binlog->data, binlog->filename_len, binlog->filename_len, &ret);
+
+    drizzle_log_debug(con, "result %d", (result == NULL));
+
+    if (ret != DRIZZLE_RETURN_OK)
+    {
+      return ret;
+    }
+
+    binlog->state= DRIZZLE_BINLOG_STATE_PREPARE_COMPLETE;
+  }
+
+  return ret;
+  drizzle_log_debug(con, _FN_OUT_ " drizzle_binlog_connect stack_size=%ld", con->state_stack_count());
+}
+
 drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
                                           uint32_t server_id,
                                           const char *file,

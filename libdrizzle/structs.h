@@ -440,6 +440,8 @@ struct drizzle_binlog_st
   bool has_checksums;
   drizzle_st *con;
   drizzle_binlog_state_t state;
+  unsigned char data[128];
+  uint8_t filename_len;
   drizzle_binlog_st() :
     binlog_fn(NULL),
     error_fn(NULL),
