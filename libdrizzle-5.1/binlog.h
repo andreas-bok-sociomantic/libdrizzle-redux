@@ -91,6 +91,12 @@ drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
                                         uint32_t start_position);
 
 DRIZZLE_API
+drizzle_return_t drizzle_binlog_start2(drizzle_binlog_st *binlog,
+                                       uint32_t server_id,
+                                       const char *file,
+                                       uint32_t start_position);
+
+DRIZZLE_API
 drizzle_return_t drizzle_binlog_set_checksum(drizzle_binlog_st *binlog);
 
 /**

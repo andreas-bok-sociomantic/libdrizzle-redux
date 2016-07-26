@@ -258,6 +258,53 @@ drizzle_return_t drizzle_binlog_connect(drizzle_binlog_st *binlog, uint32_t serv
   drizzle_log_debug(con, _FN_OUT_ " drizzle_binlog_connect stack_size=%ld", con->state_stack_count());
 }
 
+drizzle_return_t drizzle_binlog_start2(drizzle_binlog_st *binlog,
+                                          uint32_t server_id,
+                                          const char *file,
+                                          uint32_t start_position)
+{
+  if (binlog == NULL )
+  {
+    return DRIZZLE_RETURN_INVALID_ARGUMENT;
+  }
+  drizzle_log_debug(binlog->con, _FN_IN_ " drizzle_binlog_start2 stack_size=%ld", binlog->con->state_stack_count());
+  bool connected = false;
+  uint retries = 3;
+  while (!connected && retries)
+  {
+  switch (binlog->state)
+  {
+    case DRIZZLE_BINLOG_STATE_INIT_COMPLETE:
+      drizzle_binlog_set_checksum(binlog);
+     break;
+    case DRIZZLE_BINLOG_STATE_SET_CHECKSUM_COMPLETE:
+      drizzle_binlog_connect(binlog, server_id, file, start_position);
+      break;
+    case DRIZZLE_BINLOG_STATE_PREPARE_COMPLETE:
+      drizzle_binlog_read(binlog);
+      retries--;
+      break;
+    case DRIZZLE_BINLOG_STATE_CONNECTED:
+      connected = true;
+      break;
+    case DRIZZLE_BINLOG_STATE_NONE:
+    default:
+      return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    }
+  }
+
+  drizzle_log_debug(binlog->con, _FN_OUT_ " drizzle_binlog_start2, binlog->state=%s, "
+    "con->has_state=%d, stack_list_count=%d",
+    drizzle_binlog_strstate(binlog->state),
+    binlog->con->has_state(), binlog->con->state_stack_count());
+  if (!binlog->con->has_state())
+    {
+      binlog->con->pop_state();
+      drizzle_binlog_read(binlog);
+    }
+  return drizzle_state_loop(binlog->con);
+}
+
 drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
                                           uint32_t server_id,
                                           const char *file,
