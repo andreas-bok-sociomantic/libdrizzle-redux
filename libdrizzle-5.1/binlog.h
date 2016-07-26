@@ -90,6 +90,9 @@ drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
                                         const char *file,
                                         uint32_t start_position);
 
+DRIZZLE_API
+drizzle_return_t drizzle_binlog_set_checksum(drizzle_binlog_st *binlog);
+
 /**
  * Returns current state of the binlog
  *

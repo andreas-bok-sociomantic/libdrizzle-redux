@@ -64,13 +64,87 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
   binlog->binlog_context= context;
   binlog->verify_checksums= verify_checksums;
   binlog->state= DRIZZLE_BINLOG_STATE_INIT_COMPLETE;
-
+  con->binlog = binlog;
   return binlog;
 }
 
 void drizzle_binlog_free(drizzle_binlog_st *binlog)
 {
   delete binlog;
+}
+
+/**
+ * Hack for MySQL 5.6 to say that client support checksums
+ *
+ * @param[in] binlog instance of binlog
+ * @return Standard drizzle return value.
+ */
+drizzle_return_t drizzle_binlog_set_checksum(drizzle_binlog_st *binlog)
+{
+  drizzle_return_t ret;
+  drizzle_result_st *result;
+  result= drizzle_query(binlog->con, "SET @master_binlog_checksum='NONE'", 0, &ret);
+  drizzle_result_free(result);
+
+  drizzle_log_debug(binlog->con, _FN_IN_ " drizzle_binlog_set_checksum, stack_size=%ld",
+    binlog->con->state_stack_count());
+
+  if (drizzle_options_get_non_blocking(&binlog->con->options))
+  {
+      binlog->con->push_state(drizzle_state_binlog_set_checksum);
+  }
+  else {
+    if (ret != DRIZZLE_RETURN_OK)
+    {
+      return ret;
+    }
+    binlog->state= DRIZZLE_BINLOG_STATE_SET_CHECKSUM_COMPLETE;
+  }
+
+  drizzle_log_debug(binlog->con, _FN_OUT_ " drizzle_binlog_set_checksum, stack_size=%ld",
+    binlog->con->state_stack_count());
+
+  return drizzle_state_loop(binlog->con);
+}
+
+/**
+ * State function for setting checksum
+ *
+ * @param[in] binlog instance of drizzle
+ * @return Standard drizzle return value.
+ */
+drizzle_return_t drizzle_state_binlog_set_checksum(drizzle_st *con)
+{
+  if (con == NULL)
+  {
+    return DRIZZLE_RETURN_INVALID_ARGUMENT;
+  }
+
+  drizzle_return_t ret;
+  drizzle_result_st *result;
+
+  drizzle_log_debug(con, _FN_IN_ " drizzle_state_binlog_set_checksum stack_size %ld",
+    con->state_stack_count());
+
+  con->push_state(drizzle_state_read);
+
+  if (ret != DRIZZLE_RETURN_OK)
+  {
+    result= drizzle_query(con, "SET @master_binlog_checksum='NONE'", 0, &ret);
+    if (result != NULL)
+      drizzle_result_free(result);
+    con->push_state(drizzle_state_binlog_set_checksum);
+  }
+  else
+  {
+    con->binlog->state= DRIZZLE_BINLOG_STATE_SET_CHECKSUM_COMPLETE;
+    return DRIZZLE_RETURN_OK;
+  }
+
+  drizzle_log_debug(con, _FN_OUT_ " drizzle_state_binlog_set_checksum ret=%s stack_size %ld",
+    drizzle_strerror(ret), con->state_stack_count());
+
+  return drizzle_state_loop(con);
 }
 
 drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
