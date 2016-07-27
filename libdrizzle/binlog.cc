@@ -155,6 +155,19 @@ drizzle_binlog_state_t drizzle_binlog_get_state(drizzle_binlog_st *binlog)
   return binlog->state;
 }
 
+const char *drizzle_binlog_strstate(const drizzle_binlog_state_t state)
+{
+  switch (state)
+  {
+    default:
+    case DRIZZLE_BINLOG_STATE_NONE: return "BINLOG_STATE_NONE";
+    case DRIZZLE_BINLOG_STATE_INIT_COMPLETE: return "BINLOG_STATE_INIT_COMPLETE";
+    case DRIZZLE_BINLOG_STATE_SET_CHECKSUM_COMPLETE: return "BINLOG_STATE_SET_CHECKSUM_COMPLETE";
+    case DRIZZLE_BINLOG_STATE_PREPARE_COMPLETE: return "BINLOG_STATE_PREPARE_COMPLETE";
+    case DRIZZLE_BINLOG_STATE_CONNECTED: return "BINLOG_STATE_CONNECTED";
+  }
+}
+
 uint32_t drizzle_binlog_event_timestamp(drizzle_binlog_event_st *event)
 {
   if (event == NULL)
