@@ -258,6 +258,37 @@ drizzle_return_t drizzle_binlog_connect(drizzle_binlog_st *binlog, uint32_t serv
   drizzle_log_debug(con, _FN_OUT_ " drizzle_binlog_connect stack_size=%ld", con->state_stack_count());
 }
 
+drizzle_return_t drizzle_binlog_read(drizzle_binlog_st *binlog)
+{
+  if (binlog == NULL)
+  {
+    return DRIZZLE_RETURN_INVALID_ARGUMENT;
+  }
+
+  drizzle_log_debug(binlog->con, _FN_IN_ " drizzle_binlog_read ");
+
+  drizzle_return_t ret;
+  if (!binlog->con->has_state())
+  {
+    binlog->con->pop_state();
+
+    ret = drizzle_state_loop(binlog->con);
+    drizzle_log_debug(binlog->con, "ret = %s, stack_size=%ld",
+    drizzle_strerror(ret), binlog->con->state_stack_count());
+
+  }
+  else
+  {
+    binlog->con->push_state(drizzle_state_binlog_read);
+    binlog->con->push_state(drizzle_state_packet_read);
+    ret = binlog->con->current_state();
+  }
+
+  drizzle_log_debug(binlog->con, _FN_OUT_ " drizzle_binlog_read");
+
+  return ret;
+}
+
 drizzle_return_t drizzle_binlog_start2(drizzle_binlog_st *binlog,
                                           uint32_t server_id,
                                           const char *file,

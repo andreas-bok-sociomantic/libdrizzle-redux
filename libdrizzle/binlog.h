@@ -42,3 +42,5 @@ drizzle_return_t drizzle_state_binlog_read(drizzle_st *con);
 drizzle_return_t drizzle_state_binlog_set_checksum(drizzle_st *con);
 
 drizzle_return_t drizzle_state_binlog_connect(drizzle_st *con);
+
+drizzle_return_t drizzle_binlog_read(drizzle_binlog_st *binlog);
