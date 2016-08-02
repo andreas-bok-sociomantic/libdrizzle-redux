@@ -45,8 +45,24 @@
 #include <cstdio>
 #include <cstdlib>
 
+/* user provided callback
+*/
+static drizzle_return_t con_event_watch_fn(drizzle_st *_con, short _events, void *_context)
+{
+  fprintf(stdout, BLU "UTEST: " RESET "con_event_watch_fn status %d, events %d, cxt %d, "
+    "error_code=%d\n",
+  drizzle_status(_con), _events, _context == NULL, drizzle_error_code(_con));
+
+  short events = 0;
+
+  events |= _events;
+  drizzle_set_events(con, events);
+  return DRIZZLE_RETURN_OK;
+}
+
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {
+  fprintf(stderr, BLU "UTEST: " RESET "binlog_error %s\n", drizzle_strerror(ret));
   (void) context;
   ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "%s(%s)", drizzle_error(connection), drizzle_strerror(ret));
 }
@@ -55,7 +71,12 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 {
   (void) context;
   uint32_t timestamp;
+  drizzle_st *_con = (drizzle_st *) context;
   timestamp= drizzle_binlog_event_timestamp(event);
+
+  fprintf(stderr, "UTEST: binlog_event %d con.status %d\n",  drizzle_binlog_event_type(event),
+    drizzle_status(_con));
+
   /* Test to see if timestamp is greater than 2012-01-01 00:00:00, corrupted
    * timestamps will have weird values that shoud fail this after several
    * events.  Also rotate event doesn't have a timestamp so need to add 0
