@@ -364,6 +364,11 @@ public:
     return _state_stack_count == 0;
   }
 
+  size_t state_stack_count()
+  {
+    return _state_stack_count;
+  }
+
   drizzle_return_t current_state()
   {
     return _state_stack_list->func();
