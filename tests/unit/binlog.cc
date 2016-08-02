@@ -88,18 +88,67 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
   ASSERT_FALSE_((drizzle_binlog_event_type(event) >= DRIZZLE_EVENT_TYPE_END), "Bad event type: %d", drizzle_binlog_event_type(event));
 }
 
+
+/*Validate connecting to and parsing binlog*/
+void validate_binlog()
+{
+  drizzle_binlog_st *binlog;
+  drizzle_return_t ret;
+  int _server_id = 0; // read binary logs to end and finish
+  bool _non_blocking = true;
+  short poll_events = POLLIN;
+  poll_events |= POLLOUT;
+  set_up_connection_advanced(con_event_watch_fn, (void*) NULL, _non_blocking);
+
+  drizzle_set_verbose(con, DRIZZLE_VERBOSE_DEBUG);
+
+  //drizzle_set_events(con, poll_events);
+
+  binlog= drizzle_binlog_init(con, binlog_event, binlog_error, (void*) con, true);
+
+  ret= drizzle_binlog_start2(binlog, _server_id, "mysql-bin.000038", 0);
+
+  SKIP_IF_(ret == DRIZZLE_RETURN_ERROR_CODE, "Binlog is not open?: %s(%s)",
+    drizzle_error(con), drizzle_strerror(ret));
+
+  //ASSERT_EQ_(DRIZZLE_BINLOG_STATE_PREPARE_COMPLETE, drizzle_binlog_get_state(binlog),
+  //  "Binlog not started correctly");
+  fprintf(stderr, "UTEST: ret %s\n", drizzle_strerror(ret));
+  //ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "Drizzle binlog start failure: %s(%s)", drizzle_error(con), drizzle_strerror(ret));
+}
+
+/* Try to do the hack for setting master_binlog_checksum with
+*/
+void validate_checksum()
+{
+  drizzle_binlog_st *binlog;
+  drizzle_return_t ret;
+  bool _non_blocking = true;
+
+  short poll_events = POLLIN;
+
+  set_up_connection_advanced(con_event_watch_fn, (void*) NULL, _non_blocking);
+
+  drizzle_set_verbose(con, DRIZZLE_VERBOSE_INFO);
+
+  drizzle_set_events(con, poll_events);
+
+  binlog= drizzle_binlog_init(con, binlog_event, binlog_error, (void*) con, true);
+
+  ret = drizzle_binlog_set_checksum(binlog);
+  ASSERT_EQ_(DRIZZLE_BINLOG_STATE_SET_CHECKSUM_COMPLETE, drizzle_binlog_get_state(binlog),
+    "Binlog checksum not set");
+
+  fprintf(stderr, "UTEST: drizzle_wait: ret %s\n", drizzle_strerror(ret));
+}
+
 int main(int argc, char *argv[])
 {
   (void) argc;
   (void) argv;
-  drizzle_binlog_st *binlog;
-  drizzle_return_t ret;
 
-  set_up_connection();
-  
-  binlog= drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
-  ret= drizzle_binlog_start(binlog, 0, "", 0);
-  SKIP_IF_(ret == DRIZZLE_RETURN_ERROR_CODE, "Binlog is not open?: %s(%s)", drizzle_error(con), drizzle_strerror(ret));
-  ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "Drizzle binlog start failure: %s(%s)", drizzle_error(con), drizzle_strerror(ret));
+  validate_binlog();
+//  validate_checksum();
+
   return EXIT_SUCCESS;
 }
