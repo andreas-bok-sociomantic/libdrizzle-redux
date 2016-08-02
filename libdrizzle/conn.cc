@@ -210,6 +210,7 @@ void drizzle_close(drizzle_st *con)
 
 drizzle_return_t drizzle_set_events(drizzle_st *con, short events)
 {
+  drizzle_log_debug(con, CYN " drizzle_set_events" RESET);
   drizzle_return_t ret;
 
   if ((con->events | events) == con->events)
@@ -235,6 +236,7 @@ drizzle_return_t drizzle_set_events(drizzle_st *con, short events)
 
 drizzle_return_t drizzle_set_revents(drizzle_st *con, short revents)
 {
+  drizzle_log_debug(con, _FN_IN_ " drizzle_set_revents");
   drizzle_return_t ret;
 
   if (con == NULL)
@@ -1105,9 +1107,11 @@ drizzle_return_t drizzle_state_connect(drizzle_st *con)
       {
         if (connect_poll(con))
         {
+          drizzle_log_debug(con, MAG "CONN-POLL: EINPROGRESS" RESET);
           con->pop_state();
           return DRIZZLE_RETURN_OK;
         }
+        drizzle_log_debug(con, MAG "CONN-NOPOLL: EINPROGRESS" RESET);
       }
       else if (errno == ECONNREFUSED || errno == ENETUNREACH || errno == ETIMEDOUT)
       {
@@ -1140,7 +1144,7 @@ drizzle_return_t drizzle_state_connecting(drizzle_st *con)
     return DRIZZLE_RETURN_INVALID_ARGUMENT;
   }
 
-  drizzle_log_debug(con, "drizzle_state_connecting");
+  drizzle_log_debug(con, REDB "drizzle_state_connecting" RESET);
 
   while (1)
   {

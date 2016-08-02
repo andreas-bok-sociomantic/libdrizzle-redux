@@ -91,6 +91,8 @@ drizzle_return_t drizzle_binlog_start(drizzle_binlog_st *binlog,
 
   con= binlog->con;
 
+  drizzle_log_debug(con, GRN "Enter drizzle_binlog_start" RESET);
+
   // Hack in 5.6 to say that client support checksums
   result= drizzle_query(con, "SET @master_binlog_checksum='NONE'", 0, &ret);
   drizzle_result_free(result);

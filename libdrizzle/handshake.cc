@@ -90,7 +90,7 @@ drizzle_return_t drizzle_state_handshake_server_read(drizzle_st *con)
   {
     return DRIZZLE_RETURN_INVALID_ARGUMENT;
   }
-  drizzle_log_debug(con, "drizzle_state_handshake_server_read");
+  drizzle_log_debug(con, YEL "drizzle_state_handshake_server_read" RESET);
 
   /* Assume the entire handshake packet will fit in the buffer. */
   if (con->buffer_size < con->packet_size)
@@ -334,7 +334,7 @@ drizzle_return_t drizzle_state_handshake_client_read(drizzle_st *con)
   {
     return DRIZZLE_RETURN_INVALID_ARGUMENT;
   }
-  drizzle_log_debug(con, "drizzle_state_handshake_client_read");
+  drizzle_log_debug(con, YEL "drizzle_state_handshake_client_read" RESET);
 
   /* Assume the entire handshake packet will fit in the buffer. */
   if (con->buffer_size < con->packet_size)
@@ -645,7 +645,7 @@ drizzle_return_t drizzle_state_handshake_result_read(drizzle_st *con)
   {
     return DRIZZLE_RETURN_INVALID_ARGUMENT;
   }
-  drizzle_log_debug(con, "drizzle_state_handshake_result_read");
+  drizzle_log_debug(con, YEL "drizzle_state_handshake_result_read" RESET);
 
   drizzle_result_st *result = drizzle_result_create(con);
 
