@@ -259,9 +259,6 @@ void drizzle_socket_set_option(drizzle_st *con, drizzle_socket_option_t option,
     case DRIZZLE_SOCKET_OPTION_KEEPINTVL:
       con->options.keepintvl = value;
       break;
-
-    default:
-      break;
   }
 }
 
@@ -285,9 +282,6 @@ int drizzle_socket_get_option(drizzle_st *con, drizzle_socket_option_t option)
 
     case DRIZZLE_SOCKET_OPTION_KEEPINTVL:
       return con->options.keepintvl;
-
-    default:
-      return -1;
   }
 }
 
@@ -913,9 +907,6 @@ void drizzle_reset_addrinfo(drizzle_st *con)
   case DRIZZLE_CON_SOCKET_UDS:
     con->socket.uds.path_buffer[0]= 0;
     break;
-
-  default:
-    break;
   }
 
   con->addrinfo_next= NULL;
@@ -989,9 +980,6 @@ drizzle_return_t drizzle_state_addrinfo(drizzle_st *con)
     break;
 
   case DRIZZLE_CON_SOCKET_UDS:
-    break;
-
-  default:
     break;
   }
 

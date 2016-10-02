@@ -422,7 +422,6 @@ drizzle_return_t drizzle_state_binary_field_read(drizzle_st *con)
         "Unexpected column type: DRIZZLE_COLUMN_TYPE_NULL");
       con->result->field_size= 0;
       return DRIZZLE_RETURN_UNEXPECTED_DATA;
-      break;
     case DRIZZLE_COLUMN_TYPE_TINY:
       con->result->field_size= 1;
       break;
@@ -469,7 +468,6 @@ drizzle_return_t drizzle_state_binary_field_read(drizzle_st *con)
     case DRIZZLE_COLUMN_TYPE_TIME2:
     default:
       return DRIZZLE_RETURN_UNEXPECTED_DATA;
-      break;
   }
 
   con->result->field= (char*) con->buffer_ptr;

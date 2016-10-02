@@ -485,7 +485,6 @@ const char *drizzle_binlog_event_type_str(drizzle_binlog_event_types_t event_typ
       case DRIZZLE_EVENT_TYPE_ANONYMOUS_GTID : return "DRIZZLE_EVENT_TYPE_ANONYMOUS_GTID";
       case DRIZZLE_EVENT_TYPE_PREVIOUS_GTIDS : return "DRIZZLE_EVENT_TYPE_PREVIOUS_GTIDS";
       case DRIZZLE_EVENT_TYPE_END : return "DRIZZLE_EVENT_TYPE_END";
-      default : return "DRIZZLE_EVENT_TYPE_UNKNOWN";
     }
 }
 
