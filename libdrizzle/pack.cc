@@ -441,13 +441,9 @@ static drizzle_return_t _pack_scramble_hash(drizzle_st *con,
   unsigned char hash_tmp1[SHA1_DIGEST_LENGTH];
   unsigned char hash_tmp2[SHA1_DIGEST_LENGTH];
 
-  if (SHA1_DIGEST_LENGTH != DRIZZLE_MAX_SCRAMBLE_SIZE)
-  {
-    drizzle_set_error(con, __func__,
-                      "SHA1 hash size mismatch:%u:%u", SHA1_DIGEST_LENGTH,
-                      DRIZZLE_MAX_SCRAMBLE_SIZE);
-    return DRIZZLE_RETURN_INTERNAL_ERROR;
-  }
+  // SHA1 hash size mismatch. Must be eqyal equal to max scramble size
+  static_assert(SHA1_DIGEST_LENGTH == DRIZZLE_MAX_SCRAMBLE_SIZE,
+    "SHA1 hash size mismatch");
 
   if (con->scramble == NULL)
   {

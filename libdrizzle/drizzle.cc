@@ -222,9 +222,6 @@ drizzle_st *drizzle_clone(drizzle_st *drizzle, const drizzle_st *from)
   case DRIZZLE_CON_SOCKET_UDS:
     drizzle_set_uds(drizzle, from->socket.uds.path_buffer);
     break;
-
-  default:
-    break;
   }
 
   return drizzle;
