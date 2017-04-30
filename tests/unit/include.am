@@ -21,6 +21,20 @@ valgrind-binlog: tests/unit/binlog
 check-binlog: tests/unit/binlog
 	tests/unit/binlog
 
+tests_unit_binlogapi_SOURCES= tests/unit/binlogapi.cc tests/unit/common.c
+tests_unit_binlogapi_LDADD= libdrizzle/libdrizzle-redux.la
+check_PROGRAMS+= tests/unit/binlogapi
+noinst_PROGRAMS+= tests/unit/binlogapi
+
+gdb-binlogapi: tests/unit/binlogapi
+	@$(GDB_COMMAND) tests/unit/binlogapi
+
+valgrind-binlogapi: tests/unit/binlogapi
+	@$(VALGRIND_COMMAND) tests/unit/binlogapi
+
+check-binlogapi: tests/unit/binlogapi
+	tests/unit/binlogapi
+
 tests_unit_event_callback_SOURCES= tests/unit/event_callback.c
 tests_unit_event_callback_LDADD= libdrizzle/libdrizzle-redux.la
 nodist_EXTRA_tests_unit_event_callback_SOURCES = dummy.cxx
