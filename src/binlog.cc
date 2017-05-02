@@ -396,6 +396,8 @@ drizzle_return_t drizzle_state_binlog_read(drizzle_st *con)
     con->pop_state();
   }
 
+  printf("Data:\n%2x\n", *con->binlog->event.data);
+  printf("Rawdata:\n%2x\n", *con->binlog->event.raw_data);
   con->binlog->binlog_fn(&con->binlog->event, con->binlog->binlog_context);
   con->push_state(drizzle_state_binlog_read);
   con->push_state(drizzle_state_packet_read);
