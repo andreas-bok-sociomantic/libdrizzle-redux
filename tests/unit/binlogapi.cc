@@ -52,7 +52,10 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 		data= drizzle_binlog_event_raw_data(event);
 		EventData event_raw_data(data);
 		event_raw_data.getTableMap(tableMap);
-		cout << "Timestamp by data and raw_data :" << tableMap.getTableName() << ":  " << ts << endl;
+		printf("Timestamp %d\n", ts);
+		printf("Logpos %d\n", tableMap.getLogPos());
+		printf("Schemaname: %s\n", tableMap.getSchemaName());
+		printf("Tablename: %s\n", tableMap.getTableName());
 
 		uint8_t *val=  tableMap.getColumnTypeDef();
 		printf("cols: %lu\n", tableMap.getColumnCount());
