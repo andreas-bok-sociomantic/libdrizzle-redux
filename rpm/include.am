@@ -6,6 +6,12 @@
 
 .PHONY: clean-rpm rpm release-rpm
 
+FPM_OPTS := -s dir -n "${PACKAGE}" \
+			--architecture all \
+			--maintainer "$pkgmaint" \
+
+PACKAGE_MAINTAINER=$(shell "`git config user.name` <`git config user.email`>")
+
 rpm: clean-rpm
 	./configure --prefix=/usr
 	$(MAKE) DESTDIR=${abs_builddir}/rpm/install install
@@ -24,3 +30,6 @@ release-rpm:
 
 clean-rpm:
 	-rm -rf rpm/*.rpm rpm/install
+
+test-rpm:
+	@echo $(PACKAGE_MAINTAINER)
