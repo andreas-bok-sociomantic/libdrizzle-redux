@@ -6,7 +6,7 @@
 
 .PHONY: clean-rpm rpm release-rpm
 
-LIB_MAJOR_VERSION :=`echo ${LIBDRIZZLE_LIBRARY_VERSION} | cut -f1 -d :`
+LIB_MAJOR_VERSION := `echo ${LIBDRIZZLE_LIBRARY_VERSION} | cut -f1 -d :`
 PACKAGE_LIB_VERSION := `echo ${LIBDRIZZLE_LIBRARY_VERSION} | sed 's/:/./g'`
 
 FPM_OPTS := -s dir -n "${PACKAGE}" \
@@ -18,6 +18,11 @@ FPM_OPTS := -s dir -n "${PACKAGE}" \
 			--vendor "'Sociomantic Labs GmbH'" \
 			--license "'Simplified BSD License'" \
 			--epoch $(LIB_MAJOR_VERSION)
+
+#GEN_CHANGELOG_RPM := $(" * `LANG=C date +"%a %b %d %Y"` "$(MAINTAINER_NAME) <$(MAINTAINER_EMAIL)>" - \
+#						v${PACKAGE_VERSION}")
+
+GEN_CHANGELOG_DEB = " * "
 
 FPM_OPTS_RPM := -t rpm -C ${abs_builddir}/rpm/
 
@@ -43,3 +48,11 @@ clean-rpm:
 test-rpm:
 	@echo $(FPM_OPTS)
 	@echo $(PACKAGE_LIB_VERSION)
+    $(MAKE) DESTDIR=${abs_builddir}/rpm/install install
+    so_libname="./install/usr/lib/${PACKAGE}.so"
+    fpm $(FPM_OPTS_RPM) $(FPM_OPTS) $so_libname.$(PACKAGE_LIB_VERSION)=/usr/lib/ \
+    $so_libname.$(LIB_MAJOR_VERSION)=/usr/lib/
+
+
+test-changelog:
+	 `echo $(GEN_CHANGELOG_DEB)`
