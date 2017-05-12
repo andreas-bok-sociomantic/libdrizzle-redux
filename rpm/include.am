@@ -6,11 +6,20 @@
 
 .PHONY: clean-rpm rpm release-rpm
 
-MAINTAINER:=$(shell "`git config user.name` <`git config user.email`>")
+LIB_MAJOR_VERSION :=`echo ${LIBDRIZZLE_LIBRARY_VERSION} | cut -f1 -d :`
+PACKAGE_LIB_VERSION := `echo ${LIBDRIZZLE_LIBRARY_VERSION} | sed 's/:/./g'`
 
 FPM_OPTS := -s dir -n "${PACKAGE}" \
+			-v "$(LIBRARY_PACKAGE_VERSION)" \
 			--architecture all \
-			--description "Simplified API to MySQL databases"
+			--maintainer "'$(MAINTAINER_NAME) <$(MAINTAINER_EMAIL)>'" \
+			--description "'Simplified API to MySQL databases'" \
+			--url "'$(PACKAGE_URL)'" \
+			--vendor "'Sociomantic Labs GmbH'" \
+			--license "'Simplified BSD License'" \
+			--epoch $(LIB_MAJOR_VERSION)
+
+FPM_OPTS_RPM := -t rpm -C ${abs_builddir}/rpm/
 
 rpm: clean-rpm
 	./configure --prefix=/usr
@@ -32,5 +41,5 @@ clean-rpm:
 	-rm -rf rpm/*.rpm rpm/install
 
 test-rpm:
-	@echo $(MAINTAINER)
 	@echo $(FPM_OPTS)
+	@echo $(PACKAGE_LIB_VERSION)
