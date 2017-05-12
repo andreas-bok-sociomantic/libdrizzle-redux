@@ -6,11 +6,11 @@
 
 .PHONY: clean-rpm rpm release-rpm
 
+MAINTAINER:=$(shell "`git config user.name` <`git config user.email`>")
+
 FPM_OPTS := -s dir -n "${PACKAGE}" \
 			--architecture all \
-			--maintainer "$pkgmaint" \
-
-PACKAGE_MAINTAINER=$(shell "`git config user.name` <`git config user.email`>")
+			--description "Simplified API to MySQL databases"
 
 rpm: clean-rpm
 	./configure --prefix=/usr
@@ -32,4 +32,5 @@ clean-rpm:
 	-rm -rf rpm/*.rpm rpm/install
 
 test-rpm:
-	@echo $(PACKAGE_MAINTAINER)
+	@echo $(MAINTAINER)
+	@echo $(FPM_OPTS)
