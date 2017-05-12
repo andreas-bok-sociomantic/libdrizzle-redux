@@ -6,11 +6,9 @@
 
 .PHONY: clean-rpm rpm release-rpm
 
-LIB_MAJOR_VERSION := `echo ${LIBDRIZZLE_LIBRARY_VERSION} | cut -f1 -d :`
-PACKAGE_LIB_VERSION := `echo ${LIBDRIZZLE_LIBRARY_VERSION} | sed 's/:/./g'`
-
 FPM_OPTS := -s dir -n "${PACKAGE}" \
-			-v "$(LIBRARY_PACKAGE_VERSION)" \
+			-v "${PACKAGE}" \
+			--log debug
 			--architecture all \
 			--maintainer "'$(MAINTAINER_NAME) <$(MAINTAINER_EMAIL)>'" \
 			--description "'Simplified API to MySQL databases'" \
@@ -22,9 +20,18 @@ FPM_OPTS := -s dir -n "${PACKAGE}" \
 #GEN_CHANGELOG_RPM := $(" * `LANG=C date +"%a %b %d %Y"` "$(MAINTAINER_NAME) <$(MAINTAINER_EMAIL)>" - \
 #						v${PACKAGE_VERSION}")
 
-GEN_CHANGELOG_DEB = " * "
+#GEN_CHANGELOG_DEB = echo " * `LANG=C date +"%a %b %d %Y"` "$(MAINTAINER_NAME) \<$(MAINTAINER_EMAIL)\>"\n"\
+#					"`git log --date=short --format=" - %s (%cd)" HEAD^..HEAD`"
 
-FPM_OPTS_RPM := -t rpm -C ${abs_builddir}/rpm/
+
+
+GEN_CHANGELOG_DEB = " * `LANG=C date +"%a %b %d %Y"`" \
+					"$(MAINTAINER_NAME)" "<$(MAINTAINER_EMAIL)>" "${PACKAGE_VERSION}" \
+					"`git log --date=short --format=' - %s (%cd)' $$(git describe --abbrev=0 HEAD^)..HEAD | \
+					fold --spaces --width 76 | \
+					sed 's/^\([^ ]\+\)/    \1/g' `"
+
+FPM_OPTS_RPM := -t rpm --rpm-auto-add-directories
 
 rpm: clean-rpm
 	./configure --prefix=/usr
@@ -46,13 +53,26 @@ clean-rpm:
 	-rm -rf rpm/*.rpm rpm/install
 
 test-rpm:
-	@echo $(FPM_OPTS)
-	@echo $(PACKAGE_LIB_VERSION)
-    $(MAKE) DESTDIR=${abs_builddir}/rpm/install install
-    so_libname="./install/usr/lib/${PACKAGE}.so"
-    fpm $(FPM_OPTS_RPM) $(FPM_OPTS) $so_libname.$(PACKAGE_LIB_VERSION)=/usr/lib/ \
-    $so_libname.$(LIB_MAJOR_VERSION)=/usr/lib/
+	echo $(FPM_OPTS); \
+    $(MAKE) DESTDIR=${abs_builddir}/rpm/install install;\
+    cd rpm; \
+	changelog=`mktemp`; \
+	trap "rm -f '$$changelog'; exit 1" INT TERM QUIT; \
+	printf "%s %s %s v%s\n%s" $(GEN_CHANGELOG_DEB) > $$changelog; \
+	so_libname=${PACKAGE}.so; \
+	version_number=`find ./install/usr/lib/ ! -type l -name "$$so_libname.*"`;\
+	libversion=`echo $$version_number | grep -o -P -e "([0-9]+\.?)+$$"`; \
+	lib_major=`echo $$libversion | cut -f1 -d .`; \
+	lib_minor=`echo $$libversion | cut -f2 -d .`; \
+	lib_patch=`echo $$libversion | cut -f3 -d .`; \
+    so_libname="./install/usr/lib/$$so_libname"; \
+    fpm $(FPM_OPTS_RPM) --rpm-changelog $$changelog $(FPM_OPTS) \
+    $$so_libname.$$libversion=/usr/lib/ \
+    $$so_libname.$$lib_major=/usr/lib/
 
 
 test-changelog:
-	 `echo $(GEN_CHANGELOG_DEB)`
+	changelog=`mktemp`; \
+	trap "rm -f '$changelog'; exit 1" INT TERM QUIT; \
+	echo $$changelog; \
+	printf "%s %s %s v%s\n%s" $(GEN_CHANGELOG_DEB) > $$changelog;
