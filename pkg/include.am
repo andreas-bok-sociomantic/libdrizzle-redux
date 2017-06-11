@@ -7,7 +7,7 @@ include pkg/rpm/include.am
 #
 # Makefile for building osx package
 
-.PHONY: clean-osxpkg osxpkg install-osxpkg
+#.PHONY: clean-osxpkg osxpkg install-osxpkg
 
 FPM_OPTS := -s dir -v $(PACKAGE_VERSION) -p pkg/ \
 	--architecture native \
@@ -23,8 +23,7 @@ pkg-install:
 	$(MAKE) DESTDIR=${abs_builddir}/pkg/install install
 
 osxpkg: clean-osxpkg pkg-install
-	pkgmaint=$(`git config user.name` `git config user.email`)
-	fpm -C pkg -n $(PACKAGE) $(FPM_OPTS_OSX) $(FPM_OPTS) install/usr/=/
+	pkg/build
 
 clean-osxpkg:
 	-rm -rf pkg/*.pkg
