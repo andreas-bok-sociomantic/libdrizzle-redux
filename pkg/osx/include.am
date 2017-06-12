@@ -1,7 +1,8 @@
 # vim:ft=automake
 # included from Top Level Makefile.am
 # All paths should be given relative to the root
-
+#
+# http://s.sudre.free.fr/Software/Packages/about.html
 # Makefile for building osx package
 
 .PHONY: clean-osxpkg osxpkg install-osxpkg
