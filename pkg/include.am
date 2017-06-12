@@ -3,27 +3,5 @@
 # All paths should be given relative to the root
 
 include pkg/deb/include.am
+include pkg/osx/include.am
 include pkg/rpm/include.am
-#
-# Makefile for building osx package
-
-#.PHONY: clean-osxpkg osxpkg install-osxpkg
-
-FPM_OPTS := -s dir -v $(PACKAGE_VERSION) -p pkg/ \
-	--architecture native \
-	--url "$(PACKAGE_URL)" \
-	--license 'Simplified BSD License' \
-	--description "Simplified API to MySQL databases" \
-	--maintainer "`$$(echo "`git config user.name`")`"
-	--vendor 'Sociomantic Labs GmbH'
-
-FPM_OPTS_OSX := -t osxpkg --osxpkg-identifier-prefix com.github.libdrizzle-redux
-
-pkg-install:
-	$(MAKE) DESTDIR=${abs_builddir}/pkg/install install
-
-osxpkg: clean-osxpkg pkg-install
-	pkg/build
-
-clean-osxpkg:
-	-rm -rf pkg/*.pkg
