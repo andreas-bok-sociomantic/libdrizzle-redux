@@ -172,7 +172,7 @@ bool getNextBit(uint8_t& val)
 	val = val >> 1;
 	return (val & 1);
 }
-int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit)
+int getBoolArray(bool *arr,const unsigned char *data,int start_pos,int _byte,int _bit)
 {
 	if((int)sizeof(data)-start_pos<_byte)
 	{
