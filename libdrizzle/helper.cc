@@ -162,7 +162,7 @@ uint64_t getEncodedLen(int& pos, const unsigned char *data)
 		default:
 			break;
 	}
-	pos+=colBytes+(colBytes>1)?1:0; // include first byte if colCount>1
+	pos+=colBytes + ((colBytes>1)? 1 : 0); // include first byte if colCount>1
 
 	return len;
 }
