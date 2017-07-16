@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -28,13 +28,13 @@ uint32_t getByte4(int pos,const unsigned char* data)
 	{
 		return UINT_MAX;
 	}
-	uint32_t tmpMask = mask(32); // all 32 bits set to 1		
-	
+	uint32_t tmpMask = mask(32); // all 32 bits set to 1
+
 	tmpMask=((uint32_t)data[pos]&tmpMask);
 	tmpMask=((uint32_t)data[pos+1]<<8|tmpMask);
 	tmpMask=((uint32_t)data[pos+2]<<16|tmpMask);
 	tmpMask=((uint32_t)data[pos+3]<<24|tmpMask);
-	
+
 	return tmpMask;
 }
 
@@ -44,12 +44,12 @@ uint32_t getByte3(int pos,const unsigned char* data)
 	{
 		return UINT_MAX;
 	}
-	uint32_t tmpMask = mask(32); // all 32 bits set to 1		
+	uint32_t tmpMask = mask(32); // all 32 bits set to 1
 
 	tmpMask=((uint32_t)data[pos]&tmpMask);
 	tmpMask=((uint32_t)data[pos+1]<<8|tmpMask);
 	tmpMask=((uint32_t)data[pos+2]<<16|tmpMask);
-	
+
 	return tmpMask;
 }
 
@@ -59,7 +59,7 @@ uint16_t getByte2(int pos,const unsigned char* data)
 	{
 		return USHRT_MAX;
 	}
-	uint16_t tmpMask = mask(16); // all 16 bits set to 1		
+	uint16_t tmpMask = mask(16); // all 16 bits set to 1
 
 	tmpMask=((uint16_t)data[pos]&tmpMask);
 	tmpMask=((uint16_t)data[pos+1]<<8|tmpMask);
@@ -74,7 +74,7 @@ uint64_t getByte6(int pos,const unsigned char* data)
 	{
 		return UINT_MAX;
 	}
-	uint64_t tmpMask = mask(64); // all 64 bits set to 1		
+	uint64_t tmpMask = mask(64); // all 64 bits set to 1
 
 	tmpMask=((uint64_t)data[pos]&tmpMask);
 	tmpMask=((uint64_t)data[pos+1]<<8|tmpMask);
@@ -92,7 +92,7 @@ uint64_t getByte8(int pos,const unsigned char* data)
 	{
 		return UINT_MAX;
 	}
-	uint64_t tmpMask = mask(64); // all 64 bits set to 1		
+	uint64_t tmpMask = mask(64); // all 64 bits set to 1
 
 	tmpMask=((uint64_t)data[pos]&tmpMask);
 	tmpMask=((uint64_t)data[pos+1]<<8|tmpMask);
@@ -145,7 +145,7 @@ uint64_t getEncodedLen(int& pos, const unsigned char *data)
 		return 0;
 	}
 	switch(colBytes)
-	{   
+	{
 		case 1:
 			len= (uint64_t)data[pos];
 			break;
@@ -161,7 +161,7 @@ uint64_t getEncodedLen(int& pos, const unsigned char *data)
 			break;
 		default:
 			break;
-	}   
+	}
 	pos+=colBytes+(colBytes>1)?1:0; // include first byte if colCount>1
 
 	return len;
@@ -172,7 +172,8 @@ bool getNextBit(uint8_t& val)
 	val = val >> 1;
 	return (val & 1);
 }
-int getBoolArray(bool *arr,const unsigned char *data,int start_pos,int _byte,int _bit)
+int getBoolArray(bool *arr, const unsigned char *data, int start_pos, int _byte,
+	int _bit)
 {
 	if((int)sizeof(data)-start_pos<_byte)
 	{
@@ -180,7 +181,7 @@ int getBoolArray(bool *arr,const unsigned char *data,int start_pos,int _byte,int
 	}
 	int count=0;
 	for(int i=0;i<_byte;i++)
-	{   
+	{
 		if(8*i>=_bit)
 			break;
 		uint8_t number= (uint8_t)data[start_pos+i];
@@ -188,13 +189,13 @@ int getBoolArray(bool *arr,const unsigned char *data,int start_pos,int _byte,int
 		if(arr[8*i]==0)
 			count++;
 		for(int val=1;val<8;val++)
-		{   
+		{
 			if((8*i+val) >= _bit)
 				break;
 			arr[8*i+val] = getNextBit(number);
 			if(arr[8*i+val]==0)
 				count++;
-		}   
+		}
 	}
 	return count; // count where bit in not set. (0)
 
@@ -258,23 +259,23 @@ enum_field_bytes lookup_field_bytes(enum_field_types field_type)
 		case MYSQL_TYPE_VAR_STRING:
 		case MYSQL_TYPE_STRING:
 			return LEN_ENC_STR;
-		
+
 		case MYSQL_TYPE_TINY:
 			return READ_1_BYTE;
-		
+
 		case MYSQL_TYPE_SHORT:
 		case MYSQL_TYPE_YEAR:
 			return READ_2_BYTE;
-		
+
 		case MYSQL_TYPE_LONG:
 		case MYSQL_TYPE_FLOAT:
 		case MYSQL_TYPE_INT24:
 			return READ_4_BYTE;
-		
+
 		case MYSQL_TYPE_DOUBLE:
 		case MYSQL_TYPE_LONGLONG:
 			return READ_8_BYTE;
-		
+
 		case MYSQL_TYPE_NULL:
 		case MYSQL_TYPE_ENUM:
 		case MYSQL_TYPE_SET:
