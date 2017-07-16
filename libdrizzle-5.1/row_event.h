@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -29,11 +29,11 @@ using namespace std;
 
 namespace binlogevent
 {
-	class RowEvent : public Events 
+	class RowEvent : public Events
 	{
 		public:
 
-			RowEvent(uint8_t *col_type) : 
+			RowEvent(uint8_t *col_type) :
 					table_id(-1),
 					flag(-1),
 					column_count(-1),
@@ -41,7 +41,7 @@ namespace binlogevent
 					column_bitmap(NULL)
 			{
 				column_type=col_type;
-			}	
+			}
 
 			~RowEvent()
 			{
@@ -61,33 +61,34 @@ namespace binlogevent
 			/**
 			  * @retval timestamp of event.
 			  */
-			
 			DRIZZLE_API
 			uint32_t getTimestamp();
+
 			/**
 			  * @retval type of event.
 			  */
-			
+
 			DRIZZLE_API
 			 enum_event_type getType();
-			
+
 			/**
 			  * @retval server-id of the originating mysql-server. Used to filter out events in circular replication.
 			  */
 			DRIZZLE_API
 			uint32_t getServerId();
-			
+
 			/**
 			  * @retval of size of event.
 			  */
 			DRIZZLE_API
 			uint32_t getEventSize();
+
 			/**
 			  * @retval of position of the next event .
 			  */
 			DRIZZLE_API
 			uint32_t getLogPos();
-			
+
 			/**
 			  * @retval Binlog Event Flag from header
 			  */
@@ -95,68 +96,70 @@ namespace binlogevent
 			uint16_t getFlagH();
 
 			/**
-			  * @retval numeric table id 
+			  * @retval numeric table id
 			  */
-		
+
 			DRIZZLE_API
 			uint64_t getTableId();
-			
+
 			/**
-			  * @retval flag of post header 
+			  * @retval flag of post header
 			  */
 			DRIZZLE_API
 			uint16_t getFlagPh();
-			
+
 			/**
 			  * In funtion : conversion of length-encoded integer into its numeric value
-			  * @retval number of columns in the table map  
+			  * @retval number of columns in the table map
 			 */
 			DRIZZLE_API
 			uint64_t getColumnCount();
-			
+
 			/**
-			  * @retval bitmap of column present
+			  * @retval bitmap of columns present
 			  */
-			
 			DRIZZLE_API
 			bool * getColumnPresentBitmap();
 
+
+
+
 			DRIZZLE_API
 			RowVector getRows();
-			
+
 			DRIZZLE_API
 			int getRowEventType();
 
 			//RowVector getAllRows();
 			//Row getRow();
 
-			
+
 
 			//setters
 
 			void setTableId(uint64_t value);
-			
+
 			/** set flag_ph.
 			  *
 			  * @param[in] value Post header flag.
 			  */
 			void setFlagPh(uint16_t value);
-			
+
 			/** set column_count.
 			  *
 			  * @param[in] value Column count in table map.
 			  */
 			void setColumnCount(uint64_t value);
-			
+
 			/** set column_bitmap.
 			  *
-			  * @param[in] bitmap Array 
+			  * @param[in] bitmap Array
 			  */
 			void setColumnPresentBitmap(bool * value);
-			
+
 			/** set null_bitmap.
 			  *
-			  * @param[in] null bitmap Array 
+			  * @param[in] null bitmap Array
 			  */
 			void setNullBitmap(bool * value);
 
@@ -167,9 +170,9 @@ namespace binlogevent
 
 		private:
 			uint8_t * column_type;
-			uint64_t table_id;  
+			uint64_t table_id;
 			uint16_t flag; //post header
-			uint64_t column_count; 
+			uint64_t column_count;
 			bool * column_null_bitmap;
 			bool * column_bitmap;
 			bool * null_bitmap;
