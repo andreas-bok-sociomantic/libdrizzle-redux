@@ -90,7 +90,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 		printf("Schemaname: %s\n", tableMap.getSchemaName());
 		printf("Tablename: %s\n", tableMap.getTableName());
 
-		printf("cols: %" PRIu64 "\n", tableMap.getColumnCount());
+//		printf("cols: %" PRIu64 "\n", tableMap.getColumnCount());
 		// uint8_t *val=  tableMap.getColumnTypeDef();
 		// for(uint i=0;i< tableMap.getColumnCount();i++)
 		// {
