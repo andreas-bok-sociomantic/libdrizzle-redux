@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -24,7 +24,7 @@ using namespace std;
 
 namespace binlogevent
 {
-	class EventData 
+	class EventData
 	{
 		public:
 
@@ -36,6 +36,7 @@ namespace binlogevent
 			~EventData()
 			{
 			}
+
 			/** Method which sets the field values
 			  * for table map event. calls initWithData
 			  * of TableMapEvent
@@ -43,18 +44,18 @@ namespace binlogevent
 			  * @param[in] tableMap A reference to TableMapEvent object.
 			  */
 			DRIZZLE_API
-			void getTableMap(TableMapEvent&  tableMap);
+			void getTableMap(TableMapEvent& tableMap);
 			DRIZZLE_API
-			void getWriteEvent(RowEvent&  writeEvent);
+			void getWriteEvent(RowEvent& writeEvent);
 			DRIZZLE_API
-			void getUpdateEvent(RowEvent&  updateEvent);
+			void getUpdateEvent(RowEvent& updateEvent);
 			DRIZZLE_API
-			void getDeleteEvent(RowEvent&  deleteEvent);
+			void getDeleteEvent(RowEvent& deleteEvent);
 			DRIZZLE_API
-			void getQueryEvent(QueryEvent&  queryEvent);
+			void getQueryEvent(QueryEvent& queryEvent);
 			DRIZZLE_API
-			void getXidEvent(XidEvent&  xidEvent);
-			
+			void getXidEvent(XidEvent& xidEvent);
+
 			DRIZZLE_API
 			void setData(const unsigned char* _data);
 

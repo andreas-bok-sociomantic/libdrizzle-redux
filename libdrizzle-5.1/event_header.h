@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -28,7 +28,7 @@ using namespace std;
 
 namespace binlogevent
 {
-	class EventHeader 
+	class EventHeader
 	{
 		public:
 
@@ -57,11 +57,9 @@ namespace binlogevent
 			uint32_t timestamp; // timestamp of event
 			uint8_t type;       // type of event
 			uint32_t server_id; // server-id of the originating mysql-server. Used to filter out events in circular replication
-			uint32_t event_size;//size of the event (header, post-header, body) 
+			uint32_t event_size;//size of the event (header, post-header, body)
 			uint32_t log_pos;   // position of next event
 			uint16_t flag;    //header
-
-
 	};
 } /*namespace binlogevent*/
 #endif

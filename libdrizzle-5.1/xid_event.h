@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -23,13 +23,13 @@ using namespace std;
 //using namespace binlogevent;
 namespace binlogevent
 {
-	class XidEvent : public Events 
+	class XidEvent : public Events
 	{
 		public:
 
 			XidEvent() : Xid(-1)
-		{
-		}
+			{
+			}
 
 			~XidEvent()
 			{
@@ -73,15 +73,15 @@ namespace binlogevent
 			 */
 			DRIZZLE_API
 			uint16_t getFlagH();
-			
+
 			/**
-			 * @retval transaction id 
+			 * @retval transaction id
 			 */
 			DRIZZLE_API
 			uint64_t getXid();
-			
+
 			/**
-			 * set transaction id 
+			 * set transaction id
 			 */
 			//DRIZZLE_API
 			void setXid(uint64_t value);
@@ -90,6 +90,6 @@ namespace binlogevent
 		private:
 			uint64_t Xid;
 
-	}; // Xidevent 
+	}; // Xidevent
 } /*namespace binlogevent*/
 #endif
