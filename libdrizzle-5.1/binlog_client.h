@@ -1,4 +1,3 @@
-
 /* Visibility must come first */
 #include <libdrizzle-5.1/visibility.h>
 
