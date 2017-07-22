@@ -3,6 +3,7 @@
 #define T_HELPER_H
 
 #include <limits>
+#include <cstdint>
 
 template <typename U, int V = sizeof(U)> U
 readBytes(int pos, const unsigned char* data);

@@ -114,6 +114,17 @@ mkdir -p $RPM_BUILD_ROOT/
 %{_includedir}/libdrizzle-5.1/verbose.h
 %{_includedir}/libdrizzle-5.1/version.h
 %{_includedir}/libdrizzle-5.1/visibility.h
+%{_includedir}/libdrizzle-5.1/binlog_client.h
+%{_includedir}/libdrizzle-5.1/binlogapi.h
+%{_includedir}/libdrizzle-5.1/column_value.h
+%{_includedir}/libdrizzle-5.1/event_data.h
+%{_includedir}/libdrizzle-5.1/event_header.h
+%{_includedir}/libdrizzle-5.1/event_interface.h
+%{_includedir}/libdrizzle-5.1/query_event.h
+%{_includedir}/libdrizzle-5.1/row_event.h
+%{_includedir}/libdrizzle-5.1/row_iterator.h
+%{_includedir}/libdrizzle-5.1/table_map_event.h
+%{_includedir}/libdrizzle-5.1/xid_event.h
 
 %changelog
 * Tue Jun 20 2017 Andreas Bok Andersen <andreas.bok@sociomantic.com> - 6.0.5

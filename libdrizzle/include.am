@@ -19,6 +19,7 @@ noinst_HEADERS+= libdrizzle/statement_local.h
 noinst_HEADERS+= libdrizzle/structs.h
 noinst_HEADERS+= libdrizzle/windows.hpp
 noinst_HEADERS+= libdrizzle/commonapi.h
+noinst_HEADERS+= libdrizzle/t_helper.h
 
 lib_LTLIBRARIES+= libdrizzle/libdrizzle-redux.la
 libdrizzle_libdrizzle_redux_la_SOURCES=
@@ -78,5 +79,6 @@ libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/row_event.cc
 libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/xid_event.cc
 libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/row_iterator.cc
 libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/table_map_event.cc
+libdrizzle_libdrizzle_redux_la_SOURCES+= libdrizzle/t_helper.cc
 
 libdrizzle_libdrizzle_redux_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}
