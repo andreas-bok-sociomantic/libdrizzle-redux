@@ -11,7 +11,15 @@
  */
 
 #include <libdrizzle/t_helper.h>
+
 using namespace std;
+
+#define mask(__b) \
+    ((uint32_t)(__b)==32 ? 0xffffffff : \
+     ((uint32_t)(__b)==24 ? 0xffffff : \
+      ((uint32_t)(__b)==16 ? 0xffff : \
+       ((uint32_t)(__b)==8 ? 0xff : 0xffffffffffffffff ))))
+
 
 template<typename U, int V = sizeof(U)>
 U readBytes(int pos, const unsigned char* data)
@@ -22,9 +30,9 @@ U readBytes(int pos, const unsigned char* data)
     }
 
     auto byte_size = sizeof(U);
-    uint i = 1;
+    int i = 1;
     U value = ((U)data[pos] & mask(byte_size*8));
-    while (i < byte_size)
+    while (i < (int) byte_size)
     {
         value =((U)data[pos+i]<<(i*8)|value);
         i++;
