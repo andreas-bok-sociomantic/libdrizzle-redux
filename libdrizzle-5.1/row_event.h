@@ -9,15 +9,15 @@
  * summary: parsing of row events like write event, update event, delete event
  *
  */
-#include<cstring>
-#include<inttypes.h>
+#include <cstring>
+#include <inttypes.h>
 
 #ifndef event_interface
 #define event_interface
-#include"event_interface.h"
+#include "event_interface.h"
 #endif
 
-#include"row_iterator.h"
+#include "row_iterator.h"
 
 using namespace std;
 
@@ -69,7 +69,7 @@ namespace binlogevent
 			  */
 
 			DRIZZLE_API
-			 enum_event_type getType();
+			 drizzle_binlog_event_types_t getType();
 
 			/**
 			  * @retval server-id of the originating mysql-server. Used to filter out events in circular replication.

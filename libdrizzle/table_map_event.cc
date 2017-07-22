@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -10,20 +10,20 @@
  *
  */
 #include "config.h"
-#include<iostream>
+#include <iostream>
 #include "libdrizzle/common.h"
 #include "libdrizzle/commonapi.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include<string.h>
+#include <string.h>
 
 /*#ifndef table_map
 
 #define table_map
 
-#include<libdrizzle-5.1/table_map_event.h>
+#include <libdrizzle-5.1/table_map_event.h>
 
 #endif*/
 
@@ -42,13 +42,13 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	if(start_pos==-1)
 		return;
 
-	tmp = getByte6(start_pos,data);	
+	tmp = readBytes<uint64_t, 6>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
 	setTableId((uint64_t)tmp);
 	start_pos+=6;// 6 byte for table id.
-	
-	tmp = getByte2(start_pos,data);	
+
+	tmp = readBytes<uint16_t>(start_pos,data);
 	if(tmp==USHRT_MAX)
 		return;
 	setFlagPh((uint16_t)tmp);
@@ -58,7 +58,7 @@ void TableMapEvent::initWithData(const unsigned char* data)
 		return;
 	setSchemaNameLen((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for schema name length.
-	
+
 	tmp_char = getString(start_pos,schema_name_len,data);
 	if(tmp_char==NULL)
 		return;
@@ -67,12 +67,12 @@ void TableMapEvent::initWithData(const unsigned char* data)
 
 	//  data[start_pos+getSchemaNameLen()] is Null
 	start_pos+=1; //  +1 for Null.
-	
+
 	if(sizeof(data)-start_pos<1)
 		return;
 	setTableNameLen((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for table name length.
-	
+
 	tmp_char = getString(start_pos,schema_name_len,data);
 	if(tmp_char==NULL)
 		return;
@@ -100,21 +100,21 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	if(metaSize==0)
 		return;
 	column_meta_data = (uint64_t *)(malloc(sizeof(uint64_t)*column_count));
-	
+
 	if(sizeof(data)-start_pos<column_count)
 		return;
 	for(uint64_t col=0;col<column_count;col++)
 	{
 		int type= column_type_def[col];
-		int nextBytes= lookup_metadata_field_size((enum_field_types)type);
+		int nextBytes= lookup_metadata_field_size((drizzle_field_type_t)type);
 		int metaData=0;
 		switch(nextBytes)
 		{
 			case 1:
 				metaData= (int)data[start_pos];
 				break;
-			case 2:	
-				metaData= (int)getByte2(start_pos,data);
+			case 2:
+				metaData= (int)readBytes<uint16_t>(start_pos,data);
 				break;
 			default:
 				break;
@@ -131,9 +131,9 @@ uint32_t TableMapEvent::getTimestamp()
 {
 	return  header.timestamp;
 }
-enum_event_type TableMapEvent::getType()
+drizzle_binlog_event_types_t TableMapEvent::getType()
 {
-	return (enum_event_type)header.type; 
+	return (drizzle_binlog_event_types_t)header.type;
 }
 uint32_t TableMapEvent::getServerId()
 {
@@ -145,7 +145,7 @@ uint32_t TableMapEvent::getLogPos()
 }
 uint16_t TableMapEvent::getFlagH()
 {
-	return header.flag; 
+	return header.flag;
 }
 uint64_t TableMapEvent::getTableId()
 {
@@ -182,15 +182,17 @@ uint8_t * TableMapEvent::getColumnTypeDef()
 
 enum_col_type TableMapEvent::getColType(int colNo)
 {
-	enum_field_bytes num;
-	num = lookup_field_bytes((enum_field_types)column_type_def[colNo]);
+	drizzle_field_byte_t num;
+	num = lookup_field_bytes((drizzle_field_type_t)column_type_def[colNo]);
 	switch(num)
 	{
 		 case LEN_ENC_STR:
 			 return (enum_col_type)1;
 		 case READ_1_BYTE:
 		 case READ_2_BYTE:
+		 case READ_3_BYTE:
 		 case READ_4_BYTE:
+		 case READ_5_BYTE:
 		 case READ_8_BYTE:
 		 case NOT_FOUND:
 		 default:

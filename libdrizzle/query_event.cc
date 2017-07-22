@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -10,21 +10,21 @@
  *
  */
 #include "config.h"
-#include<iostream>
+#include <iostream>
 #include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include<string.h>
+#include <string.h>
 
 #ifndef write_map
 #define write_map
 
-#include<libdrizzle-5.1/query_event.h>
+#include <libdrizzle-5.1/query_event.h>
 
 #endif
-//#include"helper.h"
+//#include "helper.h"
 
 using namespace std;
 using namespace binlogevent;
@@ -37,14 +37,14 @@ void QueryEvent::initWithData(const unsigned char* data)
 	int start_pos = header.setHeader(data);
 	if(start_pos==-1)
 		return;
-	
-	tmp = getByte4(start_pos,data); 
+
+	tmp = readBytes<uint32_t>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
-	setProxyId((uint32_t)tmp); 
+	setProxyId((uint32_t)tmp);
 	start_pos+=4;// 4 byte for proxy id.
 
-	tmp = getByte4(start_pos,data); 
+	tmp = readBytes<uint32_t>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
 	setExecutionTime((uint32_t)tmp);
@@ -55,12 +55,12 @@ void QueryEvent::initWithData(const unsigned char* data)
 	setSchemaLength((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for schema length.
 
-	tmp = getByte2(start_pos,data); 
+	tmp = readBytes<uint16_t>(start_pos,data);
 	if(tmp==USHRT_MAX)
 		return;
 	setErrorCode((uint16_t)tmp);
 	start_pos+=2;// 2 byte for error code.
-	
+
 }
 
 // getters
@@ -71,7 +71,7 @@ uint32_t QueryEvent::getTimestamp()
 }
 uint8_t QueryEvent::getType()
 {
-	return header.type; 
+	return header.type;
 }
 uint32_t QueryEvent::getServerId()
 {
@@ -87,7 +87,7 @@ uint32_t QueryEvent::getLogPos()
 }
 uint16_t QueryEvent::getFlagH()
 {
-	return header.flag; 
+	return header.flag;
 }
 uint32_t QueryEvent::getProxyId()
 {

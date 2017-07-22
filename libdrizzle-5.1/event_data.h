@@ -9,14 +9,14 @@
  * summary: Returns objects of every event
  *
  */
-#include<iostream>
-#include<cstring>
-#include<inttypes.h>
+#include <iostream>
+#include <cstring>
+#include <inttypes.h>
 
-#include"table_map_event.h"
-#include"row_event.h"
-#include"query_event.h"
-#include"xid_event.h"
+#include "table_map_event.h"
+#include "row_event.h"
+#include "query_event.h"
+#include "xid_event.h"
 
 
 using namespace std;

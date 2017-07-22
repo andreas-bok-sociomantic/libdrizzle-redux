@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -10,21 +10,21 @@
  *
  */
 #include "config.h"
-#include<iostream>
+#include <iostream>
 #include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include<string.h>
+#include <string.h>
 
-#include<libdrizzle-5.1/xid_event.h>
+#include <libdrizzle-5.1/xid_event.h>
 
 
 #ifndef HELPER
 #define HELPER
 
-#include<libdrizzle-5.1/helper.h>
+#include <libdrizzle-5.1/helper.h>
 
 #endif
 
@@ -39,11 +39,11 @@ void XidEvent::initWithData(const unsigned char* data)
 	int start_pos = header.setHeader(data);
 	if(start_pos==-1)
 		return;
-	uint64_t tmp;
 
-	tmp=getByte8(start_pos,data);
+	uint64_t tmp=readBytes<uint64_t>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
+
 	setXid((uint64_t)tmp);
 }
 
@@ -53,9 +53,9 @@ uint32_t XidEvent::getTimestamp()
 {
 	return  header.timestamp;
 }
-enum_event_type XidEvent::getType()
+drizzle_binlog_event_types_t XidEvent::getType()
 {
-	return (enum_event_type)header.type; 
+	return (drizzle_binlog_event_types_t)header.type;
 }
 uint32_t XidEvent::getServerId()
 {
@@ -67,7 +67,7 @@ uint32_t XidEvent::getLogPos()
 }
 uint16_t XidEvent::getFlagH()
 {
-	return header.flag; 
+	return header.flag;
 }
 uint64_t XidEvent::getXid()
 {

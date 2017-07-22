@@ -595,6 +595,7 @@ typedef struct drizzle_stmt_st drizzle_stmt_st;
 typedef struct drizzle_bind_st drizzle_bind_st;
 typedef char *drizzle_field_t;
 typedef drizzle_field_t *drizzle_row_t;
+typedef drizzle_column_type_t drizzle_field_type_t;
 
 typedef void (drizzle_log_fn)(const char *line, drizzle_verbose_t verbose,
                               void *context);

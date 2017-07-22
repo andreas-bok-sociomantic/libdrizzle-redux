@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -11,25 +11,25 @@
  */
 
 #include "config.h"
-#include<iostream>
+#include <iostream>
 #include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include<string.h>
-#include<limits.h>
+#include <string.h>
+#include <limits.h>
 #ifndef row_event
 #define row_event
 
-#include<libdrizzle-5.1/row_event.h>
+#include <libdrizzle-5.1/row_event.h>
 
 #endif
 
 #ifndef HELPER
 #define HELPER
 
-#include<libdrizzle-5.1/helper.h>
+#include <libdrizzle-5.1/helper.h>
 
 #endif
 
@@ -48,13 +48,13 @@ void RowEvent::initWithData(const unsigned char* data)
 	if(start_pos==-1)
 		return;
 
-	tmp = getByte6(start_pos,data);
+	tmp = readBytes<uint64_t, 6>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
-	setTableId((uint64_t)tmp); 
+	setTableId((uint64_t)tmp);
 	start_pos+=6;// 6 byte for table id.
 
-	tmp = getByte2(start_pos,data);
+	tmp = readBytes<uint16_t>(start_pos,data);
 	if(tmp==USHRT_MAX)
 		return;
 	setFlagPh((uint16_t)tmp);
@@ -66,26 +66,26 @@ void RowEvent::initWithData(const unsigned char* data)
 	setColumnCount(tmp_int); // start_pos will also get updated
 
 	int size= (column_count+7)/8; // length of present column bitmap1
-	
+
 	int count_cnp=0;  // count of column not present
-	
+
 	bool *tmp_present = new bool(column_count); // bit array of column bitmap1
-	count_cnp = getBoolArray(tmp_present,data,start_pos,size,column_count); // return -1 when data problem 
+	count_cnp = getBoolArray(tmp_present,data,start_pos,size,column_count); // return -1 when data problem
 
 	if(count_cnp==-1)
 		return;
-	
+
 	setColumnPresentBitmap(tmp_present);
-	
+
 	start_pos+=size;	//null-bitmap
-	size= (column_count-count_cnp+7)/8; // length of null bitmap in bytes 
+	size= (column_count-count_cnp+7)/8; // length of null bitmap in bytes
 
 	bool *tmp_bool = new bool(column_count-count_cnp);
-	count_cnp = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp)); // return -1 when data problem 
-	
+	count_cnp = getBoolArray(tmp_bool,data,start_pos,size,(column_count-count_cnp)); // return -1 when data problem
+
 	if(count_cnp==-1)
 		return;
-	
+
 	setNullBitmap(tmp_bool);
 
 	start_pos+=size;
@@ -95,7 +95,7 @@ void RowEvent::initWithData(const unsigned char* data)
 	{
 		rows.vec_col_val.clear();
 		string str_col_val; // column value as string
-		unsigned int    int_col_val = UINT_MAX; // column value as int
+		uint64_t    int_col_val = UINT_MAX; // column value as int
 		for(uint64_t val=0;val<column_count;val++)
 		{
 			if(column_bitmap[val]==0)
@@ -110,8 +110,8 @@ void RowEvent::initWithData(const unsigned char* data)
 
 			}
 
-			enum_field_bytes num;
-			num = lookup_field_bytes((enum_field_types)column_type[val]);
+			drizzle_field_byte_t num;
+			num = lookup_field_bytes((drizzle_field_type_t)column_type[val]);
 			switch(num)
 			{
 				case LEN_ENC_STR:
@@ -148,10 +148,11 @@ void RowEvent::initWithData(const unsigned char* data)
 						start_pos+=(int)READ_1_BYTE;
 						break;
 					}
+
 				case READ_2_BYTE:
 					{
 						str_col_val.clear();
-						int_col_val = getByte2(start_pos,data);
+						int_col_val = readBytes<uint16_t>(start_pos,data);
 						if(int_col_val==USHRT_MAX)
 							return;
 						str_col_val = getIntToStr(int_col_val);
@@ -163,7 +164,7 @@ void RowEvent::initWithData(const unsigned char* data)
 				case READ_4_BYTE:
 					{
 						str_col_val.clear();
-						int_col_val = getByte4(start_pos,data);
+						int_col_val = readBytes<uint32_t>(start_pos,data);
 						if(int_col_val==UINT_MAX)
 							return;
 						str_col_val = getIntToStr(int_col_val);
@@ -175,7 +176,7 @@ void RowEvent::initWithData(const unsigned char* data)
 				case READ_8_BYTE:
 					{
 						str_col_val.clear();
-						int_col_val = getByte8(start_pos,data);
+						int_col_val = readBytes<uint64_t>(start_pos,data);
 						if(int_col_val==UINT_MAX)
 							return;
 						str_col_val = getIntToStr(int_col_val);
@@ -184,16 +185,15 @@ void RowEvent::initWithData(const unsigned char* data)
 						start_pos+=(int)READ_8_BYTE;
 						break;
 					}
+				case READ_3_BYTE:
+				case READ_5_BYTE:
 				case NOT_FOUND:
 					{
 						break;
 					}
-
-
-
 			}
 		}
-		
+
 		rows.vec_rows.push_back(rows.vec_col_val);
 		if((int)header.event_size==start_pos)
 		{
@@ -201,7 +201,7 @@ void RowEvent::initWithData(const unsigned char* data)
 		}
 	}
 
-	
+
 
 }
 
@@ -214,9 +214,9 @@ uint32_t RowEvent::getTimestamp()
 {
 	return  header.timestamp;
 }
-enum_event_type RowEvent::getType()
+drizzle_binlog_event_types_t RowEvent::getType()
 {
-	return (enum_event_type)header.type; 
+	return (drizzle_binlog_event_types_t)header.type;
 }
 uint32_t RowEvent::getServerId()
 {
@@ -232,7 +232,7 @@ uint32_t RowEvent::getLogPos()
 }
 uint16_t RowEvent::getFlagH()
 {
-	return header.flag; 
+	return header.flag;
 }
 uint64_t RowEvent::getTableId()
 {
