@@ -9,18 +9,18 @@
  * summary: parse table map event
  *
  */
-#include<cstring>
-#include<inttypes.h>
+#include <cstring>
+#include <inttypes.h>
 
 #ifndef event_interface
 #define event_interface
-#include"event_interface.h"
+#include "event_interface.h"
 #endif
 using namespace std;
 #ifndef HELPER
 #define HELPER
 
-#include"helper.h"
+#include "helper.h"
 
 #endif
 
@@ -71,7 +71,7 @@ namespace binlogevent
 			 * @retval type of event.
 			 */
 			DRIZZLE_API
-			enum_event_type getType();
+			drizzle_binlog_event_types_t getType();
 
 			/**
 			 * @retval server-id of the originating MySQL Server.
@@ -202,8 +202,6 @@ namespace binlogevent
 			 * @param[in] value Array of column definitions, one byte per field type
 			 */
 			void setColumnTypeDef(uint8_t * value);
-
-
 
 		private:
 			uint64_t table_id;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -8,9 +8,9 @@
  *
  *
  */
-#include<iostream>
-#include"column_value.h"
-#include<vector>
+#include <iostream>
+#include "column_value.h"
+#include <vector>
 
 using namespace std;
 

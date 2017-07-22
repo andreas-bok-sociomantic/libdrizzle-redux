@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -11,17 +11,17 @@
  */
 
 #include "config.h"
-#include<iostream>
+#include <iostream>
 #include "libdrizzle/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include<string.h>
+#include <string.h>
 
 #ifndef event_header
 #define event_header
-#include<libdrizzle-5.1/event_header.h>
+#include <libdrizzle-5.1/event_header.h>
 #endif
 
 using namespace std;
@@ -31,37 +31,37 @@ using namespace binlogevent;
 int EventHeader::setHeader(const unsigned char* data)
 {
 	// Total bytes to read: 19
-	int start_pos = 0;  
-        timestamp= getByte4(start_pos,data);
+	int start_pos = 0;
+        timestamp= readBytes<uint32_t>(start_pos,data);
 	if(timestamp==UINT_MAX)
 		return -1;
 	start_pos+=4; // 4 byte for timestamp.
-	
+
 	if((int)(sizeof(data) - start_pos) < 0)
 		return -1;
 	int tmp=(uint8_t)data[start_pos];
-	type= (enum_event_type)tmp;
+	type= (drizzle_binlog_event_types_t)tmp;
 	start_pos+=1; // 1 byte for type of evnet.
-	
-	server_id= getByte4(start_pos,data);
+
+	server_id= readBytes<uint32_t>(start_pos,data);
 	if(server_id==UINT_MAX)
 		return -1;
 	start_pos+=4; // 4 byte of server ID.
-	
-	event_size= getByte4(start_pos,data);
+
+	event_size= readBytes<uint32_t>(start_pos,data);
 	if(event_size==UINT_MAX)
 		return -1;
 	start_pos+=4; // 4 byte for event size.
-	
-	log_pos= getByte4(start_pos,data);
+
+	log_pos= readBytes<uint32_t>(start_pos,data);
 	if(log_pos==UINT_MAX)
 		return -1;
 	start_pos+=4;// 4 byte for getting possion of next event.
-	
-	flag= getByte2(start_pos,data);
+
+	flag= readBytes<uint16_t>(start_pos,data);
 	if(flag==USHRT_MAX)
 		return -1;
 	start_pos+=2; // 2 bytes for getting flag
 
-	return start_pos;	
+	return start_pos;
 }

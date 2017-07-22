@@ -9,12 +9,12 @@
  * summary: parse xid event
  *
  */
-#include<cstring>
-#include<inttypes.h>
+#include <cstring>
+#include <inttypes.h>
 
 #ifndef event_interface
 #define event_interface
-#include"event_interface.h"
+#include "event_interface.h"
 #endif
 using namespace std;
 
@@ -34,7 +34,6 @@ namespace binlogevent
 			~XidEvent()
 			{
 			}
-
 
 			/**
 			 * Get the raw data and call all the setters with
@@ -57,7 +56,7 @@ namespace binlogevent
 			 * @retval type of event.
 			 */
 			DRIZZLE_API
-			enum_event_type getType();
+			drizzle_binlog_event_types_t getType();
 			/**
 			 * @retval server-id of the originating mysql-server. Used to filter out events in circular replication.
 			 */

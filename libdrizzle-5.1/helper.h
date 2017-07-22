@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -9,55 +9,23 @@
  *
  */
 
-#include<limits.h>
+#pragma once
+
+#include <limits>
 
 #ifndef HELPERS
 #define HELPERS
-typedef enum{
-	MYSQL_TYPE_DECIMAL,
-	MYSQL_TYPE_TINY,
-	MYSQL_TYPE_SHORT,
-	MYSQL_TYPE_LONG,
-	MYSQL_TYPE_FLOAT,
-	MYSQL_TYPE_DOUBLE,
-	MYSQL_TYPE_NULL,
-	MYSQL_TYPE_TIMESTAMP,
-	MYSQL_TYPE_LONGLONG,
-	MYSQL_TYPE_INT24,
-	MYSQL_TYPE_DATE,
-	MYSQL_TYPE_TIME,
-	MYSQL_TYPE_DATETIME,
-	MYSQL_TYPE_YEAR,
-	MYSQL_TYPE_NEWDATE,
-	MYSQL_TYPE_VARCHAR,
-	MYSQL_TYPE_BIT,
-	MYSQL_TYPE_NEWDECIMAL,
-	MYSQL_TYPE_ENUM,
-	MYSQL_TYPE_SET,
-	MYSQL_TYPE_TINY_BLOB,
-	MYSQL_TYPE_MEDIUM_BLOB,
-	MYSQL_TYPE_LONG_BLOB,
-	MYSQL_TYPE_BLOB,
-	MYSQL_TYPE_VAR_STRING,
-	MYSQL_TYPE_STRING,
-	MYSQL_TYPE_GEOMETRY
-}enum_field_types;
 
 typedef enum{
 	LEN_ENC_STR = -1,
 	READ_1_BYTE = 1,
 	READ_2_BYTE = 2,
+	READ_3_BYTE = 3,
 	READ_4_BYTE = 4,
+	READ_5_BYTE = 5,
 	READ_8_BYTE = 8,
-	NOT_FOUND   = 0 
-}enum_field_bytes;
-
-typedef enum{
-	TABLE_MAP_EVENT = 19,
-	WRITE_ROWS_EVENTv1 = 23,
-	UPDATE_ROWS_EVENTv1,
-	DELETE_ROWS_EVENTv1
-}enum_event_type;
+	NOT_FOUND   = 0
+} drizzle_field_byte_t;
 
 typedef enum{
 	STRING = 1,
@@ -78,56 +46,6 @@ typedef enum{
 
 DRIZZLE_API
 bool getNextBit(uint8_t& val);
-/**
- * get 2 byte number from raw data
- *
- * @param[in] pos Start reading from pos.
- * @param[in] data Raw data from binglog.
- *
- *@retval 2 byte number
- */
- DRIZZLE_API
-uint16_t getByte2(int pos,const unsigned char* data);
-/**
- * get 4 byte number from raw data
- *
- * @param[in] pos Start reading from pos.
- * @param[in] data Raw data from binglog.
- *
- *@retval 4 byte number
- */
- DRIZZLE_API
-uint32_t getByte4(int pos,const unsigned char* data);
-/**
- * get 3 byte number from raw data
- *
- * @param[in] pos Start reading from pos.
- * @param[in] data Raw data from binglog.
- *
- *@retval 3 byte number
- */
- DRIZZLE_API
-uint32_t getByte3(int pos,const unsigned char* data);
-/**
- * get 6 byte number from raw data
- *
- * @param[in] pos Start reading from pos.
- * @param[in] data Raw data from binglog.
- *
- *@retval 6 byte number
- */
- DRIZZLE_API
-uint64_t getByte6(int pos,const unsigned char* data);
-/**
- * get 8 byte number from raw data
- *
- * @param[in] pos Start reading from pos.
- * @param[in] data Raw data from binglog.
- *
- *@retval 8 byte number
- */
- DRIZZLE_API
-uint64_t getByte8(int pos,const unsigned char* data);
 /** gets the string of specified length
   *
   * @param[in] pos Start reading from pos.
@@ -141,7 +59,7 @@ char * getString(int pos,int len,const unsigned char * data);
 uint64_t getEncodedLen(int& pos,const unsigned char * data);
 
  DRIZZLE_API
-int lookup_metadata_field_size(enum_field_types field_type);
+int lookup_metadata_field_size(drizzle_field_type_t field_type);
 
  DRIZZLE_API
 std::string getIntToStr(uint64_t num);
@@ -150,6 +68,14 @@ std::string getIntToStr(uint64_t num);
 int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit);
 
  DRIZZLE_API
-enum_field_bytes lookup_field_bytes(enum_field_types field_type);
+drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type);
+
+#ifndef T_HELPER_H
+#include <libdrizzle/t_helper.h>
+#include <libdrizzle/t_helper.cc>
+template <typename U, int V = sizeof(U)> U
+DRIZZLE_API
+readBytes(int pos, const unsigned char* data);
+#endif // T_HELPER_H
 
 #endif

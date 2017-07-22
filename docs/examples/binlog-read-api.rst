@@ -8,14 +8,14 @@ Binlog Retrieval
   * Basic Example to show the use of api
   */
 
-#include<iostream>
+#include <iostream>
 #include <libdrizzle-5.1/libdrizzle.h>
 #include <libdrizzle-5.1/binlogapi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include<string.h>
+#include <string.h>
 
 
 
@@ -26,7 +26,7 @@ XidEvent xevent;
 
 void binlog_error(drizzle_return_t ret, drizzle_st *con, void *context)
 {
-	
+
 	(void) context;
 	if (ret != DRIZZLE_RETURN_EOF)
 	{
@@ -57,7 +57,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 
 
 	}
-	
+
 	if((int)type==19) //TABLE_MAP_EVENT)
 	{
 		data= drizzle_binlog_event_raw_data(event);
@@ -100,10 +100,10 @@ int main(void)
 
 	//ret= drizzle_binlog_start(binlog, 0, "mysql-bin.000150", 0);
 	ret= drizzle_binlog_start(binlog, 0, "", 0);
-	
+
 	if (ret != DRIZZLE_RETURN_OK)
 	{
-		return EXIT_FAILURE;  
+		return EXIT_FAILURE;
 	}
 	drizzle_quit(con);
 	return EXIT_SUCCESS;

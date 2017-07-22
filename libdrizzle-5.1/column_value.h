@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 Drizzle Developer Group
  * Copyright (C) 2013 Kuldeep Porwal
  * All rights reserved.
@@ -9,8 +9,8 @@
  * summary: column value info
  *
  */
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 
 #ifndef COLUMN_VALUE
 #define COLUMN_VALUE
@@ -25,7 +25,7 @@ namespace binlogevent
 				is_null = _bool;
 				col_num = col_n;
 			}
-				
+
 			std::string getValue() {return value;  } // Check: str.empty() is true so int value otherwise string value.
 			bool isNull() { return is_null;}
 			int getColumnNum() {return col_num;}

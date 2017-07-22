@@ -91,6 +91,29 @@ mkdir -p $RPM_BUILD_ROOT/
 %{_includedir}/%{name}/libdrizzle-redux/verbose.h
 %{_includedir}/%{name}/libdrizzle-redux/version.h
 %{_includedir}/%{name}/libdrizzle-redux/visibility.h
+%{_includedir}/libdrizzle-5.1/binlog.h
+%{_includedir}/libdrizzle-5.1/column.h
+%{_includedir}/libdrizzle-5.1/column_client.h
+%{_includedir}/libdrizzle-5.1/conn.h
+%{_includedir}/libdrizzle-5.1/conn_client.h
+%{_includedir}/libdrizzle-5.1/constants.h
+%{_includedir}/libdrizzle-5.1/drizzle.h
+%{_includedir}/libdrizzle-5.1/drizzle_client.h
+%{_includedir}/libdrizzle-5.1/error.h
+%{_includedir}/libdrizzle-5.1/field_client.h
+%{_includedir}/libdrizzle-5.1/helper.h
+%{_includedir}/libdrizzle-5.1/libdrizzle.h
+%{_includedir}/libdrizzle-5.1/query.h
+%{_includedir}/libdrizzle-5.1/result.h
+%{_includedir}/libdrizzle-5.1/result_client.h
+%{_includedir}/libdrizzle-5.1/return.h
+%{_includedir}/libdrizzle-5.1/row_client.h
+%{_includedir}/libdrizzle-5.1/ssl.h
+%{_includedir}/libdrizzle-5.1/statement.h
+%{_includedir}/libdrizzle-5.1/structs.h
+%{_includedir}/libdrizzle-5.1/verbose.h
+%{_includedir}/libdrizzle-5.1/version.h
+%{_includedir}/libdrizzle-5.1/visibility.h
 
 %changelog
 * Tue Jun 20 2017 Andreas Bok Andersen <andreas.bok@sociomantic.com> - 6.0.5

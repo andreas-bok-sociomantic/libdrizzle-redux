@@ -13,8 +13,8 @@ Helper contains functions which give binlog api the capabilities to parse binary
 MySQL Fields
 ------------
 
-.. cc:type:: enum_field_types
-   
+.. cc:type:: drizzle_field_type_t
+
    An ENUM of the possible MySQL field types
 
    .. py:data:: MYSQL_TYPE_DECIMAL
@@ -71,12 +71,12 @@ MySQL Fields
 
    .. py:data:: MYSQL_TYPE_GEOMETRY
 
-.. cc:type:: enum_field_bytes   
+.. cc:type:: drizzle_field_byte_t
 
    An ENUM of formats in which Field types are stored
 
    .. py:data:: LEN_ENC_STR
-      
+
       Length Encoded String
 
    .. py:data:: READ_1_BYTE
@@ -90,24 +90,6 @@ MySQL Fields
    .. py:data:: NOT_FOUND
 
       No format for corresponding field type present
- 
-.. cc:type:: enum_event_type
-
-   An ENUM for possible Event Types
-
-   .. py:data:: TABLE_MAP_EVENT
-
-   .. py:data:: WRITE_ROWS_EVENTv1
-
-      v1 is for version number
-
-   .. py:data:: UPDATE_ROWS_EVENTv1
-
-      v1 is for version number
-
-   .. py:data:: DELETE_ROWS_EVENTv1
-
-      v1 is for version number
 
 .. cc:type:: enum_col_type
 
@@ -118,7 +100,7 @@ MySQL Fields
       Type is string
 
    .. py:data:: INT
- 
+
       Type is INTEGER
 
 Functions
@@ -130,44 +112,9 @@ Functions
 
    :param val: The number
 
-.. cc:function:: uint16_t getByte2(int pos,const unsigned char* data)
-
-   get 2 byte number from raw data
-
-   :param pos: Start psosition
-   :param data: Raw Data of binlog
-   
-.. cc:function:: uint32_t getByte3(int pos,const unsigned char* data)
-
-   get 3 byte number from raw data
-
-   :param pos: Start psosition
-   :param data: Raw Data of binlog
-
-.. cc:function:: uint32_t getByte4(int pos,const unsigned char* data)
-
-   get 4 byte number from raw data
-
-   :param pos: Start psosition
-   :param data: Raw Data of binlog
-   
-.. cc:function:: uint64_t getByte6(int pos,const unsigned char* data)
-
-   get 6 byte number from raw data
-
-   :param pos: Start psosition
-   :param data: Raw Data of binlog
-   
-.. cc:function:: uint64_t getByte8(int pos,const unsigned char* data)
-
-   get 8 byte number from raw data
-
-   :param pos: Start psosition
-   :param data: Raw Data of binlog
-
 .. cc:function:: char * getString(int pos,int len,const unsigned char * data)
 
-   Gets the string of specified length	
+   Gets the string of specified length
 
    :param pos: Start  position
    :param len: Length of string to read
@@ -180,13 +127,13 @@ Functions
    :param pos: reference to start position
    :param data: Raw data which conatins LenEncoded string
 
-.. cc:function:: int lookup_metadata_field_size(enum_field_types field_type)
+.. cc:function:: int lookup_metadata_field_size(drizzle_field_type_t field_type)
 
    Returns the Meta len of given field type
 
    :param field_type: The field type (enum)
-   	
-.. cc:function:: string getIntToStr(uint64_t num)	
+
+.. cc:function:: string getIntToStr(uint64_t num)
 
    converts int to string
 
@@ -200,9 +147,9 @@ Functions
    :param data: Raw data
    :param start_pos: start position
    :param _byte: total number of bytes to read (remember column count can be less than _byte*8)
-   :param _bit: Total number of bits(column count) to read	
+   :param _bit: Total number of bits(column count) to read
 
-.. cc:function:: enum_field_bytes lookup_field_bytes(enum_field_types field_type)	
+.. cc:function:: drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type)
 
    Returns the enum of field bytes which should be read for corresponding column/field type
 

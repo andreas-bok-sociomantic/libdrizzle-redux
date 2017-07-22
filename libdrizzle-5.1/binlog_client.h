@@ -11,4 +11,3 @@
 #include <libdrizzle-5.1/row_event.h>
 #include <libdrizzle-5.1/row_iterator.h>
 #include <libdrizzle-5.1/column_value.h>
-

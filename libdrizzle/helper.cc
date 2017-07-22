@@ -10,101 +10,14 @@
  *
  */
 #include "config.h"
-#include<iostream>
+#include <iostream>
 #include "libdrizzle/common.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <inttypes.h>
-#include<string.h>
-#include<sstream>
-#include<libdrizzle-5.1/helper.h>
+#include <string.h>
+#include <sstream>
+#include <libdrizzle-5.1/helper.h>
 
 using namespace std;
-
-uint32_t getByte4(int pos,const unsigned char* data)
-{
-	if((int)(sizeof(data)-pos)<4)
-	{
-		return UINT_MAX;
-	}
-	uint32_t tmpMask = mask(32); // all 32 bits set to 1
-
-	tmpMask=((uint32_t)data[pos]&tmpMask);
-	tmpMask=((uint32_t)data[pos+1]<<8|tmpMask);
-	tmpMask=((uint32_t)data[pos+2]<<16|tmpMask);
-	tmpMask=((uint32_t)data[pos+3]<<24|tmpMask);
-
-	return tmpMask;
-}
-
-uint32_t getByte3(int pos,const unsigned char* data)
-{
-	if((int)(sizeof(data)-pos)<3)
-	{
-		return UINT_MAX;
-	}
-	uint32_t tmpMask = mask(32); // all 32 bits set to 1
-
-	tmpMask=((uint32_t)data[pos]&tmpMask);
-	tmpMask=((uint32_t)data[pos+1]<<8|tmpMask);
-	tmpMask=((uint32_t)data[pos+2]<<16|tmpMask);
-
-	return tmpMask;
-}
-
-uint16_t getByte2(int pos,const unsigned char* data)
-{
-	if((int)sizeof(data)-pos<2)
-	{
-		return USHRT_MAX;
-	}
-	uint16_t tmpMask = mask(16); // all 16 bits set to 1
-
-	tmpMask=((uint16_t)data[pos]&tmpMask);
-	tmpMask=((uint16_t)data[pos+1]<<8|tmpMask);
-
-	return tmpMask;
-}
-
-
-uint64_t getByte6(int pos,const unsigned char* data)
-{
-	if((int)sizeof(data)-pos<6)
-	{
-		return UINT_MAX;
-	}
-	uint64_t tmpMask = mask(64); // all 64 bits set to 1
-
-	tmpMask=((uint64_t)data[pos]&tmpMask);
-	tmpMask=((uint64_t)data[pos+1]<<8|tmpMask);
-	tmpMask=((uint64_t)data[pos+2]<<16|tmpMask);
-	tmpMask=((uint64_t)data[pos+3]<<24|tmpMask);
-	tmpMask=((uint64_t)data[pos+4]<<32|tmpMask);
-	tmpMask=((uint64_t)data[pos+5]<<40|tmpMask);
-
-	return tmpMask;
-}
-
-uint64_t getByte8(int pos,const unsigned char* data)
-{
-	if((int)sizeof(data)-pos<8)
-	{
-		return UINT_MAX;
-	}
-	uint64_t tmpMask = mask(64); // all 64 bits set to 1
-
-	tmpMask=((uint64_t)data[pos]&tmpMask);
-	tmpMask=((uint64_t)data[pos+1]<<8|tmpMask);
-	tmpMask=((uint64_t)data[pos+2]<<16|tmpMask);
-	tmpMask=((uint64_t)data[pos+3]<<24|tmpMask);
-	tmpMask=((uint64_t)data[pos+4]<<32|tmpMask);
-	tmpMask=((uint64_t)data[pos+5]<<40|tmpMask);
-	tmpMask=((uint64_t)data[pos+5]<<48|tmpMask);
-	tmpMask=((uint64_t)data[pos+5]<<56|tmpMask);
-
-	return tmpMask;
-}
 
 char * getString(int pos,int len,const unsigned char * data)
 {
@@ -151,13 +64,13 @@ uint64_t getEncodedLen(int& pos, const unsigned char *data)
 			break;
 
 		case 2:
-			len= (uint64_t)getByte2(pos+1,data);
+			len= (uint64_t)readBytes<uint16_t>(pos+1,data);
 			break;
 		case 3:
-			len= (uint64_t)getByte3(pos+1,data);
+			len= (uint64_t)readBytes<uint32_t, 3>(pos+1,data);
 			break;
 		case 8:
-			len= (uint64_t)getByte8(pos+1,data);
+			len= readBytes<uint64_t>(pos+1,data);
 			break;
 		default:
 			break;
@@ -200,88 +113,116 @@ int getBoolArray(bool *arr, const unsigned char *data, int start_pos, int _byte,
 	return count; // count where bit in not set. (0)
 
 }
-int lookup_metadata_field_size(enum_field_types field_type)
-{
-	switch (field_type)
-	{
-		case MYSQL_TYPE_DOUBLE:
-		case MYSQL_TYPE_FLOAT:
-		case MYSQL_TYPE_BLOB:
-		case MYSQL_TYPE_GEOMETRY:
-			return 1;
-		case MYSQL_TYPE_BIT:
-		case MYSQL_TYPE_VARCHAR:
-		case MYSQL_TYPE_NEWDECIMAL:
-		case MYSQL_TYPE_STRING:
-		case MYSQL_TYPE_VAR_STRING:
-			return 2;
-		case MYSQL_TYPE_DECIMAL:
-		case MYSQL_TYPE_SET:
-		case MYSQL_TYPE_ENUM:
-		case MYSQL_TYPE_YEAR:
-		case MYSQL_TYPE_TINY:
-		case MYSQL_TYPE_SHORT:
-		case MYSQL_TYPE_INT24:
-		case MYSQL_TYPE_LONG:
-		case MYSQL_TYPE_LONGLONG:
-		case MYSQL_TYPE_NEWDATE:
-		case MYSQL_TYPE_DATE:
-		case MYSQL_TYPE_TIME:
-		case MYSQL_TYPE_TIMESTAMP:
-		case MYSQL_TYPE_DATETIME:
-		case MYSQL_TYPE_TINY_BLOB:
-		case MYSQL_TYPE_MEDIUM_BLOB:
-		case MYSQL_TYPE_LONG_BLOB:
-		case MYSQL_TYPE_NULL:
-		default:
-			return 0;
-	}
 
+int lookup_metadata_field_size(drizzle_field_type_t field_type)
+{
+    switch ( field_type )
+    {
+        case DRIZZLE_COLUMN_TYPE_DATE:
+        case DRIZZLE_COLUMN_TYPE_DATETIME:
+        case DRIZZLE_COLUMN_TYPE_DECIMAL: // Pre 5.0
+        case DRIZZLE_COLUMN_TYPE_INT24:
+        case DRIZZLE_COLUMN_TYPE_LONG:
+        case DRIZZLE_COLUMN_TYPE_LONGLONG:
+        case DRIZZLE_COLUMN_TYPE_NULL:
+        case DRIZZLE_COLUMN_TYPE_SHORT:
+        case DRIZZLE_COLUMN_TYPE_TIME:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP:
+        case DRIZZLE_COLUMN_TYPE_TINY:
+        case DRIZZLE_COLUMN_TYPE_YEAR:
+            return 0;
+
+        // Note that the following column types were added in v5.0
+        // - DRIZZLE_COLUMN_TYPE_DATETIME2
+        // - DRIZZLE_COLUMN_TYPE_TIME2
+        // - DRIZZLE_COLUMN_TYPE_TIMESTAMP2
+        //
+        // The column types and their  metadata byte size is however not
+        // covered in the accessible MySQL source code documentation,
+        // (https://is.gd/IPzVrf), cf.
+        // "Table_map_event column types: numerical identifier and metadata"
+        //
+        // Instead the metadata byte size of 1 is based on how MaxScale
+        // handles these column types, cf. (avro_rbr.c)
+        case DRIZZLE_COLUMN_TYPE_BLOB:
+        case DRIZZLE_COLUMN_TYPE_DATETIME2:
+        case DRIZZLE_COLUMN_TYPE_DOUBLE:
+        case DRIZZLE_COLUMN_TYPE_FLOAT:
+        case DRIZZLE_COLUMN_TYPE_GEOMETRY:
+        case DRIZZLE_COLUMN_TYPE_TIME2:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP2:
+            return 1;
+
+        case DRIZZLE_COLUMN_TYPE_BIT:
+        case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
+        case DRIZZLE_COLUMN_TYPE_STRING:
+        case DRIZZLE_COLUMN_TYPE_VARCHAR:
+        case DRIZZLE_COLUMN_TYPE_VAR_STRING:
+            return 2;
+
+        // The column types below are only used internally at the MySQL. Added
+        // so enumeration values of drizzle_column_t are handled in order to
+        // satisfy compile flag -Werror=switch-enum
+        case DRIZZLE_COLUMN_TYPE_NEWDATE:
+		case DRIZZLE_COLUMN_TYPE_ENUM:
+		case DRIZZLE_COLUMN_TYPE_SET:
+		case DRIZZLE_COLUMN_TYPE_TINY_BLOB:
+		case DRIZZLE_COLUMN_TYPE_MEDIUM_BLOB:
+		case DRIZZLE_COLUMN_TYPE_LONG_BLOB:
+        default:
+            return 0;
+    }
 }
 
-enum_field_bytes lookup_field_bytes(enum_field_types field_type)
+drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type)
 {
-	switch (field_type)
-	{
-		case MYSQL_TYPE_DECIMAL:
-		case MYSQL_TYPE_TIMESTAMP:
-		case MYSQL_TYPE_DATE:
-		case MYSQL_TYPE_TIME:
-		case MYSQL_TYPE_DATETIME:
-		case MYSQL_TYPE_NEWDATE:
-		case MYSQL_TYPE_VARCHAR:
-		case MYSQL_TYPE_BIT:
-		case MYSQL_TYPE_NEWDECIMAL:
-		case MYSQL_TYPE_TINY_BLOB:
-		case MYSQL_TYPE_MEDIUM_BLOB:
-		case MYSQL_TYPE_LONG_BLOB:
-		case MYSQL_TYPE_BLOB:
-		case MYSQL_TYPE_VAR_STRING:
-		case MYSQL_TYPE_STRING:
-			return LEN_ENC_STR;
+    switch ( field_type )
+    {
+        case DRIZZLE_COLUMN_TYPE_DECIMAL:
+        case DRIZZLE_COLUMN_TYPE_VARCHAR:
+        case DRIZZLE_COLUMN_TYPE_BIT:
+        case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
+        case DRIZZLE_COLUMN_TYPE_TINY_BLOB:
+        case DRIZZLE_COLUMN_TYPE_MEDIUM_BLOB:
+        case DRIZZLE_COLUMN_TYPE_LONG_BLOB:
+        case DRIZZLE_COLUMN_TYPE_BLOB:
+        case DRIZZLE_COLUMN_TYPE_GEOMETRY:
+        case DRIZZLE_COLUMN_TYPE_VAR_STRING:
+        case DRIZZLE_COLUMN_TYPE_STRING:
+            return LEN_ENC_STR;
 
-		case MYSQL_TYPE_TINY:
-			return READ_1_BYTE;
+        case DRIZZLE_COLUMN_TYPE_TINY:
+        case DRIZZLE_COLUMN_TYPE_YEAR:
+            return READ_1_BYTE;
 
-		case MYSQL_TYPE_SHORT:
-		case MYSQL_TYPE_YEAR:
-			return READ_2_BYTE;
+        case DRIZZLE_COLUMN_TYPE_SHORT:
+            return READ_2_BYTE;
 
-		case MYSQL_TYPE_LONG:
-		case MYSQL_TYPE_FLOAT:
-		case MYSQL_TYPE_INT24:
-			return READ_4_BYTE;
+        case DRIZZLE_COLUMN_TYPE_DATE:
+        case DRIZZLE_COLUMN_TYPE_TIME:
+        case DRIZZLE_COLUMN_TYPE_TIME2 :
+        case DRIZZLE_COLUMN_TYPE_INT24 :
+        case DRIZZLE_COLUMN_TYPE_NEWDATE :
+            return READ_3_BYTE;
 
-		case MYSQL_TYPE_DOUBLE:
-		case MYSQL_TYPE_LONGLONG:
-			return READ_8_BYTE;
+        case DRIZZLE_COLUMN_TYPE_LONG:
+        case DRIZZLE_COLUMN_TYPE_FLOAT:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP2 :
+        case DRIZZLE_COLUMN_TYPE_DATETIME:
+            return READ_4_BYTE;
 
-		case MYSQL_TYPE_NULL:
-		case MYSQL_TYPE_ENUM:
-		case MYSQL_TYPE_SET:
-		case MYSQL_TYPE_GEOMETRY:
-		default:
-			return NOT_FOUND;
+        case DRIZZLE_COLUMN_TYPE_DATETIME2 :
+            return READ_5_BYTE;
 
-	}
+        case DRIZZLE_COLUMN_TYPE_DOUBLE:
+        case DRIZZLE_COLUMN_TYPE_LONGLONG:
+            return READ_8_BYTE;
+
+        case DRIZZLE_COLUMN_TYPE_NULL:
+        case DRIZZLE_COLUMN_TYPE_ENUM:
+        case DRIZZLE_COLUMN_TYPE_SET:
+        default:
+            return NOT_FOUND;
+    }
 }
