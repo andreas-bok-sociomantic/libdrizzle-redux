@@ -79,7 +79,7 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	setTableName(tmp_char);
 	start_pos+=table_name_len+1; // +1 for null
 
-	tmp_int = getEncodedLen(start_pos,data);
+	tmp_int = (int) getEncodedLen(start_pos,data);
 	if(tmp_int==0)
 		return;
 	setColumnCount(getEncodedLen(start_pos,data)); // start_pos will also get updated
@@ -96,7 +96,7 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	start_pos+=column_count;
 
 
-	int metaSize= getEncodedLen(start_pos,data);
+	int metaSize= (int) getEncodedLen(start_pos,data);
 	if(metaSize==0)
 		return;
 	column_meta_data = (uint64_t *)(malloc(sizeof(uint64_t)*column_count));
