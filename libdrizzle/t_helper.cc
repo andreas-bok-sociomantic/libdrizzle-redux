@@ -21,7 +21,7 @@ using namespace std;
        ((uint32_t)(__b)==8 ? 0xff : 0xffffffffffffffff ))))
 
 
-template<typename U, int V = sizeof(U)>
+template<typename U, int V>
 U readBytes(int pos, const unsigned char* data)
 {
     if ((int)(sizeof(data)-pos)<V)

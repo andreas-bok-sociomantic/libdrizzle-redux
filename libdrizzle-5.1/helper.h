@@ -66,9 +66,9 @@ drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type);
 #ifndef T_HELPER_H
 #include <libdrizzle/t_helper.h>
 #include <libdrizzle/t_helper.cc>
-template <typename U, int V = sizeof(U)> U
+template <typename U, int V>
 DRIZZLE_API
-readBytes(int pos, const unsigned char* data);
+U readBytes(int pos, const unsigned char* data);
 #endif // T_HELPER_H
 
 #endif

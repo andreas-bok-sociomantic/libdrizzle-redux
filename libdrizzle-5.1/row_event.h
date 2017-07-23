@@ -37,7 +37,6 @@ namespace binlogevent
 					table_id(-1),
 					flag(-1),
 					column_count(-1),
-					column_null_bitmap(NULL),
 					column_bitmap(NULL)
 			{
 				column_type=col_type;
@@ -173,7 +172,6 @@ namespace binlogevent
 			uint64_t table_id;
 			uint16_t flag; //post header
 			uint64_t column_count;
-			bool * column_null_bitmap;
 			bool * column_bitmap;
 			bool * null_bitmap;
 			RowIterator rows;
