@@ -11,7 +11,7 @@
  */
 #include "config.h"
 #include <iostream>
-#include "libdrizzle/common.h"
+#include "src/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -21,7 +21,7 @@
 #ifndef write_map
 #define write_map
 
-#include <libdrizzle-5.1/query_event.h>
+#include <libdrizzle-redux/query_event.h>
 
 #endif
 //#include "helper.h"

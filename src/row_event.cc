@@ -12,7 +12,7 @@
 
 #include "config.h"
 #include <iostream>
-#include "libdrizzle/common.h"
+#include "src/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -22,14 +22,14 @@
 #ifndef row_event
 #define row_event
 
-#include <libdrizzle-5.1/row_event.h>
+#include <libdrizzle-redux/row_event.h>
 
 #endif
 
 #ifndef HELPER
 #define HELPER
 
-#include <libdrizzle-5.1/helper.h>
+#include <libdrizzle-redux/helper.h>
 
 #endif
 

@@ -10,7 +10,7 @@
  *
  */
 #include "config.h"
-#include <libdrizzle-5.1/row_iterator.h>
+#include <libdrizzle-redux/row_iterator.h>
 
 using namespace binlogevent;
 

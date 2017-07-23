@@ -10,7 +10,7 @@
  *
  */
 
-#include <libdrizzle/t_helper.h>
+#include <src/t_helper.h>
 
 using namespace std;
 

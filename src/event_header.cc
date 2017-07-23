@@ -12,7 +12,7 @@
 
 #include "config.h"
 #include <iostream>
-#include "libdrizzle/common.h"
+#include "src/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -21,7 +21,7 @@
 
 #ifndef event_header
 #define event_header
-#include <libdrizzle-5.1/event_header.h>
+#include <libdrizzle-redux/event_header.h>
 #endif
 
 using namespace std;

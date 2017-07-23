@@ -11,20 +11,20 @@
  */
 #include "config.h"
 #include <iostream>
-#include "libdrizzle/common.h"
+#include "src/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <string.h>
 
-#include <libdrizzle-5.1/xid_event.h>
+#include <libdrizzle-redux/xid_event.h>
 
 
 #ifndef HELPER
 #define HELPER
 
-#include <libdrizzle-5.1/helper.h>
+#include <libdrizzle-redux/helper.h>
 
 #endif
 

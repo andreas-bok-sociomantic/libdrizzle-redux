@@ -11,8 +11,8 @@
  */
 #include "config.h"
 #include <iostream>
-#include "libdrizzle/common.h"
-#include "libdrizzle/commonapi.h"
+#include "src/common.h"
+#include "src/commonapi.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -23,7 +23,7 @@
 
 #define table_map
 
-#include <libdrizzle-5.1/table_map_event.h>
+#include <libdrizzle-redux/table_map_event.h>
 
 #endif*/
 

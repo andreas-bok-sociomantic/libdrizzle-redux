@@ -38,8 +38,8 @@
 #include <yatl/lite.h>
 
 #include <iostream>
-#include <libdrizzle-5.1/libdrizzle.h>
-#include <libdrizzle-5.1/binlogapi.h>
+#include <libdrizzle-redux/libdrizzle.h>
+#include <libdrizzle-redux/binlogapi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -129,8 +129,9 @@ int main(void)
 
 	binlog= drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
 
-  	char *binlog_file;
-  	drizzle_binlog_get_filename(con, &binlog_file, -1);
+	char *binlog_file;
+	uint32_t end_position;
+	drizzle_binlog_get_filename(con, &binlog_file, &end_position, -1);
 	ret= drizzle_binlog_start(binlog, 0, binlog_file, 0);
 
 	ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "Drizzle binlog start failure: %s(%s)",

@@ -22,7 +22,7 @@ check-binlog: tests/unit/binlog
 	tests/unit/binlog
 
 tests_unit_binlogapi_SOURCES= tests/unit/binlogapi.cc tests/unit/common.c
-tests_unit_binlogapi_LDADD= libdrizzle/libdrizzle-redux.la
+tests_unit_binlogapi_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 check_PROGRAMS+= tests/unit/binlogapi
 noinst_PROGRAMS+= tests/unit/binlogapi
 
@@ -162,7 +162,7 @@ check_PROGRAMS+= tests/unit/statement_nulls
 noinst_PROGRAMS+= tests/unit/statement_nulls
 
 tests_unit_helper_SOURCES= tests/unit/helper.cc
-tests_unit_helper_LDADD= libdrizzle/libdrizzle-redux.la
+tests_unit_helper_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_helper_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/helper
 noinst_PROGRAMS+= tests/unit/helper

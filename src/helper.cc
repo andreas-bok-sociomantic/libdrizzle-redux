@@ -11,11 +11,11 @@
  */
 #include "config.h"
 #include <iostream>
-#include "libdrizzle/common.h"
+#include "src/common.h"
 #include <errno.h>
 #include <string.h>
 #include <sstream>
-#include <libdrizzle-5.1/helper.h>
+#include <libdrizzle-redux/helper.h>
 
 using namespace std;
 

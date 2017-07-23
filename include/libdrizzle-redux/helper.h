@@ -64,8 +64,8 @@ int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,i
 drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type);
 
 #ifndef T_HELPER_H
-#include <libdrizzle/t_helper.h>
-#include <libdrizzle/t_helper.cc>
+#include <src/t_helper.h>
+#include <src/t_helper.cc>
 template <typename U, int V>
 DRIZZLE_API
 U readBytes(int pos, const unsigned char* data);

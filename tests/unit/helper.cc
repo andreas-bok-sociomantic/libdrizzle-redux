@@ -36,8 +36,8 @@
  */
 
 
-#include <libdrizzle-5.1/libdrizzle.h>
-#include <libdrizzle-5.1/binlog_client.h>
+#include <libdrizzle-redux/libdrizzle.h>
+#include <libdrizzle-redux/binlog_client.h>
 #include <cassert>
 
 #include <yatl/lite.h>
