@@ -9,24 +9,15 @@
  * summary: parse table map event
  *
  */
+#pragma once
+
 #include <cstring>
 #include <inttypes.h>
-
-#ifndef event_interface
-#define event_interface
 #include "event_interface.h"
-#endif
-using namespace std;
-#ifndef HELPER
-#define HELPER
-
 #include "helper.h"
 
-#endif
+using namespace std;
 
-#ifndef TABLE_MAP
-#define TABLE_MAP
-//using namespace binlogevent;
 namespace binlogevent
 {
 	class TableMapEvent : public Events
@@ -216,4 +207,3 @@ namespace binlogevent
 
 	}; // tablemapevent
 } /*namespace binlogevent*/
-#endif

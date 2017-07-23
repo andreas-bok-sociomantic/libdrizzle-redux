@@ -9,20 +9,14 @@
  * summary: creation of Event object (global)
  *
  */
+#pragma once
+
 #include <iostream>
 #include <cstring>
 #include <inttypes.h>
-
-#ifndef event_header
-#define event_header
 #include "event_header.h"
-#endif
 
 using namespace std;
-//using namespace binlogevent;
-
-#ifndef EVENT_INTERFACE
-#define EVENT_INTERFACE
 
 namespace binlogevent
 {
@@ -48,4 +42,3 @@ namespace binlogevent
 
 	};
 }
-#endif

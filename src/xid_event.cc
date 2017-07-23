@@ -21,11 +21,8 @@
 #include <libdrizzle-redux/xid_event.h>
 
 
-#ifndef HELPER
-#define HELPER
-
+#ifndef HELPER_H
 #include <libdrizzle-redux/helper.h>
-
 #endif
 
 using namespace std;

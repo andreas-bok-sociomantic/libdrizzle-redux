@@ -9,23 +9,15 @@
  * summary: parsing of row events like write event, update event, delete event
  *
  */
+
+#pragma once
+
 #include <cstring>
 #include <inttypes.h>
-
-#ifndef event_interface
-#define event_interface
 #include "event_interface.h"
-#endif
-
 #include "row_iterator.h"
 
 using namespace std;
-
-
-//using namespace binlogevent;
-
-#ifndef ROW_EVENT
-#define ROW_EVENT
 
 namespace binlogevent
 {
@@ -179,4 +171,3 @@ namespace binlogevent
 
 	}; // RowEvent
 } /*namespace binlogevent*/
-#endif

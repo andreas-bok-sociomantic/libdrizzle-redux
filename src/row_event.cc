@@ -19,18 +19,12 @@
 #include <inttypes.h>
 #include <string.h>
 #include <limits.h>
-#ifndef row_event
-#define row_event
-
+#ifndef ROW_EVENT_H
 #include <libdrizzle-redux/row_event.h>
-
 #endif
 
-#ifndef HELPER
-#define HELPER
-
+#ifndef HELPER_H
 #include <libdrizzle-redux/helper.h>
-
 #endif
 
 using namespace std;

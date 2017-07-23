@@ -9,22 +9,14 @@
  * summary: parsing of header (common for each event)
  *
  */
+#pragma once
+
 #include <iostream>
 #include <cstring>
 #include <inttypes.h>
-
-#ifndef HELPER
-#define HELPER
-
 #include "helper.h"
 
-#endif
-
-
 using namespace std;
-
-#ifndef EVENT_HEADER
-#define EVENT_HEADER
 
 namespace binlogevent
 {
@@ -62,4 +54,3 @@ namespace binlogevent
 			uint16_t flag;    //header
 	};
 } /*namespace binlogevent*/
-#endif

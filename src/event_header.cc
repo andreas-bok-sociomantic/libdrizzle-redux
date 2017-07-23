@@ -18,11 +18,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <string.h>
-
-#ifndef event_header
-#define event_header
 #include <libdrizzle-redux/event_header.h>
-#endif
 
 using namespace std;
 using namespace binlogevent;

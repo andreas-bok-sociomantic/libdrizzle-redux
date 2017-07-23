@@ -9,6 +9,9 @@
  * summary: Returns objects of every event
  *
  */
+
+#pragma once
+
 #include <iostream>
 #include <cstring>
 #include <inttypes.h>
@@ -18,9 +21,7 @@
 #include "query_event.h"
 #include "xid_event.h"
 
-
 using namespace std;
-//using namespace binlogevent;
 
 namespace binlogevent
 {
@@ -67,4 +68,3 @@ namespace binlogevent
 
 	};
 } /*namespace binlogevent*/
-

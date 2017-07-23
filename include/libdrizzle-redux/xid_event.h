@@ -9,18 +9,15 @@
  * summary: parse xid event
  *
  */
+
+#pragma once
+
 #include <cstring>
 #include <inttypes.h>
-
-#ifndef event_interface
-#define event_interface
 #include "event_interface.h"
-#endif
+
 using namespace std;
 
-#ifndef XID_EVENT
-#define XID_EVENT
-//using namespace binlogevent;
 namespace binlogevent
 {
 	class XidEvent : public Events
@@ -90,5 +87,4 @@ namespace binlogevent
 			uint64_t Xid;
 
 	}; // Xidevent
-} /*namespace binlogevent*/
-#endif
+}

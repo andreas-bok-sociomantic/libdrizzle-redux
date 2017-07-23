@@ -13,20 +13,8 @@
 #include <iostream>
 #include "src/common.h"
 #include "src/commonapi.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include <string.h>
-
-/*#ifndef table_map
-
-#define table_map
-
-#include <libdrizzle-redux/table_map_event.h>
-
-#endif*/
-
 
 using namespace std;
 using namespace binlogevent;

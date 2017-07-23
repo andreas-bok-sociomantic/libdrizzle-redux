@@ -9,11 +9,13 @@
  * summary: column value info
  *
  */
+
+#pragma once
+
 #include <iostream>
 #include <string>
 
-#ifndef COLUMN_VALUE
-#define COLUMN_VALUE
+
 namespace binlogevent
 {
 	class ColumnValue
@@ -36,4 +38,3 @@ namespace binlogevent
 			int col_num;
 	};
 }
-#endif

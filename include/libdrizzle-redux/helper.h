@@ -13,9 +13,6 @@
 
 #include <limits>
 
-#ifndef HELPERS
-#define HELPERS
-
 typedef enum{
 	LEN_ENC_STR = -1,
 	READ_1_BYTE = 1,
@@ -70,5 +67,3 @@ template <typename U, int V>
 DRIZZLE_API
 U readBytes(int pos, const unsigned char* data);
 #endif // T_HELPER_H
-
-#endif

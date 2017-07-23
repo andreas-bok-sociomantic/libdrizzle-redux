@@ -1,11 +1,7 @@
-
-#ifndef T_HELPER_H
-#define T_HELPER_H
+#pragma once
 
 #include <limits>
 #include <cstdint>
 
 template <typename U, int V = sizeof(U)> U
 readBytes(int pos, const unsigned char* data);
-
-#endif // T_HELPER_H

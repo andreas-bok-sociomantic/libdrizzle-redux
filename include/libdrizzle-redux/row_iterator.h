@@ -14,8 +14,8 @@
 
 using namespace std;
 
-#ifndef ROW_ITERATOR
-#define ROW_ITERATOR
+#ifndef ROW_ITERATOR_H
+#define ROW_ITERATOR_H
 namespace binlogevent
 {
 	typedef vector<vector<ColumnValue> > RowVector;

@@ -11,12 +11,7 @@
  */
 #include <cstring>
 #include <inttypes.h>
-
-#ifndef event_interface
-#define event_interface
 #include "event_interface.h"
-#endif
-
 
 using namespace std;
 
