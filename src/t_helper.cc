@@ -21,9 +21,23 @@ using namespace std;
        ((uint32_t)(__b)==8 ? 0xff : 0xffffffffffffffff ))))
 
 
+/**
+ * @brief read raw bytes as a given numeric type
+ * @details Generic function to read a numeric value from
+ * raw bytes
+ *
+ * @param pos index into the byte array
+ * @param data char array
+ * @tparam U the target type for the bytes
+ * @tparam V number of bytes to read
+ * @return A value of type U
+ */
 template<typename U, int V>
 U readBytes(int pos, const unsigned char* data)
 {
+    static_assert(std::is_integral<U>::value,
+        "The target type must integral");
+
     if ((int)(sizeof(data)-pos)<V)
     {
         return numeric_limits<U>::max();
