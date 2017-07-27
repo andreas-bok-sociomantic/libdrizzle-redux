@@ -14,13 +14,6 @@
 
 using namespace std;
 
-#define mask(__b) \
-    ((uint32_t)(__b)==32 ? 0xffffffff : \
-     ((uint32_t)(__b)==24 ? 0xffffff : \
-      ((uint32_t)(__b)==16 ? 0xffff : \
-       ((uint32_t)(__b)==8 ? 0xff : 0xffffffffffffffff ))))
-
-
 /**
  * @brief read raw bytes as a given numeric type
  * @details Generic function to read a numeric value from
@@ -33,7 +26,7 @@ using namespace std;
  * @return A value of type U
  */
 template<typename U, int V>
-U readBytes(int pos, const unsigned char* data)
+U drizzle_binlog_read_bytes(int pos, const unsigned char* data)
 {
     static_assert(std::is_integral<U>::value,
         "The target type must integral");

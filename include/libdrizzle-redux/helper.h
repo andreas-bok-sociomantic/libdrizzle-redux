@@ -13,7 +13,27 @@
 
 #include <limits>
 
-typedef enum{
+#ifndef T_HELPER_H
+#include <src/t_helper.h>
+#include <src/t_helper.cc>
+
+/**
+ * @brief Read a number of bytes as a specific type
+ * @details The number of bytes can be less than the size of the datatype to
+ * convert the bytes into
+ *
+ * @param pos the position from which to read
+ * @param data array of bytes
+ * @tparam U The datatype to read
+ * @tparam V The number of bytes to read
+ * @return A value of type U
+ */
+template <typename U, int V>
+DRIZZLE_API
+U drizzle_binlog_read_bytes(int pos, const unsigned char* data);
+#endif // T_HELPER_H
+
+typedef enum {
 	LEN_ENC_STR = -1,
 	READ_1_BYTE = 1,
 	READ_2_BYTE = 2,
@@ -24,18 +44,14 @@ typedef enum{
 	NOT_FOUND   = 0
 } drizzle_field_byte_t;
 
-typedef enum{
+typedef enum {
 	STRING = 1,
 	INT = 2
-}enum_col_type;
+} enum_col_type;
 
-#define bytes_col_count(__b) \
-	((uint64_t)(__b)<0xfb ? 1 : \
-	 ((uint64_t)(__b)==0xfc ? 2 : \
-	  ((uint64_t)(__b)==0xfd ? 3 : 8)))
+// DRIZZLE_API
+// bool getNextBit(uint8_t& val);
 
-DRIZZLE_API
-bool getNextBit(uint8_t& val);
 /** gets the string of specified length
   *
   * @param[in] pos Start reading from pos.
@@ -45,25 +61,17 @@ bool getNextBit(uint8_t& val);
  DRIZZLE_API
 char * getString(int pos,int len,const unsigned char * data);
 
- DRIZZLE_API
+DRIZZLE_API
 uint64_t getEncodedLen(int& pos,const unsigned char * data);
 
- DRIZZLE_API
+DRIZZLE_API
 int lookup_metadata_field_size(drizzle_field_type_t field_type);
 
- DRIZZLE_API
+DRIZZLE_API
 std::string getIntToStr(uint64_t num);
 
- DRIZZLE_API
+DRIZZLE_API
 int getBoolArray(bool arr[],const unsigned char data[],int start_pos,int _byte,int _bit);
 
- DRIZZLE_API
-drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type);
-
-#ifndef T_HELPER_H
-#include <src/t_helper.h>
-#include <src/t_helper.cc>
-template <typename U, int V>
 DRIZZLE_API
-U readBytes(int pos, const unsigned char* data);
-#endif // T_HELPER_H
+drizzle_field_byte_t lookup_field_bytes(drizzle_field_type_t field_type);

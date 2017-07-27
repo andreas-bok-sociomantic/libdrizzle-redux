@@ -30,13 +30,13 @@ void TableMapEvent::initWithData(const unsigned char* data)
 	if(start_pos==-1)
 		return;
 
-	tmp = readBytes<uint64_t, 6>(start_pos,data);
+	tmp = drizzle_binlog_read_bytes<uint64_t, 6>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
 	setTableId((uint64_t)tmp);
 	start_pos+=6;// 6 byte for table id.
 
-	tmp = readBytes<uint16_t>(start_pos,data);
+	tmp = drizzle_binlog_read_bytes<uint16_t>(start_pos,data);
 	if(tmp==USHRT_MAX)
 		return;
 	setFlagPh((uint16_t)tmp);
@@ -102,7 +102,7 @@ void TableMapEvent::initWithData(const unsigned char* data)
 				metaData= (int)data[start_pos];
 				break;
 			case 2:
-				metaData= (int)readBytes<uint16_t>(start_pos,data);
+				metaData= (int)drizzle_binlog_read_bytes<uint16_t>(start_pos,data);
 				break;
 			default:
 				break;

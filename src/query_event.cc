@@ -38,13 +38,13 @@ void QueryEvent::initWithData(const unsigned char* data)
 	if(start_pos==-1)
 		return;
 
-	tmp = readBytes<uint32_t>(start_pos,data);
+	tmp = drizzle_binlog_read_bytes<uint32_t>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
 	setProxyId((uint32_t)tmp);
 	start_pos+=4;// 4 byte for proxy id.
 
-	tmp = readBytes<uint32_t>(start_pos,data);
+	tmp = drizzle_binlog_read_bytes<uint32_t>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
 	setExecutionTime((uint32_t)tmp);
@@ -55,7 +55,7 @@ void QueryEvent::initWithData(const unsigned char* data)
 	setSchemaLength((uint8_t)data[start_pos]);
 	start_pos+=1;// 1 byte for schema length.
 
-	tmp = readBytes<uint16_t>(start_pos,data);
+	tmp = drizzle_binlog_read_bytes<uint16_t>(start_pos,data);
 	if(tmp==USHRT_MAX)
 		return;
 	setErrorCode((uint16_t)tmp);

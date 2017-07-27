@@ -64,13 +64,13 @@ uint64_t getEncodedLen(int& pos, const unsigned char *data)
 			break;
 
 		case 2:
-			len= (uint64_t)readBytes<uint16_t>(pos+1,data);
+			len= (uint64_t)drizzle_binlog_read_bytes<uint16_t>(pos+1,data);
 			break;
 		case 3:
-			len= (uint64_t)readBytes<uint32_t, 3>(pos+1,data);
+			len= (uint64_t)drizzle_binlog_read_bytes<uint32_t, 3>(pos+1,data);
 			break;
 		case 8:
-			len= readBytes<uint64_t>(pos+1,data);
+			len= drizzle_binlog_read_bytes<uint64_t>(pos+1,data);
 			break;
 		default:
 			break;
@@ -80,10 +80,11 @@ uint64_t getEncodedLen(int& pos, const unsigned char *data)
 	return len;
 }
 
+
 bool getNextBit(uint8_t& val)
 {
-	val = val >> 1;
-	return (val & 1);
+    val = val >> 1;
+    return (val & 1);
 }
 int getBoolArray(bool *arr, const unsigned char *data, int start_pos, int _byte,
 	int _bit)

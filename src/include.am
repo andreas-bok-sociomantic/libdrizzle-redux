@@ -20,6 +20,7 @@ noinst_HEADERS+= src/structs.h
 noinst_HEADERS+= src/windows.hpp
 noinst_HEADERS+= src/commonapi.h
 noinst_HEADERS+= src/t_helper.h
+noinst_HEADERS+= src/helper.h
 
 lib_LTLIBRARIES+= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES=

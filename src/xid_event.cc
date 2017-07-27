@@ -37,7 +37,7 @@ void XidEvent::initWithData(const unsigned char* data)
 	if(start_pos==-1)
 		return;
 
-	uint64_t tmp=readBytes<uint64_t>(start_pos,data);
+	uint64_t tmp=drizzle_binlog_read_bytes<uint64_t>(start_pos,data);
 	if(tmp==UINT_MAX)
 		return;
 

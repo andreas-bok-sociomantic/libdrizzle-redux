@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
   int i = 253;
   int pos = 0;
   auto ptr = reinterpret_cast<const unsigned char*>(&i);
-  auto result = readBytes<int>(pos, ptr);
+  auto result = drizzle_binlog_read_bytes<int>(pos, ptr);
 
   ASSERT_EQ_(result, 253, "readValue returned wrong value (expected 253, got %d )",
     result);

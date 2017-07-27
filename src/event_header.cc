@@ -28,7 +28,7 @@ int EventHeader::setHeader(const unsigned char* data)
 {
 	// Total bytes to read: 19
 	int start_pos = 0;
-        timestamp= readBytes<uint32_t>(start_pos,data);
+        timestamp= drizzle_binlog_read_bytes<uint32_t>(start_pos,data);
 	if(timestamp==UINT_MAX)
 		return -1;
 	start_pos+=4; // 4 byte for timestamp.
@@ -39,22 +39,22 @@ int EventHeader::setHeader(const unsigned char* data)
 	type= (drizzle_binlog_event_types_t)tmp;
 	start_pos+=1; // 1 byte for type of evnet.
 
-	server_id= readBytes<uint32_t>(start_pos,data);
+	server_id= drizzle_binlog_read_bytes<uint32_t>(start_pos,data);
 	if(server_id==UINT_MAX)
 		return -1;
 	start_pos+=4; // 4 byte of server ID.
 
-	event_size= readBytes<uint32_t>(start_pos,data);
+	event_size= drizzle_binlog_read_bytes<uint32_t>(start_pos,data);
 	if(event_size==UINT_MAX)
 		return -1;
 	start_pos+=4; // 4 byte for event size.
 
-	log_pos= readBytes<uint32_t>(start_pos,data);
+	log_pos= drizzle_binlog_read_bytes<uint32_t>(start_pos,data);
 	if(log_pos==UINT_MAX)
 		return -1;
 	start_pos+=4;// 4 byte for getting possion of next event.
 
-	flag= readBytes<uint16_t>(start_pos,data);
+	flag= drizzle_binlog_read_bytes<uint16_t>(start_pos,data);
 	if(flag==USHRT_MAX)
 		return -1;
 	start_pos+=2; // 2 bytes for getting flag
