@@ -407,6 +407,40 @@ public:
   }
 };
 
+
+struct drizzle_binlog_event_interface_st
+{
+  public :
+    void parse_postheader(const char *data);
+    void parse_payload(const char *data);
+};
+
+struct drizzle_binlog_xid_event_st : drizzle_binlog_event_interface_st
+{
+  public :
+    uint64_t xid;
+
+  drizzle_binlog_xid_event_st() : xid(0) {}
+
+};
+
+struct drizzle_binlog_query_event_st : drizzle_binlog_event_interface_st
+{
+
+};
+
+
+struct drizzle_binlog_rows_event_st : drizzle_binlog_event_interface_st
+{
+
+};
+
+
+struct drizzle_binlog_tablemap_event_st : drizzle_binlog_event_interface_st
+{
+
+};
+
 struct drizzle_binlog_event_st
 {
   uint32_t timestamp;
