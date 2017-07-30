@@ -54,7 +54,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
   if (drizzle_binlog_event_type(event) == DRIZZLE_EVENT_TYPE_XID)
   {
     drizzle_binlog_xid_event_st* xid_event = drizzle_binlog_get_xid_event(event);
-    printf("%ld\n", xid_event->xid());
+    printf("%ld\n", xid_event->xid);
   }
 }
 

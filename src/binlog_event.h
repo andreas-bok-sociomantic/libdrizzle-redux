@@ -106,15 +106,15 @@ struct drizzle_binlog_event_allocator
 };
 
 
-struct drizzle_binlog_xid_event_st
-{
+// struct drizzle_binlog_xid_event_st
+// {
 
-    uint64_t xid_;
-    drizzle_binlog_xid_event_st() : xid_(0)
-    {}
+//     uint64_t xid_;
+//     drizzle_binlog_xid_event_st() : xid_(0)
+//     {}
 
-    uint64_t xid();
-};
+//     uint64_t xid();
+// };
 
 struct drizzle_binlog_query_event_st
 {

@@ -101,9 +101,11 @@ U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
     uint64_t i = 1;
     while (i < byte_size)
     {
-        value = ((U)(binlog_event->data_ptr) + i) << (i * 8)| value;
+        value = ((U)binlog_event->data_ptr[i]) << (i * 8) | value;
         i++;
     }
+
+    binlog_event->data_ptr+=byte_size;
 
     return value;
 }
@@ -122,11 +124,13 @@ void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
 }
 
 
+// drizzle_binlog_xid_event_st::drizzle_binlog_xid_event_st() : xid(0) {}
+
 drizzle_binlog_xid_event_st* drizzle_binlog_get_xid_event( drizzle_binlog_event_st *event )
 {
     auto xid_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_xid_event_st>();
 
-    xid_event->xid_ = drizzle_read_type<uint64_t>(event);
+    xid_event->xid = drizzle_read_type<uint64_t>(event);
     return xid_event;
 }
 
