@@ -90,6 +90,24 @@ U drizzle_read_type(uint32_t *pos, unsigned char* data)
     return value;
 }
 
+
+template<typename U, uint32_t V>
+U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
+{
+    static_assert(std::is_integral<U>::value,
+        "The target type must integral");
+    auto byte_size = sizeof(U);
+    U value = ((U)binlog_event->data_ptr) & mask(byte_size*8);
+    uint64_t i = 1;
+    while (i < byte_size)
+    {
+        value = ((U)(binlog_event->data_ptr) + i) << (i * 8)| value;
+        i++;
+    }
+
+    return value;
+}
+
 template <typename U>
 void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
   U *value, uint32_t num_bytes)
@@ -108,7 +126,7 @@ drizzle_binlog_xid_event_st* drizzle_binlog_get_xid_event( drizzle_binlog_event_
 {
     auto xid_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_xid_event_st>();
 
-    xid_event->xid = drizzle_read_type<uint64_t>(&xid_event->data_index, event->data);
+    xid_event->xid_ = drizzle_read_type<uint64_t>(event);
     return xid_event;
 }
 
@@ -116,21 +134,25 @@ drizzle_binlog_query_event_st *drizzle_binlog_get_query_event( drizzle_binlog_ev
 {
     auto query_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_query_event_st>();
 
-    query_event->slave_proxy_id = drizzle_read_type<uint32_t>(&query_event->data_index,
-        event->data);
+    // query_event->slave_proxy_id = drizzle_read_type<uint32_t>(&query_event->data_index,
+    //     event->data);
 
-    query_event->execution_time = drizzle_read_type<uint32_t>(&query_event->data_index,
-        event->data);
+    // query_event->execution_time = drizzle_read_type<uint32_t>(&query_event->data_index,
+    //     event->data);
 
-    uint16_t schema_length = drizzle_read_type<unsigned char>(&query_event->data_index,
-        event->data);
 
-    query_event->error_code = drizzle_read_type<uint16_t>(&query_event->data_index,
-        event->data);
+    // uint16_t schema_length = drizzle_read_type<unsigned char>(&query_event->data_index,
+    //     event->data);
 
-    uint32_t status_vars_length = drizzle_read_type<uint16_t>(&query_event->data_index,
-        event->data);
 
+    // query_event->error_code = drizzle_read_type<uint16_t>(&query_event->data_index,
+    //     event->data);
+
+    // uint32_t status_vars_length = drizzle_read_type<uint16_t>(&query_event->data_index,
+    //     event->data);
+
+    uint16_t schema_length = 10;
+    uint32_t status_vars_length = 19;
     drizzle_binlog_event_set_value<unsigned char*>(
         event, &query_event->status_vars, status_vars_length);
 

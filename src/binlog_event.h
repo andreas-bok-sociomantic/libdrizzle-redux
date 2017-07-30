@@ -49,7 +49,11 @@
  * @return an integral of type U
  */
 template<typename U, uint32_t V = sizeof(U)>
-U drizzle_read_type(uint32_t *pos, unsigned char* data)
+U drizzle_read_type(uint32_t *pos, unsigned char* data);
+
+template<typename U, uint32_t V = sizeof(U)>
+U drizzle_read_type(drizzle_binlog_event_st* binlog_event);
+
 
 /**
  * @brief Set a value on a binlog event struct
