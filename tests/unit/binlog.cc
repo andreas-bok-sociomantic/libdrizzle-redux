@@ -37,11 +37,9 @@
 
 #include <yatl/lite.h>
 
-#include <libdrizzle-redux/libdrizzle.h>
+#include "tests/unit/common.h"
 #include <cstdio>
 #include <cstdlib>
-
-#include "tests/unit/common.h"
 
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {

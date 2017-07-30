@@ -5,10 +5,12 @@
 noinst_HEADERS+= src/binlog.h
 noinst_HEADERS+= src/column.h
 noinst_HEADERS+= src/common.h
+noinst_HEADERS+= src/binlog_event.h
 noinst_HEADERS+= src/conn_local.h
 noinst_HEADERS+= src/datetime.h
 noinst_HEADERS+= src/drizzle_local.h
 noinst_HEADERS+= src/handshake_client.h
+#noinst_HEADERS+= src/helper.h
 noinst_HEADERS+= src/pack.h
 noinst_HEADERS+= src/packet.h
 noinst_HEADERS+= src/poll.h
@@ -56,6 +58,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/column.cc	\
 	src/conn.cc		\
 	src/drizzle.cc	\
+	src/binlog_event.cc	\
 	src/field.cc	\
 	src/pack.cc		\
 	src/poll.cc		\

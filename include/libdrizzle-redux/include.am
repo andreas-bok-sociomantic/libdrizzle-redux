@@ -3,6 +3,7 @@
 # All paths should be given relative to the root
 
 nobase_include_HEADERS+= include/libdrizzle-redux/binlog.h
+nobase_include_HEADERS+= include/libdrizzle-redux/binlog_event.h
 nobase_include_HEADERS+= include/libdrizzle-redux/column.h
 nobase_include_HEADERS+= include/libdrizzle-redux/column_client.h
 nobase_include_HEADERS+= include/libdrizzle-redux/conn.h

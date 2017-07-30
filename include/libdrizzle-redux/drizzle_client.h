@@ -63,6 +63,7 @@
 #include <libdrizzle-redux/field_client.h>
 #include <libdrizzle-redux/error.h>
 #include <libdrizzle-redux/ssl.h>
+#include <libdrizzle-redux/binlog_event.h>
 #include <libdrizzle-redux/binlog.h>
 #include <libdrizzle-redux/statement.h>
 #include <libdrizzle-redux/version.h>
