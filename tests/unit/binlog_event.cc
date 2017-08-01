@@ -53,9 +53,14 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
   (void)context;
   if (drizzle_binlog_event_type(event) == DRIZZLE_EVENT_TYPE_XID)
   {
-    drizzle_binlog_xid_event_st* xid_event = drizzle_binlog_get_xid_event(event);
-    printf("%ld\n", xid_event->xid);
+    drizzle_binlog_get_xid_event(event);
   }
+  else if (drizzle_binlog_event_type(event) == DRIZZLE_EVENT_TYPE_TABLE_MAP)
+  {
+  drizzle_binlog_tablemap_event_st* e = drizzle_binlog_get_tablemap_event(event);
+  printf("%ld", e->table_id());
+  }
+
 }
 
 int main(int argc, char *argv[])
@@ -80,6 +85,8 @@ int main(int argc, char *argv[])
            drizzle_error(con), drizzle_strerror(ret));
   ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "Drizzle binlog start failure: %s(%s)",
              drizzle_error(con), drizzle_strerror(ret));
+
+
 
   free(binlog_file);
   return EXIT_SUCCESS;

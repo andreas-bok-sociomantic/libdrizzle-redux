@@ -38,6 +38,13 @@
 
 #pragma once
 
+#include <memory>
+
+struct xid_event_impl;
+struct query_event_impl;
+//struct drizzle_binlog_rows_event_st;
+struct drizzle_binlog_tablemap_event_st;
+
 /**
  * @brief Read an integral type
  * @details [long description]
@@ -49,11 +56,17 @@
  * @return an integral of type U
  */
 template<typename U, uint32_t V = sizeof(U)>
-U drizzle_read_type(uint32_t *pos, unsigned char* data);
-
-template<typename U, uint32_t V = sizeof(U)>
 U drizzle_read_type(drizzle_binlog_event_st* binlog_event);
 
+
+/**
+ * @brief      Gets the bytes for a length-encoded numeric value from raw bytes
+ *
+ * @param      binlog_event  A pointer to a binlog event struct
+ *
+ * @return     the encoded length
+ */
+uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st * binlog_event);
 
 /**
  * @brief Set a value on a binlog event struct
@@ -65,6 +78,11 @@ U drizzle_read_type(drizzle_binlog_event_st* binlog_event);
 template <typename U>
 void drizzle_binlog_event_set_value(drizzle_binlog_event_st * binlog_event,
   U *dest, uint32_t num_bytes = sizeof(U));
+
+
+uint32_t ptr_dist(unsigned char* ptr1, unsigned char* ptr2);
+
+uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
 
 #define bytes_col_count(__b) \
     ((uint64_t)(__b)<0xfb ? 1 : \
@@ -79,21 +97,20 @@ void drizzle_binlog_event_set_value(drizzle_binlog_event_st * binlog_event,
        ((uint32_t)(__b)==8 ? 0xff : 0xffffffffffffffff ))))
 
 
+
 /**
  * \struct handles allocation of binlog event structs
  */
 struct drizzle_binlog_event_allocator
 {
-  drizzle_binlog_query_event_st *query_event;
-  drizzle_binlog_xid_event_st *xid_event;
-  Book b;
+  drizzle_binlog_query_event_st query_event;
+  drizzle_binlog_xid_event_st xid_event;
+  drizzle_binlog_tablemap_event_st tablemap_event;
 
   drizzle_binlog_event_allocator();
 
   ~drizzle_binlog_event_allocator()
   {
-    free(this->query_event);
-    free(this->xid_event);
   };
 
   template<typename U>
@@ -107,44 +124,6 @@ struct drizzle_binlog_event_allocator
 };
 
 
-// struct drizzle_binlog_xid_event_st
-// {
-
-//     uint64_t xid_;
-//     drizzle_binlog_xid_event_st() : xid_(0)
-//     {}
-
-//     uint64_t xid();
-// };
-
-struct drizzle_binlog_query_event_st
-{
-
-  uint32_t slave_proxy_id;
-
-  uint32_t execution_time;
-
-  uint16_t error_code;
-
-  uint16_t status_vars_length;
-
-  unsigned char *status_vars;
-
-  unsigned char *schema;
-
-  unsigned char *query;
-};
-
-
-// struct drizzle_binlog_rows_event_st
-// {
-//     void parse_postheader(unsigned char *_data) {
-//       this->data = _data;
-//     };
-
-//     void parse_payload() {};
-// };
-
 
 // struct drizzle_binlog_tablemap_event_st
 // {
@@ -156,15 +135,4 @@ struct drizzle_binlog_query_event_st
 // };
 
 /* private.h */
-#include <libdrizzle-redux/binlog_event.h>
-class Book::BookImpl
-{
-public:
-  void print();
-  const char *_str;
-
-private:
-  const char* m_Contents;
-  const char* m_Title;
-
-};
+//#include <libdrizzle-redux/binlog_event.h>
