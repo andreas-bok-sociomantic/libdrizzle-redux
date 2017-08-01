@@ -63,6 +63,8 @@ drizzle_binlog_event_allocator::drizzle_binlog_event_allocator()
 {
     this->xid_event = new (std::nothrow) drizzle_binlog_xid_event_st;
     this->query_event = new (std::nothrow) drizzle_binlog_query_event_st;
+
+    this->b.print();
 }
 
 template<typename U, uint32_t V>
@@ -174,3 +176,22 @@ drizzle_binlog_query_event_st *drizzle_binlog_get_query_event( drizzle_binlog_ev
 }
 
 
+
+Book::Book(): m_p(new BookImpl())
+{
+}
+
+Book::~Book() = default;
+
+
+void Book::print()
+{
+  m_p->print();
+}
+
+/* then BookImpl functions */
+
+void Book::BookImpl::print()
+{
+  printf("print from BookImpl\n");
+}

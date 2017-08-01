@@ -86,6 +86,7 @@ struct drizzle_binlog_event_allocator
 {
   drizzle_binlog_query_event_st *query_event;
   drizzle_binlog_xid_event_st *xid_event;
+  Book b;
 
   drizzle_binlog_event_allocator();
 
@@ -153,3 +154,17 @@ struct drizzle_binlog_query_event_st
 
 //     void parse_payload() {};
 // };
+
+/* private.h */
+#include <libdrizzle-redux/binlog_event.h>
+class Book::BookImpl
+{
+public:
+  void print();
+  const char *_str;
+
+private:
+  const char* m_Contents;
+  const char* m_Title;
+
+};
