@@ -52,7 +52,7 @@ void dump_array_to_hex(const unsigned char *ptr, uint32_t len)
     for (uint32_t i = 0; i < len; i++)
     {
         std::cout << std::hex << (uint32_t) ptr[i] << " ";
-        if (i > 0 && i % 8 == 0 )
+        if (i > 0 && i % 7 == 0 )
             std::cout << "\n";
     }
     std::cout << "\n";

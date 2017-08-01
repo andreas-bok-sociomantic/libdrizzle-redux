@@ -336,15 +336,18 @@ drizzle_return_t drizzle_state_binlog_read(drizzle_st *con)
     }
     else
     {
-      binlog_event->length= binlog_event->length -
-                            19 - // Header length
-                            8;   // Fixed rotate length
+      binlog_event->length= binlog_event->length - 19;
+                            //19; - // Header length
+//                            8;   // Fixed rotate length
       binlog_event->next_pos= drizzle_get_byte4(con->buffer_ptr + 13);
       binlog_event->flags= drizzle_get_byte2(con->buffer_ptr + 17);
 
-      con->buffer_ptr+= 27;
-      con->buffer_size-= 27;
-      con->packet_size-= 27;
+      // con->buffer_ptr+= 27;
+      // con->buffer_size-= 27;
+      // con->packet_size-= 27;
+      con->buffer_ptr+= 19;
+      con->buffer_size-= 19;
+      con->packet_size-= 19;
       /* 5.6.1 or higher is automatic checksums on */
       if (binlog_event->type == DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION)
       {
