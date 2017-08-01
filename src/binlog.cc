@@ -396,7 +396,6 @@ drizzle_return_t drizzle_state_binlog_read(drizzle_st *con)
     }
     con->pop_state();
   }
-
   con->binlog->event.binlog = con->binlog;
   con->binlog->binlog_fn(&con->binlog->event, con->binlog->binlog_context);
   con->push_state(drizzle_state_binlog_read);

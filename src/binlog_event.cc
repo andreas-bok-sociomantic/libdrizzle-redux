@@ -43,8 +43,21 @@
 #include <type_traits>
 #include <inttypes.h>
 #include <string>
+#include <iostream>
 
 using namespace std;
+
+void dump_array_to_hex(const unsigned char *ptr, uint32_t len)
+{
+    for (uint32_t i = 0; i < len; i++)
+    {
+        std::cout << std::hex << (uint32_t) ptr[i] << " ";
+        if (i > 0 && i % 8 == 0 )
+            std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
 
 struct xid_event_impl
 {
@@ -133,13 +146,13 @@ U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
     auto byte_size = sizeof(U);
     U value = ((U)binlog_event->data_ptr[0]) & mask(byte_size*8);
     uint64_t i = 1;
-    while (i < byte_size)
+    while (i < V)
     {
         value = ((U)binlog_event->data_ptr[i]) << (i * 8) | value;
         i++;
     }
 
-    binlog_event->data_ptr+=byte_size;
+    binlog_event->data_ptr+=V;
 
     return value;
 }
@@ -211,6 +224,8 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st * binlog_event)
 
 drizzle_binlog_xid_event_st* drizzle_binlog_get_xid_event( drizzle_binlog_event_st *event )
 {
+    dump_array_to_hex(drizzle_binlog_event_data(event),
+        drizzle_binlog_event_length(event));
     auto xid_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_xid_event_st>();
     ((xid_event_impl*) xid_event)->_xid = drizzle_read_type<uint64_t>(event);
     return xid_event;

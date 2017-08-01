@@ -54,11 +54,13 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
   (void)context;
 
   drizzle_binlog_event_types_t type = drizzle_binlog_event_type(event);
-  printf("%s\n", drizzle_binlog_event_type_str(type));
+  printf("%s raw_len %d, event_len %d\n", drizzle_binlog_event_type_str(type),
+    drizzle_binlog_event_raw_length(event),
+    drizzle_binlog_event_length(event));
 
   if (type == DRIZZLE_EVENT_TYPE_XID)
   {
-    //drizzle_binlog_get_xid_event(event);
+    drizzle_binlog_get_xid_event(event);
   }
   else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
   {
