@@ -153,3 +153,11 @@ nodist_EXTRA_tests_unit_binlog_event_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/binlog_event
 noinst_PROGRAMS+= tests/unit/binlog_event
 
+gdb-binlog_event: tests/unit/binlog_event
+	@$(GDB_COMMAND) tests/unit/binlog_event
+
+valgrind-binlog_event: tests/unit/binlog_event
+	@$(VALGRIND_COMMAND) tests/unit/binlog_event
+
+check-binlog_event: tests/unit/binlog_event
+	tests/unit/binlog_event
