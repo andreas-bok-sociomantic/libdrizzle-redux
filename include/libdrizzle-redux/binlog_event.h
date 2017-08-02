@@ -54,12 +54,16 @@ struct drizzle_binlog_query_event_st {
 
   DRIZZLE_API
   uint32_t execution_time();
+
   DRIZZLE_API
   uint16_t error_code();
+
   DRIZZLE_API
   uint16_t status_vars_length();
+
   DRIZZLE_API
   unsigned char *status_vars();
+
   DRIZZLE_API
   unsigned char *schema();
 

@@ -143,12 +143,13 @@ U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
 {
     static_assert(std::is_integral<U>::value,
         "The target type must integral");
-    auto byte_size = sizeof(U);
-    U value = ((U)binlog_event->data_ptr[0]) & mask(byte_size*8);
+    //U value = ((U)binlog_event->data_ptr[0]) & _mask;
+    U value = mask(sizeof(U)*8);
+    value =((U)binlog_event->data_ptr[0]) & value;
     uint64_t i = 1;
     while (i < V)
     {
-        value = ((U)binlog_event->data_ptr[i]) << (i * 8) | value;
+        value = ((U)binlog_event->data_ptr[i] << (i*8) | value);
         i++;
     }
 

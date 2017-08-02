@@ -421,7 +421,6 @@ struct drizzle_binlog_event_st
   unsigned char *data_ptr;
   unsigned char *raw_data;
   uint32_t raw_length;
-  drizzle_binlog_st *binlog;
   drizzle_binlog_event_st() :
     timestamp(0),
     type(DRIZZLE_EVENT_TYPE_UNKNOWN),
@@ -434,8 +433,7 @@ struct drizzle_binlog_event_st
     data(NULL),
     data_ptr(NULL),
     raw_data(NULL),
-    raw_length(0),
-    binlog(NULL)
+    raw_length(0)
   { }
 };
 
