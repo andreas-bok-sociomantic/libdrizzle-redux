@@ -58,11 +58,15 @@ void dump_array_to_hex(const unsigned char *ptr, uint32_t len)
     std::cout << "\n";
 }
 
-
-struct xid_event_impl
+//struct xid_event_impl;
+struct drizzle_binlog_xid_event_st::xid_event_impl
 {
 
   public :
+    // uint64_t xid()
+    // {
+    //     return this->_xid;
+    // }
     uint64_t _xid;
 };
 
@@ -78,6 +82,17 @@ struct query_event_impl
     unsigned char *_query;
 };
 
+struct drizzle_binlog_rows_event_st::rows_event_impl
+{
+
+    public :
+        uint64_t myint;
+};
+
+uint64_t drizzle_binlog_rows_event_st::getMyInt()
+{
+    return _impl->myint;
+}
 
 struct tablemap_event_impl
 {
@@ -91,6 +106,12 @@ struct tablemap_event_impl
         unsigned char* _field_metadata;
         unsigned char* _null_bitmap;
 };
+
+drizzle_binlog_rows_event_st::drizzle_binlog_rows_event_st() :
+    _impl(new rows_event_impl())
+{
+
+}
 
 template<>
 drizzle_binlog_query_event_st* drizzle_binlog_event_allocator::get()
@@ -227,8 +248,10 @@ drizzle_binlog_xid_event_st* drizzle_binlog_get_xid_event( drizzle_binlog_event_
 {
     dump_array_to_hex(drizzle_binlog_event_data(event),
         drizzle_binlog_event_length(event));
-    auto xid_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_xid_event_st>();
-    ((xid_event_impl*) xid_event)->_xid = drizzle_read_type<uint64_t>(event);
+    drizzle_binlog_xid_event_st* xid_event = new drizzle_binlog_xid_event_st();
+
+//    ((xid_event_impl*) xid_event->_impl)->_xid = drizzle_read_type<uint64_t>(event);
+    printf("xid: %ld ", xid_event->xid());
     return xid_event;
 }
 
@@ -355,7 +378,7 @@ drizzle_binlog_tablemap_event_st::drizzle_binlog_tablemap_event_st() :
 /**
  * @brief      Destroys the object.
  */
-drizzle_binlog_tablemap_event_st::~drizzle_binlog_tablemap_event_st() {}
+drizzle_binlog_tablemap_event_st::~drizzle_binlog_tablemap_event_st() = default;
 
 uint64_t drizzle_binlog_tablemap_event_st::table_id()
 {

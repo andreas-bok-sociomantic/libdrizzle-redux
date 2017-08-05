@@ -40,8 +40,10 @@
 
 #include <memory>
 
-struct xid_event_impl;
+//struct xid_event_impl;
 struct query_event_impl;
+
+//class rows_event_impl;
 //struct drizzle_binlog_rows_event_st;
 struct drizzle_binlog_tablemap_event_st;
 

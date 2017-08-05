@@ -62,7 +62,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 
   if (type == DRIZZLE_EVENT_TYPE_XID)
   {
-    //drizzle_binlog_get_xid_event(event);
+    drizzle_binlog_get_xid_event(event);
   }
   else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
   {

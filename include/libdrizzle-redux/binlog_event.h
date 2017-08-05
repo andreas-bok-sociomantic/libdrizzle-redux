@@ -12,25 +12,13 @@
 extern "C" {
 #endif*/
 
-DRIZZLE_API
-drizzle_binlog_xid_event_st *drizzle_binlog_get_xid_event(
-    drizzle_binlog_event_st *event);
-
-DRIZZLE_API
-drizzle_binlog_query_event_st *drizzle_binlog_get_query_event(
-    drizzle_binlog_event_st *event);
-
-DRIZZLE_API
-drizzle_binlog_tablemap_event_st* drizzle_binlog_get_tablemap_event(
-    drizzle_binlog_event_st *event);
 
 /*#ifdef __cplusplus
 }
 #endif*/
 
-struct xid_event_impl;
+
 struct query_event_impl;
-//struct drizzle_binlog_rows_event_st;
 struct tablemap_event_impl;
 
 struct drizzle_binlog_xid_event_st {
@@ -41,7 +29,8 @@ struct drizzle_binlog_xid_event_st {
   uint64_t xid();
 
  private:
-  std::unique_ptr<xid_event_impl> _impl;
+    struct xid_event_impl;
+    std::unique_ptr<xid_event_impl> _impl;
 };
 
 struct drizzle_binlog_query_event_st {
@@ -106,10 +95,31 @@ struct drizzle_binlog_tablemap_event_st
         std::unique_ptr<tablemap_event_impl> _impl;
 };
 
-/*
 struct drizzle_binlog_rows_event_st
 {
+    public :
+        drizzle_binlog_rows_event_st();
+        ~drizzle_binlog_rows_event_st();
+        uint64_t getMyInt();
 
     private :
-    std::unique_ptr<rows_event_impl> _impl;
-};*/
+        struct rows_event_impl;
+        std::unique_ptr<rows_event_impl> _impl;
+};
+
+
+DRIZZLE_API
+drizzle_binlog_xid_event_st *drizzle_binlog_get_xid_event(
+    drizzle_binlog_event_st *event);
+
+DRIZZLE_API
+drizzle_binlog_query_event_st *drizzle_binlog_get_query_event(
+    drizzle_binlog_event_st *event);
+
+DRIZZLE_API
+drizzle_binlog_tablemap_event_st* drizzle_binlog_get_tablemap_event(
+    drizzle_binlog_event_st *event);
+
+DRIZZLE_API
+drizzle_binlog_rows_event_st* drizzle_binlog_get_rows_event(
+    drizzle_binlog_event_st *event);
