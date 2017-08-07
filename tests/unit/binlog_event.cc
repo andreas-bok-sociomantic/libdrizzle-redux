@@ -62,12 +62,14 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 
   if (type == DRIZZLE_EVENT_TYPE_XID)
   {
-    drizzle_binlog_get_xid_event(event);
+     drizzle_binlog_xid_event_st * xid_event = drizzle_binlog_get_xid_event(event);
+     printf("xid %ld\n", xid_event->xid());
   }
   else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
   {
-    // drizzle_binlog_tablemap_event_st* e = drizzle_binlog_get_tablemap_event(event);
-    // printf("%ld", e->table_id());
+
+    drizzle_binlog_tablemap_event_st* table_map_event = drizzle_binlog_get_tablemap_event(event);
+    printf("%ld", table_map_event->table_id());
   }
 }
 

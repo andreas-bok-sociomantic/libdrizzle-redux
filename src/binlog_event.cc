@@ -63,14 +63,10 @@ struct drizzle_binlog_xid_event_st::xid_event_impl
 {
 
   public :
-    // uint64_t xid()
-    // {
-    //     return this->_xid;
-    // }
     uint64_t _xid;
 };
 
-struct query_event_impl
+struct drizzle_binlog_query_event_st::query_event_impl
 {
     public :
     uint32_t _slave_proxy_id;
@@ -86,15 +82,11 @@ struct drizzle_binlog_rows_event_st::rows_event_impl
 {
 
     public :
-        uint64_t myint;
+        uint64_t _table_id;
 };
 
-uint64_t drizzle_binlog_rows_event_st::getMyInt()
-{
-    return _impl->myint;
-}
 
-struct tablemap_event_impl
+struct drizzle_binlog_tablemap_event_st::tablemap_event_impl
 {
     public :
         uint64_t _table_id;
@@ -113,25 +105,6 @@ drizzle_binlog_rows_event_st::drizzle_binlog_rows_event_st() :
 
 }
 
-template<>
-drizzle_binlog_query_event_st* drizzle_binlog_event_allocator::get()
-{
-    return &this->query_event;
-}
-
-template<>
-drizzle_binlog_xid_event_st* drizzle_binlog_event_allocator::get()
-{
-    return &this->xid_event;
-}
-
-template<>
-drizzle_binlog_tablemap_event_st* drizzle_binlog_event_allocator::get()
-{
-    return &this->tablemap_event;
-}
-
-drizzle_binlog_event_allocator::drizzle_binlog_event_allocator() {}
 
 /*template<typename U, uint32_t V>
 U drizzle_read_type(uint32_t *pos, unsigned char* data)
@@ -250,15 +223,52 @@ drizzle_binlog_xid_event_st* drizzle_binlog_get_xid_event( drizzle_binlog_event_
         drizzle_binlog_event_length(event));
     drizzle_binlog_xid_event_st* xid_event = new drizzle_binlog_xid_event_st();
 
-//    ((xid_event_impl*) xid_event->_impl)->_xid = drizzle_read_type<uint64_t>(event);
-    printf("xid: %ld ", xid_event->xid());
+    xid_event->parse(event);
     return xid_event;
 }
 
 drizzle_binlog_query_event_st *drizzle_binlog_get_query_event( drizzle_binlog_event_st *event )
 {
-    auto query_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_query_event_st>();
-    auto _impl = (query_event_impl*) query_event;
+    auto query_event = new drizzle_binlog_query_event_st();
+    query_event->parse(event);
+    return query_event;
+}
+
+
+drizzle_binlog_tablemap_event_st* drizzle_binlog_get_tablemap_event(drizzle_binlog_event_st *event)
+{
+
+    auto table_map_event = new drizzle_binlog_tablemap_event_st();
+    table_map_event->parse(event);
+    return table_map_event;
+}
+
+
+drizzle_binlog_xid_event_st::drizzle_binlog_xid_event_st() : _impl(new xid_event_impl())
+{}
+
+drizzle_binlog_xid_event_st::~drizzle_binlog_xid_event_st()
+{}
+
+void drizzle_binlog_xid_event_st::parse(drizzle_binlog_event_st *event)
+{
+   _impl->_xid = drizzle_read_type<uint64_t>(event);
+   //printf("xid: %ld ", xid_event->xid());
+}
+
+uint64_t drizzle_binlog_xid_event_st::xid()
+{
+    return _impl->_xid;
+}
+
+
+drizzle_binlog_query_event_st::drizzle_binlog_query_event_st() : _impl(new query_event_impl())
+{}
+
+drizzle_binlog_query_event_st::~drizzle_binlog_query_event_st() = default;
+
+void drizzle_binlog_query_event_st::parse(drizzle_binlog_event_st *event)
+{
     _impl->_slave_proxy_id = drizzle_read_type<uint32_t>(event);
     _impl->_execution_time = drizzle_read_type<uint32_t>(event);
     uint16_t schema_length = drizzle_read_type<unsigned char>(event);
@@ -273,61 +283,7 @@ drizzle_binlog_query_event_st *drizzle_binlog_get_query_event( drizzle_binlog_ev
     event->data_ptr++;
     drizzle_binlog_event_set_value<unsigned char*>(
         event, &_impl->_query, drizzle_binlog_event_available_bytes(event) - 4);
-
-    return query_event;
 }
-
-
-drizzle_binlog_tablemap_event_st* drizzle_binlog_get_tablemap_event(drizzle_binlog_event_st *event)
-{
-    auto table_map_event = drizzle_binlog_event_allocator::instance().get<drizzle_binlog_tablemap_event_st>();
-    auto _impl = (tablemap_event_impl*) table_map_event;
-
-    _impl->_table_id = drizzle_read_type<uint64_t, 6>(event);
-
-    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_flags, 2);
-
-    uint32_t len_enc = drizzle_read_type<uint32_t,1>(event);
-    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_schema_name, len_enc);
-    event->data_ptr++;
-
-    len_enc = drizzle_read_type<uint32_t,1>(event);
-    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_table_name, len_enc);
-    event->data_ptr++;
-
-    _impl->_column_count = drizzle_binlog_get_encoded_len(event);
-
-    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_column_type_def,
-        _impl->_column_count);
-
-    len_enc = drizzle_binlog_get_encoded_len(event);
-    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_field_metadata,
-        len_enc);
-
-    len_enc = (uint32_t) (_impl->_column_count + 7)/8;
-    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_null_bitmap,
-        len_enc);
-
-    return table_map_event;
-}
-
-
-drizzle_binlog_xid_event_st::drizzle_binlog_xid_event_st() : _impl(new xid_event_impl())
-{}
-
-drizzle_binlog_xid_event_st::~drizzle_binlog_xid_event_st()
-{}
-
-uint64_t drizzle_binlog_xid_event_st::xid()
-{
-    return _impl->_xid;
-}
-
-
-drizzle_binlog_query_event_st::drizzle_binlog_query_event_st() : _impl(new query_event_impl())
-{}
-
-drizzle_binlog_query_event_st::~drizzle_binlog_query_event_st() = default;
 
 uint32_t  drizzle_binlog_query_event_st::slave_proxy_id()
 {
@@ -379,6 +335,36 @@ drizzle_binlog_tablemap_event_st::drizzle_binlog_tablemap_event_st() :
  * @brief      Destroys the object.
  */
 drizzle_binlog_tablemap_event_st::~drizzle_binlog_tablemap_event_st() = default;
+
+
+void drizzle_binlog_tablemap_event_st::parse(drizzle_binlog_event_st *event)
+{
+    _impl->_table_id = drizzle_read_type<uint64_t, 6>(event);
+
+    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_flags, 2);
+
+    uint32_t len_enc = drizzle_read_type<uint32_t,1>(event);
+    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_schema_name, len_enc);
+    event->data_ptr++;
+
+    len_enc = drizzle_read_type<uint32_t,1>(event);
+    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_table_name, len_enc);
+    event->data_ptr++;
+
+    _impl->_column_count = drizzle_binlog_get_encoded_len(event);
+
+    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_column_type_def,
+        _impl->_column_count);
+
+    len_enc = drizzle_binlog_get_encoded_len(event);
+    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_field_metadata,
+        len_enc);
+
+    len_enc = (uint32_t) (_impl->_column_count + 7)/8;
+    drizzle_binlog_event_set_value<unsigned char*>(event, &_impl->_null_bitmap,
+        len_enc);
+
+}
 
 uint64_t drizzle_binlog_tablemap_event_st::table_id()
 {

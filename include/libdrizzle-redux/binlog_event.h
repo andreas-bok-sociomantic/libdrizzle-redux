@@ -3,11 +3,6 @@
 #include <inttypes.h>
 #include <memory>
 
-//#ifdef __cplusplus
-// struct drizzle_binlog_query_event_st;
-// struct drizzle_binlog_xid_event_st;
-//#endif
-
 /*#ifdef __cplusplus
 extern "C" {
 #endif*/
@@ -18,13 +13,11 @@ extern "C" {
 #endif*/
 
 
-struct query_event_impl;
-struct tablemap_event_impl;
-
 struct drizzle_binlog_xid_event_st {
  public:
   drizzle_binlog_xid_event_st();
   ~drizzle_binlog_xid_event_st();
+  void parse(drizzle_binlog_event_st *event);
   DRIZZLE_API
   uint64_t xid();
 
@@ -37,6 +30,7 @@ struct drizzle_binlog_query_event_st {
  public:
   drizzle_binlog_query_event_st();
   ~drizzle_binlog_query_event_st();
+  void parse(drizzle_binlog_event_st *event);
 
   DRIZZLE_API
   uint32_t slave_proxy_id();
@@ -65,6 +59,7 @@ struct drizzle_binlog_query_event_st {
   unsigned char *query();
 
  private:
+  struct query_event_impl;
   std::unique_ptr<query_event_impl> _impl;
 };
 
@@ -75,6 +70,8 @@ struct drizzle_binlog_tablemap_event_st
         drizzle_binlog_tablemap_event_st();
         DRIZZLE_API
         ~drizzle_binlog_tablemap_event_st();
+
+        void parse(drizzle_binlog_event_st *event);
         DRIZZLE_API
         uint64_t table_id();
         DRIZZLE_API
@@ -92,6 +89,7 @@ struct drizzle_binlog_tablemap_event_st
         DRIZZLE_API
         unsigned char* null_bitmap();
     private:
+        struct tablemap_event_impl;
         std::unique_ptr<tablemap_event_impl> _impl;
 };
 
@@ -100,7 +98,9 @@ struct drizzle_binlog_rows_event_st
     public :
         drizzle_binlog_rows_event_st();
         ~drizzle_binlog_rows_event_st();
-        uint64_t getMyInt();
+        void parse(drizzle_binlog_event_st *event);
+
+        uint64_t table_id();
 
     private :
         struct rows_event_impl;

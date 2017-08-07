@@ -40,13 +40,6 @@
 
 #include <memory>
 
-//struct xid_event_impl;
-struct query_event_impl;
-
-//class rows_event_impl;
-//struct drizzle_binlog_rows_event_st;
-struct drizzle_binlog_tablemap_event_st;
-
 /**
  * @brief Read an integral type
  * @details [long description]
@@ -99,42 +92,3 @@ uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
        ((uint32_t)(__b)==8 ? 0xff : 0xffffffffffffffff ))))
 
 void dump_array_to_hex(const unsigned char *ptr, uint32_t len);
-
-/**
- * \struct handles allocation of binlog event structs
- */
-struct drizzle_binlog_event_allocator
-{
-  drizzle_binlog_query_event_st query_event;
-  drizzle_binlog_xid_event_st xid_event;
-  drizzle_binlog_tablemap_event_st tablemap_event;
-
-  drizzle_binlog_event_allocator();
-
-  ~drizzle_binlog_event_allocator()
-  {
-  };
-
-  template<typename U>
-  U* get();
-
-  static drizzle_binlog_event_allocator& instance()
-  {
-    static drizzle_binlog_event_allocator binlog_event_allocator;
-    return binlog_event_allocator;
-  }
-};
-
-
-
-// struct drizzle_binlog_tablemap_event_st
-// {
-//   void parse_postheader(unsigned char *_data) {
-//     this->data = _data;
-//   };
-
-//     void parse_payload() {};
-// };
-
-/* private.h */
-//#include <libdrizzle-redux/binlog_event.h>
