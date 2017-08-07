@@ -47,21 +47,9 @@
 
 using namespace std;
 
-void dump_array_to_hex(const unsigned char *ptr, uint32_t len)
-{
-    for (uint32_t i = 0; i < len; i++)
-    {
-        std::cout << std::hex << (uint32_t) ptr[i] << " ";
-        if (i > 0 && i % 7 == 0 )
-            std::cout << "\n";
-    }
-    std::cout << "\n";
-}
-
 //struct xid_event_impl;
 struct drizzle_binlog_xid_event_st::xid_event_impl
 {
-
   public :
     uint64_t _xid;
 };
@@ -103,33 +91,6 @@ struct drizzle_binlog_tablemap_event_st::tablemap_event_impl
         unsigned char* _null_bitmap;
 };
 
-
-/*template<typename U, uint32_t V>
-U drizzle_read_type(uint32_t *pos, unsigned char* data)
-{
-    static_assert(std::is_integral<U>::value,
-        "The target type must integral");
-
-    if ((sizeof(data)-*pos) - V < 0)
-    {
-        return numeric_limits<U>::max();
-    }
-
-    auto byte_size = sizeof(U);
-    int i = 1;
-    U value = ((U)data[*pos] & mask(byte_size*8));
-    while (i < (int) byte_size)
-    {
-        value =((U)data[*pos+i]<<(i*8)|value);
-        i++;
-    }
-
-    *pos += byte_size;
-
-    return value;
-}
-*/
-
 template<typename U, uint32_t V>
 U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
 {
@@ -148,11 +109,6 @@ U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
     binlog_event->data_ptr+=V;
 
     return value;
-}
-
-uint32_t ptr_dist(unsigned char* ptr1, unsigned char* ptr2)
-{
-  return ((const char*) ptr1 - (const char*) ptr2);
 }
 
 uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event)
