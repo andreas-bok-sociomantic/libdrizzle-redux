@@ -10,7 +10,7 @@ noinst_HEADERS+= src/conn_local.h
 noinst_HEADERS+= src/datetime.h
 noinst_HEADERS+= src/drizzle_local.h
 noinst_HEADERS+= src/handshake_client.h
-#noinst_HEADERS+= src/helper.h
+noinst_HEADERS+= src/binlog_helper.h
 noinst_HEADERS+= src/pack.h
 noinst_HEADERS+= src/packet.h
 noinst_HEADERS+= src/poll.h
@@ -66,6 +66,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/sha1.cc		\
 	src/state.cc	\
 	src/statement.cc \
-	src/statement_param.cc
+	src/statement_param.cc \
+	src/binlog_helper.cc
 
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}

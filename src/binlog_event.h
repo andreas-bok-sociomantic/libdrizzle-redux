@@ -53,7 +53,6 @@
 template<typename U, uint32_t V = sizeof(U)>
 U drizzle_read_type(drizzle_binlog_event_st* binlog_event);
 
-
 /**
  * @brief      Gets the bytes for a length-encoded numeric value from raw bytes
  *

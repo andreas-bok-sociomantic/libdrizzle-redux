@@ -12,7 +12,6 @@ extern "C" {
 }
 #endif*/
 
-
 struct drizzle_binlog_xid_event_st {
  public:
   drizzle_binlog_xid_event_st();
@@ -86,6 +85,7 @@ struct drizzle_binlog_tablemap_event_st
         unsigned char* column_type_def();
         DRIZZLE_API
         unsigned char* field_metadata();
+        uint64_t field_metadata_len();
         DRIZZLE_API
         unsigned char* null_bitmap();
     private:
@@ -98,9 +98,12 @@ struct drizzle_binlog_rows_event_st
     public :
         drizzle_binlog_rows_event_st();
         ~drizzle_binlog_rows_event_st();
-        void parse(drizzle_binlog_event_st *event);
+        void parse(drizzle_binlog_event_st *event,
+          drizzle_binlog_tablemap_event_st *table_map_event);
 
         uint64_t table_id();
+        uint64_t column_count();
+
 
     private :
         struct rows_event_impl;
@@ -122,4 +125,5 @@ drizzle_binlog_tablemap_event_st* drizzle_binlog_get_tablemap_event(
 
 DRIZZLE_API
 drizzle_binlog_rows_event_st* drizzle_binlog_get_rows_event(
-    drizzle_binlog_event_st *event);
+    drizzle_binlog_event_st *event,
+    drizzle_binlog_tablemap_event_st *table_map_event);

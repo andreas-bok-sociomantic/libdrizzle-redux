@@ -83,7 +83,7 @@ typedef struct pollfd pollfd_t;
 
 #include "src/structs.h"
 #include "src/drizzle_local.h"
-//#include "src/helper.h"
+#include "src/binlog_helper.h"
 #include "src/binlog_event.h"
 #include "src/conn_local.h"
 #include "src/pack.h"
