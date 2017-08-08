@@ -61,7 +61,7 @@ public:
     uint16_t _error_code;
     uint16_t _status_vars_length;
     unsigned char *_status_vars;
-    unsigned char _schema[DRIZZLE_MAX_DB_SIZE];
+    unsigned char *_schema;
     unsigned char *_query;
 };
 
@@ -80,9 +80,9 @@ struct drizzle_binlog_tablemap_event_st::tablemap_event_impl
 {
 public:
     uint64_t _table_id;
-    unsigned char _flags[2];
-    unsigned char _schema_name[255];
-    unsigned char _table_name[255];
+    unsigned char *_flags;
+    unsigned char *_schema_name;
+    unsigned char *_table_name;
     uint64_t _column_count;
     unsigned char *_column_type_def;
     unsigned char *_field_metadata;
