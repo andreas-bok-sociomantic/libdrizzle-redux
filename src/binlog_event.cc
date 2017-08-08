@@ -232,6 +232,12 @@ uint64_t drizzle_binlog_xid_event_st::xid()
     return _impl->_xid;
 }
 
+std::ostream &operator<<(std::ostream & _stream, drizzle_binlog_xid_event_st &e) {
+    _stream << "Xid Event( xid=" << e.xid() << ")\n";
+    return _stream;
+}
+
+
 drizzle_binlog_query_event_st::drizzle_binlog_query_event_st() : _impl(
         new query_event_impl())
 {

@@ -64,6 +64,8 @@ public:
     DRIZZLE_API
     uint64_t xid();
 
+    friend std::ostream &operator<<(std::ostream & _stream, drizzle_binlog_xid_event_st const &e);
+
 private:
     /**
      * @brief      Struct hiding implementation
