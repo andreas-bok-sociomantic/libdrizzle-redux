@@ -73,13 +73,34 @@ template <typename U>
 void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
                                     U *dest, uint32_t num_bytes = sizeof(U));
 
+/**
+ * @brief      Get remaining bytes in the binlog event
+ *
+ * @param      event  a drizzle_binlog_event struct
+ *
+ * @return     number of available bytes
+ */
 uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
 
+/**
+ * @brief      Gets the length encoded integer in bytes
+ *
+ * @param      __b   a char value
+ *
+ * @return     { description_of_the_return_value }
+ */
 #define bytes_col_count(__b) \
     ((uint64_t) (__b) < 0xfb ? 1 : \
      ((uint64_t) (__b) == 0xfc ? 2 : \
       ((uint64_t) (__b) == 0xfd ? 3 : 8)))
 
+/**
+ * @brief      Create a bitmask with all bits set to 1
+ *
+ * @param      __b   length of bitmask in bits
+ *
+ * @return     bitmask with a all bits set to 1
+ */
 #define mask(__b) \
     ((uint32_t) (__b) == 32 ? 0xffffffff : \
      ((uint32_t) (__b) == 24 ? 0xffffff : \
