@@ -47,7 +47,6 @@
 
 using namespace std;
 
-// struct xid_event_impl;
 struct drizzle_binlog_xid_event_st::xid_event_impl
 {
 public:
