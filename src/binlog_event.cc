@@ -215,14 +215,12 @@ drizzle_binlog_xid_event_st::~drizzle_binlog_xid_event_st()
 void drizzle_binlog_xid_event_st::parse(drizzle_binlog_event_st *event)
 {
    _impl->_xid = drizzle_read_type<uint64_t>(event);
-   //printf("xid: %ld ", xid_event->xid());
 }
 
 uint64_t drizzle_binlog_xid_event_st::xid()
 {
     return _impl->_xid;
 }
-
 
 drizzle_binlog_query_event_st::drizzle_binlog_query_event_st() : _impl(new query_event_impl())
 {}
