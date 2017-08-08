@@ -44,71 +44,77 @@
 
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {
-  (void)context;
-  ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "%s(%s)", drizzle_error(connection),
-             drizzle_strerror(ret));
+    (void) context;
+    ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "%s(%s)", drizzle_error(connection),
+               drizzle_strerror(ret));
 }
 
 void binlog_event(drizzle_binlog_event_st *event, void *context)
 {
-  (void)context;
+    (void) context;
 
-  printf("callback\n");
-  drizzle_binlog_event_types_t type = drizzle_binlog_event_type(event);
-  printf("%s raw_len %d, event_len %d, timestamp: %d \n", drizzle_binlog_event_type_str(type),
-    drizzle_binlog_event_raw_length(event),
-    drizzle_binlog_event_length(event),
-    drizzle_binlog_event_timestamp(event));
+    printf("callback\n");
+    drizzle_binlog_event_types_t type = drizzle_binlog_event_type(event);
+    printf("%s raw_len %d, event_len %d, timestamp: %d \n", drizzle_binlog_event_type_str(
+               type),
+           drizzle_binlog_event_raw_length(event),
+           drizzle_binlog_event_length(event),
+           drizzle_binlog_event_timestamp(event));
 
-  if (type == DRIZZLE_EVENT_TYPE_XID)
-  {
-     drizzle_binlog_xid_event_st * xid_event = drizzle_binlog_get_xid_event(event);
-     printf("xid %ld\n", xid_event->xid());
-  }
-  else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
-  {
-
-    drizzle_binlog_tablemap_event_st* table_map_event = drizzle_binlog_get_tablemap_event(event);
-    printf("%ld", table_map_event->table_id());
-  }
-}
+    if (type == DRIZZLE_EVENT_TYPE_XID)
+    {
+        drizzle_binlog_xid_event_st *xid_event = drizzle_binlog_get_xid_event(
+                event);
+        printf("xid %ld\n", xid_event->xid());
+    }
+    else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
+    {
+        drizzle_binlog_tablemap_event_st *table_map_event =
+            drizzle_binlog_get_tablemap_event(event);
+        printf("table_id %ld\narrow()", table_map_event->table_id());
+    }
+} // binlog_event
 
 int main(int argc, char *argv[])
 {
-  (void)argc;
-  (void)argv;
-  drizzle_binlog_st *binlog;
-  drizzle_return_t driz_ret;
-  drizzle_result_st VARIABLE_IS_NOT_USED *result;
+    (void) argc;
+    (void) argv;
+    drizzle_binlog_st *binlog;
+    drizzle_return_t driz_ret;
+    drizzle_result_st VARIABLE_IS_NOT_USED *result;
 
-  set_up_connection();
+    set_up_connection();
 
-  set_up_schema("test_binlog_event");
+    set_up_schema("test_binlog_event");
 
-  CHECKED_QUERY("CREATE TABLE test_binlog_event.t1 "
-    "(a int PRIMARY KEY auto_increment, b int)");
+    CHECKED_QUERY("CREATE TABLE test_binlog_event.t1 "
+                  "(a int PRIMARY KEY auto_increment, b int)");
 
-  CHECKED_QUERY("INSERT INTO test_binlog_event.t1 (b) "
-    "VALUES (1),(2),(3)");
+    CHECKED_QUERY("INSERT INTO test_binlog_event.t1 (b) "
+                  "VALUES (1),(2),(3)");
 
-  char *binlog_file;
-  uint32_t end_position;
-  driz_ret = drizzle_binlog_get_filename(con, &binlog_file, &end_position, -1);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "Couldn't retrieve binlog filename: %s(%s)",
+    char *binlog_file;
+    uint32_t end_position;
+    driz_ret =
+        drizzle_binlog_get_filename(con, &binlog_file, &end_position, -1);
+    ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret,
+               "Couldn't retrieve binlog filename: %s(%s)",
+               drizzle_error(con), drizzle_strerror(driz_ret));
+
+    printf("pos %d\n", end_position);
+    binlog = drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
+    driz_ret = drizzle_binlog_start(binlog, 0, binlog_file, 0);
+
+    SKIP_IF_(driz_ret == DRIZZLE_RETURN_ERROR_CODE,
+             "Binlog is not open?: %s(%s)",
              drizzle_error(con), drizzle_strerror(driz_ret));
+    ASSERT_EQ_(DRIZZLE_RETURN_EOF, driz_ret,
+               "Drizzle binlog start failure: %s(%s)",
+               drizzle_error(con), drizzle_strerror(driz_ret));
 
-  printf("pos %d\n", end_position);
-  binlog = drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
-  driz_ret = drizzle_binlog_start(binlog, 0, binlog_file, 0);
+    CHECKED_QUERY("DROP TABLE test_binlog_event.t1");
 
-  SKIP_IF_(driz_ret == DRIZZLE_RETURN_ERROR_CODE, "Binlog is not open?: %s(%s)",
-           drizzle_error(con), drizzle_strerror(driz_ret));
-  ASSERT_EQ_(DRIZZLE_RETURN_EOF, driz_ret, "Drizzle binlog start failure: %s(%s)",
-             drizzle_error(con), drizzle_strerror(driz_ret));
-
-  CHECKED_QUERY("DROP TABLE test_binlog_event.t1");
-
-  tear_down_schema("test_binlog_event");
-  free(binlog_file);
-  return EXIT_SUCCESS;
-}
+    tear_down_schema("test_binlog_event");
+    free(binlog_file);
+    return EXIT_SUCCESS;
+} // main
