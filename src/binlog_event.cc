@@ -120,6 +120,15 @@ template <typename U>
 void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
                                     U *value, uint32_t num_bytes)
 {
+
+    if (drizzle_binlog_event_available_bytes(binlog_event) < num_bytes)
+    {
+        printf("Insufficient data (%d) to read %d bytes\n",
+            drizzle_binlog_event_available_bytes(binlog_event),
+            num_bytes);
+        assert(false);
+    }
+
     if (std::is_same<U, unsigned char *>::value)
     {
         *value = (U) realloc(*value, num_bytes + 1);
@@ -149,6 +158,7 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event)
     {
         case 1:
             len = (uint64_t) binlog_event->data_ptr[0];
+            binlog_event->data_ptr++;
             break;
         case 2:
             binlog_event->data_ptr++;
@@ -165,8 +175,6 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event)
         default:
             break;
     }
-    // pos+=colBytes + ((colBytes>1)? 1 : 0); // include first byte if
-    // colCount>1
 
     return len;
 } // drizzle_binlog_get_encoded_len

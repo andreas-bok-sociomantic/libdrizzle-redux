@@ -55,16 +55,17 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 
     printf("callback\n");
     drizzle_binlog_event_types_t type = drizzle_binlog_event_type(event);
-    printf("%s raw_len %d, event_len %d, timestamp: %d \n", drizzle_binlog_event_type_str(
-               type),
-           drizzle_binlog_event_raw_length(event),
-           drizzle_binlog_event_length(event),
-           drizzle_binlog_event_timestamp(event));
+    printf("%s raw_len %d, event_len %d, timestamp: %d, next_pos: %d \n",
+        drizzle_binlog_event_type_str(type),
+        drizzle_binlog_event_raw_length(event),
+        drizzle_binlog_event_length(event),
+        drizzle_binlog_event_timestamp(event),
+        drizzle_binlog_event_next_pos(event));
 
     if (type == DRIZZLE_EVENT_TYPE_XID)
     {
         drizzle_binlog_xid_event_st *xid_event = drizzle_binlog_get_xid_event(
-                event);
+            event);
         printf("xid %ld\n", xid_event->xid());
     }
     else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
@@ -72,6 +73,17 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
         drizzle_binlog_tablemap_event_st *table_map_event =
             drizzle_binlog_get_tablemap_event(event);
         printf("table_id %ld\narrow()", table_map_event->table_id());
+    }
+    else if (type == DRIZZLE_EVENT_TYPE_QUERY)
+    {
+        drizzle_binlog_query_event_st *query_event =
+            drizzle_binlog_get_query_event(event);
+        printf("slave_proxy_id: %d, "
+               "schema: '%s', execution_time: %d, query: '%s'\n",
+               query_event->slave_proxy_id(),
+               query_event->schema(),
+               query_event->execution_time(),
+               query_event->query());
     }
 } // binlog_event
 
