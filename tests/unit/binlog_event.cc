@@ -53,7 +53,6 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 {
     (void) context;
 
-    printf("callback\n");
     drizzle_binlog_event_types_t type = drizzle_binlog_event_type(event);
     printf("%s raw_len %d, event_len %d, timestamp: %d, next_pos: %d \n",
         drizzle_binlog_event_type_str(type),
@@ -72,7 +71,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     {
         drizzle_binlog_tablemap_event_st *table_map_event =
             drizzle_binlog_get_tablemap_event(event);
-        printf("table_id %ld\narrow()", table_map_event->table_id());
+        printf("table_id %ld\n", table_map_event->table_id());
     }
     else if (type == DRIZZLE_EVENT_TYPE_QUERY)
     {
