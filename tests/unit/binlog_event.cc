@@ -71,7 +71,10 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     {
         drizzle_binlog_tablemap_event_st *table_map_event =
             drizzle_binlog_get_tablemap_event(event);
-        printf("table_id %ld\n", table_map_event->table_id());
+        printf("schema: %s, table: %s, table_id %ld, \n",
+          table_map_event->schema_name(),
+          table_map_event->table_name(),
+          table_map_event->table_id());
     }
     else if (type == DRIZZLE_EVENT_TYPE_QUERY)
     {
@@ -86,6 +89,24 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     }
 } // binlog_event
 
+template<typename V, typename U>
+bool check_type ( U *dest )
+{
+    if (std::rank<U>::value == 0)
+    {
+      typedef typename std::remove_cv<U>::type TYPE0;
+      typedef typename std::remove_pointer<TYPE0>::type _TYPE0;
+      return std::is_same<_TYPE0, V>::value;
+    }
+    else if (std::rank<U>::value == 1 )
+    {
+      typedef typename std::remove_cv<typeof((*dest)[0])>::type TYPE1;
+      typedef typename std::remove_pointer<TYPE1>::type _TYPE1;
+      return std::is_same<_TYPE1, V>::value;
+    }
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
     (void) argc;
@@ -97,6 +118,34 @@ int main(int argc, char *argv[])
     set_up_connection();
 
     set_up_schema("test_binlog_event");
+    char mychar[5];
+    unsigned char unsigned_char[5];
+    const unsigned char const_unsigned_char[5] = {'f','i','l','m', 'e'};
+    const char const_char[4] = {'f','i','l','m'};
+    unsigned char* char_ptr = (unsigned char*) malloc(64);
+
+    memcpy(mychar, const_char, 4);
+    mychar[4] = '\0';
+    memcpy(unsigned_char, const_char, 4);
+    unsigned_char[4] = '\0';
+
+    printf("mychar[5] is string: %d\n", check_type<char>(&mychar));
+    printf("unsigned_char[5] is string: %d\n",
+      check_type<unsigned char>(&unsigned_char));
+    printf("const char[] is string: %d\n", check_type<char>(&const_char));
+    printf("const_unsigned_char[] is string: %d\n", check_type<char>(&const_unsigned_char));
+    printf("char_ptr is string: %d\n", check_type<unsigned char>(&char_ptr));
+
+    // typedef typeof(src[0]) T;
+    // printf("src[] is const : %d\n", std::is_same<T, const char>::value);
+    // printf("src[0] rank  : %ld\n", std::rank<T>::value);
+
+    // printf("U2: %d\n", std::is_same<char*, char*>::value);
+    // printf("char[] is_same: %d\n", std::is_same<typeof(mychar[0]), char>::value);
+    // printf("src is_name char[]: %d\n", std::is_same<typeof(src[0]), const char>::value );
+    // printf("mychar rank: %ld\n", std::rank<typeof(mychar)>::value );
+    // printf("rank: %ld\n", std::rank<char*>::value);
+    // printf("is array: %d\n", std::is_array<char[]>::value);
 
     CHECKED_QUERY("CREATE TABLE test_binlog_event.t1 "
                   "(a int PRIMARY KEY auto_increment, b int)");
