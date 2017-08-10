@@ -143,7 +143,7 @@ public:
      * @return     array of status vars
      */
     DRIZZLE_API
-    unsigned char *status_vars();
+    uint8_t *status_vars();
 
     /**
      * @brief      The name of the schema which casused the binlog event
@@ -240,7 +240,7 @@ public:
      * @return     an array of column types
      */
     DRIZZLE_API
-    unsigned char *column_type_def();
+    uint8_t *column_type_def();
 
     /**
      * @brief      Metadata for table columns
@@ -251,7 +251,7 @@ public:
      * @return     array of metadata
      */
     DRIZZLE_API
-    unsigned char *field_metadata();
+    uint8_t *field_metadata();
 
     /**
      * @brief      Length of the field_metadata array.
@@ -268,7 +268,7 @@ public:
      * @return     A bitmap
      */
     DRIZZLE_API
-    unsigned char *null_bitmap();
+    uint8_t *null_bitmap();
 
 private:
     /**
