@@ -65,7 +65,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     {
         drizzle_binlog_xid_event_st *xid_event = drizzle_binlog_get_xid_event(
             event);
-        printf("xid %ld\n", xid_event->xid());
+        printf("xid %" PRIu64 ", timestamp: %d\n", xid_event->xid(), xid_event->timestamp());
     }
     else if (type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
     {

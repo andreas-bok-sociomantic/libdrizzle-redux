@@ -151,10 +151,10 @@ void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
         drizzle_check_type<unsigned char, U>(dest))
     {
         memcpy(*dest, binlog_event->data_ptr, num_bytes);
-        *dest[num_bytes] = '\0';
     }
     else if (drizzle_check_type<uint8_t, U>(dest))
     {
+        printf("copying uint8_t\n");
         memcpy(*dest, binlog_event->data_ptr, num_bytes);
     }
 
@@ -270,6 +270,11 @@ uint64_t drizzle_binlog_xid_event_st::xid()
     return _impl->_xid;
 }
 
+uint32_t drizzle_binlog_xid_event_st::binlog_event_header::timestamp()
+{
+    return 1234;
+}
+
 std::ostream &operator<<(std::ostream &_stream, drizzle_binlog_xid_event_st &e)
 {
     _stream << "Xid Event( xid=" << e.xid() << ")\n";
@@ -288,17 +293,19 @@ void drizzle_binlog_query_event_st::parse(drizzle_binlog_event_st *event)
 {
     _impl->_slave_proxy_id = drizzle_read_type<uint32_t>(event);
     _impl->_execution_time = drizzle_read_type<uint32_t>(event);
-    uint16_t schema_length = drizzle_read_type<unsigned char>(event);
+    uint16_t schema_length = drizzle_read_type<uint8_t>(event);
     _impl->_error_code = drizzle_read_type<uint16_t>(event);
 
     uint32_t value_len = drizzle_read_type<uint16_t>(event);
-    drizzle_binlog_event_alloc_set_value(event, &_impl->_status_vars,
+    drizzle_binlog_event_alloc_set_value<uint8_t*>(event, &_impl->_status_vars,
                                          value_len);
     drizzle_binlog_event_set_value(event, &_impl->_schema, schema_length);
+    _impl->_schema[schema_length] = '\0';
 
     event->data_ptr++;
     value_len = drizzle_binlog_event_available_bytes(event) - 4;
     drizzle_binlog_event_alloc_set_value(event, &_impl->_query, value_len);
+    _impl->_query[value_len] = '\0';
 }
 
 uint32_t drizzle_binlog_query_event_st::slave_proxy_id()
@@ -363,10 +370,12 @@ void drizzle_binlog_tablemap_event_st::parse(drizzle_binlog_event_st *event)
 
     uint32_t len_enc = drizzle_read_type<uint32_t, 1>(event);
     drizzle_binlog_event_set_value(event, &_impl->_schema_name, len_enc);
+    _impl->_schema_name[len_enc] = '\0';
     event->data_ptr++;
 
     len_enc = drizzle_read_type<uint32_t, 1>(event);
     drizzle_binlog_event_set_value(event, &_impl->_table_name, len_enc);
+    _impl->_table_name[len_enc] = '\0';
     event->data_ptr++;
 
     _impl->_column_count = drizzle_binlog_get_encoded_len(event);
@@ -470,6 +479,5 @@ void drizzle_binlog_rows_event_st::parse(drizzle_binlog_event_st *event,
     _impl->_column_count = drizzle_binlog_get_encoded_len(event);
 
     _impl->bitmap_size = (_impl->_column_count + 7)/8;
-
 
 } // drizzle_binlog_rows_event_st::parse

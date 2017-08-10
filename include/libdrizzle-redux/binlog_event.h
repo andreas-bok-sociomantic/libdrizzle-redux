@@ -3,39 +3,38 @@
 #include <inttypes.h>
 #include <memory>
 
-// struct binlog_event_interface
-// {
-//   public:
-//     DRIZZLE_API
-//     uint32_t timestamp();
+struct binlog_event_header
+{
+  public:
+    DRIZZLE_API
+    uint32_t timestamp();
 
-//     DRIZZLE_API
-//     drizzle_binlog_event_types_t type();
+    DRIZZLE_API
+    drizzle_binlog_event_types_t type();
 
-//     DRIZZLE_API
-//     uint32_t server_id();
+    DRIZZLE_API
+    uint32_t server_id();
 
-//     DRIZZLE_API
-//     uint32_t length();
+    DRIZZLE_API
+    uint32_t length();
 
-//     DRIZZLE_API
-//     uint32_t next_pos();
+    DRIZZLE_API
+    uint32_t next_pos();
 
-//     DRIZZLE_API
-//     uint16_t flags();
+    DRIZZLE_API
+    uint16_t flags();
 
-//     DRIZZLE_API
-//     uint16_t extra_flags();
+    DRIZZLE_API
+    uint16_t extra_flags();
 
-//     DRIZZLE_API
-//     uint32_t checksum();
-// };
-
+    DRIZZLE_API
+    uint32_t checksum();
+};
 
 /**
  * @brief      XID event
  */
-struct drizzle_binlog_xid_event_st
+struct drizzle_binlog_xid_event_st : public binlog_event_header
 {
 public:
     /**

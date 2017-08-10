@@ -25,3 +25,13 @@ void dump_array_to_hex(const unsigned char *ptr, uint32_t len);
  * @return     distance in bytes between pointers
  */
 uint32_t ptr_dist(unsigned char *ptr1, unsigned char *ptr2);
+
+/**
+ * @brief Check if a bit is set
+ *
+ * @param ptr Pointer to start of bitfield
+ * @param columns Number of columns (bits)
+ * @param current_column Zero indexed column number
+ * @return True if the bit is set
+ */
+//static bool bit_is_set(uint8_t *ptr, int columns, int current_column);
