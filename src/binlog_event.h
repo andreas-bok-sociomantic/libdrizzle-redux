@@ -40,6 +40,21 @@
 
 #include <memory>
 
+
+/**
+ * @brief      Check for type equality of primitive types or
+ *             arrays of primitive types with rank 1
+ *
+ * @param      value  pointer to a value
+ *
+ * @tparam     V      Type to match
+ * @tparam     U      Type of input
+ *
+ * @return     True if the types match, false otherwise
+ */
+template<typename V, typename U>
+bool drizzle_check_type(U *value);
+
 /**
  * @brief Read an integral type
  * @details [long description]

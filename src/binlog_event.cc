@@ -90,6 +90,25 @@ public:
     unsigned char *_null_bitmap;
 };
 
+template<typename V, typename U>
+bool drizzle_check_type(U *value)
+{
+    if (std::rank<U>::value == 0)
+    {
+      typedef typename std::remove_cv<U>::type TYPE0;
+      typedef typename std::remove_pointer<TYPE0>::type _TYPE0;
+      return std::is_same<_TYPE0, V>::value;
+    }
+    else if (std::rank<U>::value == 1 )
+    {
+      typedef typename std::remove_cv<typeof((*value)[0])>::type TYPE1;
+      typedef typename std::remove_pointer<TYPE1>::type _TYPE1;
+      return std::is_same<_TYPE1, V>::value;
+    }
+    return false;
+}
+
+
 template<typename U, uint32_t V>
 U drizzle_read_type(drizzle_binlog_event_st *binlog_event)
 {
