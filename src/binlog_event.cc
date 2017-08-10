@@ -61,7 +61,7 @@ public:
     uint16_t _error_code;
     uint16_t _status_vars_length;
     unsigned char *_status_vars;
-    unsigned char *_schema;
+    unsigned char _schema[DRIZZLE_MAX_DB_SIZE];
     unsigned char *_query;
 };
 
@@ -80,9 +80,9 @@ struct drizzle_binlog_tablemap_event_st::tablemap_event_impl
 {
 public:
     uint64_t _table_id;
-    unsigned char *_flags;
-    unsigned char *_schema_name;
-    unsigned char *_table_name;
+    unsigned char _flags[2];
+    unsigned char _schema_name[DRIZZLE_MAX_DB_SIZE];
+    unsigned char _table_name[DRIZZLE_MAX_TABLE_SIZE];
     uint64_t _column_count;
     unsigned char *_column_type_def;
     unsigned char *_field_metadata;
@@ -137,9 +137,8 @@ uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event)
 
 template <typename U>
 void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
-                                    U *value, uint32_t num_bytes)
+                                    U *dest, uint32_t num_bytes)
 {
-
     if (drizzle_binlog_event_available_bytes(binlog_event) < num_bytes)
     {
         printf("Insufficient data (%d) to read %d bytes\n",
@@ -148,13 +147,21 @@ void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
         assert(false);
     }
 
-    if (std::is_same<U, unsigned char *>::value)
+    if (drizzle_check_type<char, U>(dest) ||
+        drizzle_check_type<unsigned char, U>(dest))
     {
-        *value = (U) realloc(*value, num_bytes + 1);
-        memcpy(*value, binlog_event->data_ptr, num_bytes);
+        memcpy(*dest, binlog_event->data_ptr, num_bytes);
     }
 
     binlog_event->data_ptr += num_bytes;
+}
+
+template <typename U>
+void drizzle_binlog_event_alloc_set_value(drizzle_binlog_event_st *binlog_event,
+                                    U *value, uint32_t num_bytes)
+{
+    *value = (U) realloc(*value, num_bytes + 1);
+    drizzle_binlog_event_set_value<U>(binlog_event, value, num_bytes);
 }
 
 uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event)
@@ -279,13 +286,13 @@ void drizzle_binlog_query_event_st::parse(drizzle_binlog_event_st *event)
     _impl->_error_code = drizzle_read_type<uint16_t>(event);
 
     uint32_t status_vars_length = drizzle_read_type<uint16_t>(event);
-    drizzle_binlog_event_set_value<unsigned char *>(
+    drizzle_binlog_event_alloc_set_value<unsigned char *>(
         event, &_impl->_status_vars, status_vars_length);
-    drizzle_binlog_event_set_value<unsigned char *>(
-        event, &_impl->_schema, schema_length);
+    drizzle_binlog_event_set_value(event, &_impl->_schema, schema_length);
+    _impl->_schema[schema_length] = '\0';
 
     event->data_ptr++;
-    drizzle_binlog_event_set_value<unsigned char *>(
+    drizzle_binlog_event_alloc_set_value<unsigned char *>(
         event, &_impl->_query, drizzle_binlog_event_available_bytes(event) - 4);
 }
 
@@ -347,32 +354,31 @@ void drizzle_binlog_tablemap_event_st::parse(drizzle_binlog_event_st *event)
 {
     _impl->_table_id = drizzle_read_type<uint64_t, 6>(event);
 
-    drizzle_binlog_event_set_value<unsigned char *>(event, &_impl->_flags, 2);
+    drizzle_binlog_event_set_value(event, &_impl->_flags, 2);
 
     uint32_t len_enc = drizzle_read_type<uint32_t, 1>(event);
-    drizzle_binlog_event_set_value<unsigned char *>(event, &_impl->_schema_name,
-                                                    len_enc);
+    drizzle_binlog_event_set_value(event, &_impl->_schema_name, len_enc);
+    _impl->_schema_name[len_enc] = '\0';
     event->data_ptr++;
 
     len_enc = drizzle_read_type<uint32_t, 1>(event);
-    drizzle_binlog_event_set_value<unsigned char *>(event, &_impl->_table_name,
-                                                    len_enc);
+    drizzle_binlog_event_set_value(event, &_impl->_table_name, len_enc);
+    _impl->_table_name[len_enc] = '\0';
     event->data_ptr++;
 
     _impl->_column_count = drizzle_binlog_get_encoded_len(event);
 
-    drizzle_binlog_event_set_value<unsigned char *>(event,
+    drizzle_binlog_event_alloc_set_value<unsigned char *>(event,
                                                     &_impl->_column_type_def,
                                                     _impl->_column_count);
 
-    // len_enc = drizzle_binlog_get_encoded_len(event);
     _impl->_field_metadata_len = drizzle_binlog_get_encoded_len(event);
-    drizzle_binlog_event_set_value<unsigned char *>(event,
+    drizzle_binlog_event_alloc_set_value<unsigned char *>(event,
                                                     &_impl->_field_metadata,
                                                     _impl->_field_metadata_len);
 
     len_enc = (uint32_t) (_impl->_column_count + 7) / 8;
-    drizzle_binlog_event_set_value<unsigned char *>(event, &_impl->_null_bitmap,
+    drizzle_binlog_event_alloc_set_value<unsigned char *>(event, &_impl->_null_bitmap,
                                                     len_enc);
 
 } // drizzle_binlog_tablemap_event_st::parse
@@ -456,7 +462,7 @@ void drizzle_binlog_rows_event_st::parse(drizzle_binlog_event_st *event,
         auto len = drizzle_read_type<uint16_t>(event);
         if ( len > 2 )
         {
-            drizzle_binlog_event_set_value<unsigned char *>(event, &buffer,
+            drizzle_binlog_event_alloc_set_value<unsigned char *>(event, &buffer,
                                                             len - 2);
         }
     }

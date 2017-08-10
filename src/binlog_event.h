@@ -62,7 +62,7 @@ bool drizzle_check_type(U *value);
  * @param pos index into the data array
  * @param data array of bytes
  * @tparam U the return type
- * @tparam V = the number of bytes to read from the data
+ * @tparam V the number of bytes to read from the data
  * @return an integral of type U
  */
 template<typename U, uint32_t V = sizeof(U)>
@@ -77,15 +77,31 @@ U drizzle_read_type(drizzle_binlog_event_st *binlog_event);
  */
 uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event);
 
+
 /**
- * @brief Set a value on a binlog event struct
+ * @brief      Set a value on a binlog event struct using memcpy.
+ *             Assumes that source value fits in the dest
+ * @param      binlog_event  a pointer to a drizzle_binlog_event_st
+ * @param      dest          pointer to the a member variable
+ * @param[in]  num_bytes     number of bytes to copy from source to destination
  *
- * @param binlog_event a pointer to a drizzle_binlog_event_st
- * @param dest pointer to the a member variable
- * @param num_bytes [description]
+ * @tparam     U             The type of dest
  */
 template <typename U>
 void drizzle_binlog_event_set_value(drizzle_binlog_event_st *binlog_event,
+                                    U *dest, uint32_t num_bytes = sizeof(U));
+
+/**
+ * @brief      Allocate memory before setting a value
+ *
+ * @param      binlog_event  a pointer to a drizzle_binlog_event_st
+ * @param      dest          pointer to the a member variable
+ * @param[in]  num_bytes     number of bytes to copy from source to destination
+ *
+ * @tparam     U             The type of dest
+ */
+template <typename U>
+void drizzle_binlog_event_alloc_set_value(drizzle_binlog_event_st *binlog_event,
                                     U *dest, uint32_t num_bytes = sizeof(U));
 
 /**
