@@ -45,6 +45,9 @@
 #pragma once
 
 #include <sys/types.h>
+#include <iterator>
+#include <unordered_map>
+#include <vector>
 
 #if defined(HAVE_OPENSSL_SSL_H)
 # include <openssl/ssl.h>

@@ -481,3 +481,28 @@ void drizzle_binlog_rows_event_st::parse(drizzle_binlog_event_st *event,
     _impl->bitmap_size = (_impl->_column_count + 7)/8;
 
 } // drizzle_binlog_rows_event_st::parse
+
+
+drizzle_binlog_rbr_client_st::drizzle_binlog_rbr_client_st()
+{
+    this->xid_event = new (std::nothrow) drizzle_binlog_xid_event_st();
+    this->query_event = new (std::nothrow) drizzle_binlog_query_event_st();
+}
+
+drizzle_binlog_rbr_client_st::~drizzle_binlog_rbr_client_st()
+{
+    delete this->xid_event;
+    delete this->query_event;
+    for (iterator_table_map_events it= this->table_map_events.begin();
+        it != this->table_map_events.end(); it++)
+    {
+        delete it->second;
+    }
+    this->table_map_events.clear();
+
+    for (auto it = this->rows_events.begin(); it != rows_events.end(); it++)
+    {
+        delete *it;
+    }
+    this->rows_events.clear();
+}

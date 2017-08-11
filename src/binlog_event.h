@@ -137,3 +137,22 @@ uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
      ((uint32_t) (__b) == 24 ? 0xffffff : \
       ((uint32_t) (__b) == 16 ? 0xffff : \
        ((uint32_t) (__b) == 8 ? 0xff : 0xffffffffffffffff ))))
+
+struct drizzle_binlog_rbr_client_st
+{
+private:
+    drizzle_binlog_xid_event_st *xid_event;
+    drizzle_binlog_query_event_st *query_event;
+    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st *> map_table_map_events;
+    typedef map_table_map_events::iterator iterator_table_map_events;
+    map_table_map_events table_map_events;
+    typedef std::vector<drizzle_binlog_rows_event_st*> vec_rows_events;
+    vec_rows_events rows_events;
+
+  public :
+    drizzle_binlog_rbr_client_st();
+
+    ~drizzle_binlog_rbr_client_st();
+};
+
+

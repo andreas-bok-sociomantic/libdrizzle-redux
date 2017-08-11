@@ -46,4 +46,5 @@ struct drizzle_binlog_st;
 struct drizzle_column_st;
 struct drizzle_stmt_st;
 struct drizzle_bind_st;
+struct drizzle_binlog_rbr_client_st;
 #endif
