@@ -71,7 +71,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     {
         drizzle_binlog_tablemap_event_st *table_map_event =
             drizzle_binlog_get_tablemap_event(event);
-        printf("schema: %s, table: %s, table_id %ld, \n",
+        printf("schema: %s, table: %s, table_id %" PRIu64 ", \n",
           table_map_event->schema_name(),
           table_map_event->table_name(),
           table_map_event->table_id());
