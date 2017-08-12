@@ -400,7 +400,16 @@ drizzle_return_t drizzle_state_binlog_read(drizzle_st *con)
     con->pop_state();
   }
 
-  con->binlog->binlog_fn(&con->binlog->event, con->binlog->binlog_context);
+  if (con->binlog->binlog_fn != NULL)
+  {
+    con->binlog->binlog_fn(&con->binlog->event, con->binlog->binlog_context);
+  }
+
+  if (con->binlog->rbr != NULL)
+  {
+    con->binlog->rbr->add_event(&con->binlog->event);
+  }
+
   con->push_state(drizzle_state_binlog_read);
   con->push_state(drizzle_state_packet_read);
 

@@ -161,3 +161,18 @@ valgrind-binlog_event: tests/unit/binlog_event
 
 check-binlog_event: tests/unit/binlog_event
 	tests/unit/binlog_event
+
+tests_unit_binlog_rbr_SOURCES= tests/unit/binlog_rbr.cc tests/unit/common.cc
+tests_unit_binlog_rbr_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_binlog_rbr_SOURCES = dummy.cxx
+check_PROGRAMS+= tests/unit/binlog_rbr
+noinst_PROGRAMS+= tests/unit/binlog_rbr
+
+gdb-binlog_rbr: tests/unit/binlog_rbr
+	@$(GDB_COMMAND) tests/unit/binlog_rbr
+
+valgrind-binlog_rbr: tests/unit/binlog_rbr
+	@$(VALGRIND_COMMAND) tests/unit/binlog_rbr
+
+check-binlog_rbr: tests/unit/binlog_rbr
+	tests/unit/binlog_rbr
