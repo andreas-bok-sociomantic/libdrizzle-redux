@@ -47,6 +47,22 @@
 
 using namespace std;
 
+struct drizzle_binlog_event_object_pool_st
+{
+  drizzle_binlog_xid_event_st *xid_event;
+  drizzle_binlog_query_event_st *query_event;
+  drizzle_binlog_tablemap_event_st *table_map_event;
+  drizzle_binlog_event_object_pool_st()
+  {
+    this->xid_event = new drizzle_binlog_xid_event_st();
+    this->query_event = new drizzle_binlog_query_event_st();
+    this->table_map_event = new drizzle_binlog_tablemap_event_st();
+  }
+};
+
+static drizzle_binlog_event_object_pool_st  *drizzle_binlog_event_object_pool =
+    new drizzle_binlog_event_object_pool_st();
+
 struct drizzle_binlog_event_header_st::binlog_event_header_impl
 {
     uint32_t _timestamp;
@@ -301,8 +317,7 @@ drizzle_binlog_xid_event_st *drizzle_binlog_get_xid_event(
 {
     dump_array_to_hex(drizzle_binlog_event_data(event),
                       drizzle_binlog_event_length(event));
-    drizzle_binlog_xid_event_st *xid_event =
-        new drizzle_binlog_xid_event_st(event);
+    auto *xid_event = drizzle_binlog_event_object_pool->xid_event;
     xid_event->set_event_header(event);
     xid_event->parse(event);
     return xid_event;
@@ -311,8 +326,8 @@ drizzle_binlog_xid_event_st *drizzle_binlog_get_xid_event(
 drizzle_binlog_query_event_st *drizzle_binlog_get_query_event(
     drizzle_binlog_event_st *event)
 {
-    auto query_event = new drizzle_binlog_query_event_st();
-
+    auto query_event = drizzle_binlog_event_object_pool->query_event;
+    query_event->set_event_header(event);
     query_event->parse(event);
     return query_event;
 }
@@ -322,8 +337,8 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_get_tablemap_event(
     drizzle_binlog_event_st *event)
 {
 
-    auto table_map_event = new drizzle_binlog_tablemap_event_st();
-
+    auto table_map_event = drizzle_binlog_event_object_pool->table_map_event;
+    table_map_event->set_event_header(event);
     table_map_event->parse(event);
     return table_map_event;
 }
@@ -340,13 +355,9 @@ drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
 
 drizzle_binlog_xid_event_st::drizzle_binlog_xid_event_st(drizzle_binlog_event_st *event) :
     drizzle_binlog_event_header_st(event), _impl(new xid_event_impl())
-{
+{}
 
-}
-
-drizzle_binlog_xid_event_st::~drizzle_binlog_xid_event_st()
-{
-}
+drizzle_binlog_xid_event_st::~drizzle_binlog_xid_event_st() = default;
 
 void drizzle_binlog_xid_event_st::parse(drizzle_binlog_event_st *event)
 {

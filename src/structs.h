@@ -446,6 +446,11 @@ struct drizzle_binlog_st
   drizzle_binlog_error_fn *error_fn;
   void *binlog_context;
   drizzle_binlog_event_st event;
+  /**
+   * create some sort of object pool
+   * which has a preallocated event of each used event type
+   * return pointer to this pool object to the client
+   */
   bool verify_checksums;
   bool has_checksums;
   drizzle_st *con;

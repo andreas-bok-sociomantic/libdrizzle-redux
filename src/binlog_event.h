@@ -138,6 +138,8 @@ uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
       ((uint32_t) (__b) == 16 ? 0xffff : \
        ((uint32_t) (__b) == 8 ? 0xff : 0xffffffffffffffff ))))
 
+struct drizzle_binlog_event_object_pool_st;
+
 /**
  * @brief      Binlog Row based replication structure
  *
