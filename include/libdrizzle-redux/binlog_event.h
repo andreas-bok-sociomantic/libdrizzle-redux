@@ -485,18 +485,11 @@ drizzle_binlog_query_event_st *drizzle_binlog_rbr_get_query_event(
  * @brief      Set the client callback function to receive row based
  *             replication event group notifications
  *
- * @param      binlog_st  An initialized drizzle_binlog structure
- * @param      rbr_fn     A callback function
- */
-DRIZZLE_API
-/**
- * @brief      Set the client callback function to receive row based
- *             replication event group notifications
- *
  * @param      binlog_st  An initialized binlog structure
  * @param      rbr_fn     The function callback defined in (drizzle_binlog_rbr_fn)()
  * @param      context    A pointer to user data which will be used for the
  *                        callback functions
  */
+DRIZZLE_API
 drizzle_return_t drizzle_binlog_set_rbr_fn(drizzle_binlog_st *binlog,
     drizzle_binlog_rbr_fn *rbr_fn, void *context);
