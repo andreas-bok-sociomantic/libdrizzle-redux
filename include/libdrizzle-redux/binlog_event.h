@@ -63,8 +63,18 @@ public:
     void parse(drizzle_binlog_event_st *event);
 
 
-    // DRIZZLE_API
-    // uint32_t timestamp();
+
+    /**
+     * Inherited methods from drizzle_binlog_event_header_st
+     */
+    using drizzle_binlog_event_header_st::timestamp;
+    using drizzle_binlog_event_header_st::type;
+    using drizzle_binlog_event_header_st::server_id;
+    using drizzle_binlog_event_header_st::length;
+    using drizzle_binlog_event_header_st::next_pos;
+    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::extra_flags;
+    using drizzle_binlog_event_header_st::checksum;
 
     /**
      * @brief      Get the xid id for the transaction
@@ -73,8 +83,6 @@ public:
      */
     DRIZZLE_API
     uint64_t xid();
-
-    using drizzle_binlog_event_header_st::timestamp;
 
     friend std::ostream &operator<<(std::ostream & _stream, drizzle_binlog_xid_event_st const &e);
 
@@ -114,6 +122,18 @@ public:
      * @param      event  a drizzle_binlog_event_st
      */
     void parse(drizzle_binlog_event_st *event);
+
+    /**
+     * Inherited methods from drizzle_binlog_event_header_st
+     */
+    using drizzle_binlog_event_header_st::timestamp;
+    using drizzle_binlog_event_header_st::type;
+    using drizzle_binlog_event_header_st::server_id;
+    using drizzle_binlog_event_header_st::length;
+    using drizzle_binlog_event_header_st::next_pos;
+    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::extra_flags;
+    using drizzle_binlog_event_header_st::checksum;
 
     /**
      * @brief      { function_description }
@@ -212,6 +232,18 @@ public:
      * @param      event  a drizzle_binlog_event_st
      */
     void parse(drizzle_binlog_event_st *event);
+
+    /**
+     * Inherited methods from drizzle_binlog_event_header_st
+     */
+    using drizzle_binlog_event_header_st::timestamp;
+    using drizzle_binlog_event_header_st::type;
+    using drizzle_binlog_event_header_st::server_id;
+    using drizzle_binlog_event_header_st::length;
+    using drizzle_binlog_event_header_st::next_pos;
+    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::extra_flags;
+    using drizzle_binlog_event_header_st::checksum;
 
     /**
      * @brief      Unique id assigned to a table by the MySQL server
@@ -339,6 +371,20 @@ public:
     DRIZZLE_API
     void parse(drizzle_binlog_event_st *event,
                drizzle_binlog_tablemap_event_st *table_map_event);
+
+
+    /**
+     * Inherited methods from drizzle_binlog_event_header_st
+     */
+    using drizzle_binlog_event_header_st::timestamp;
+    using drizzle_binlog_event_header_st::type;
+    using drizzle_binlog_event_header_st::server_id;
+    using drizzle_binlog_event_header_st::length;
+    using drizzle_binlog_event_header_st::next_pos;
+    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::extra_flags;
+    using drizzle_binlog_event_header_st::checksum;
+
 
     /**
      * @brief      The id of the table of assigned by the MySQL
