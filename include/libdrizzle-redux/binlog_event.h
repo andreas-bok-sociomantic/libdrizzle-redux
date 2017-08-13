@@ -5,16 +5,6 @@
 
 struct drizzle_binlog_event_header_st
 {
-protected:
-    uint32_t _timestamp;
-    drizzle_binlog_event_types_t _type;
-    uint32_t _server_id;
-    uint32_t _length;
-    uint32_t _next_pos;
-    uint16_t _header_flags;
-    uint16_t _extra_flags;
-    uint32_t _checksum;
-
 public:
     drizzle_binlog_event_header_st(drizzle_binlog_event_st *event=NULL);
     ~drizzle_binlog_event_header_st();
@@ -43,9 +33,11 @@ public:
     DRIZZLE_API
     uint32_t checksum();
 
-// private:
-//     struct binlog_event_header_impl;
-//     std::unique_ptr<binlog_event_header_impl> _impl;
+    void set_event_header(drizzle_binlog_event_st *event);
+
+private:
+    struct binlog_event_header_impl;
+    std::unique_ptr<binlog_event_header_impl> _impl;
 };
 
 /**
@@ -93,8 +85,6 @@ public:
     uint64_t xid();
 
     friend std::ostream &operator<<(std::ostream & _stream, drizzle_binlog_xid_event_st const &e);
-
-    friend drizzle_binlog_event_header_st;
 private:
     /**
      * @brief      Struct hiding implementation

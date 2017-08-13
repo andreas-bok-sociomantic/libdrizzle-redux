@@ -47,59 +47,88 @@
 
 using namespace std;
 
+struct drizzle_binlog_event_header_st::binlog_event_header_impl
+{
+    uint32_t _timestamp;
+    drizzle_binlog_event_types_t _type;
+    uint32_t _server_id;
+    uint32_t _length;
+    uint32_t _next_pos;
+    uint16_t _header_flags;
+    uint16_t _extra_flags;
+    uint32_t _checksum;
+    binlog_event_header_impl(drizzle_binlog_event_st *event=NULL)
+    {
+        if (event !=NULL)
+        {
+            this->_timestamp = event->timestamp;
+            this->_type = event->type;
+            this->_server_id = event->server_id;
+            this->_length = event->length;
+            this->_next_pos = event->next_pos;
+            this->_header_flags = event->flags;
+            this->_extra_flags = event->extra_flags;
+            this->_checksum = event->checksum;
+        }
+    }
+};
+
+void drizzle_binlog_event_header_st::set_event_header(
+    drizzle_binlog_event_st *event)
+{
+    _impl->_timestamp = event->timestamp;
+    _impl->_type = event->type;
+    _impl->_server_id = event->server_id;
+    _impl->_length = event->length;
+    _impl->_next_pos = event->next_pos;
+    _impl->_header_flags = event->flags;
+    _impl->_extra_flags = event->extra_flags;
+    _impl->_checksum = event->checksum;
+}
+
 uint32_t drizzle_binlog_event_header_st::timestamp()
 {
-    return this->_timestamp;
+    return _impl->_timestamp;
 }
 
 drizzle_binlog_event_types_t drizzle_binlog_event_header_st::type()
 {
-    return this->_type;
+    return _impl->_type;
 }
 
 uint32_t drizzle_binlog_event_header_st::server_id()
 {
-    return this->_server_id;
+    return _impl->_server_id;
 }
 
 uint32_t drizzle_binlog_event_header_st::length()
 {
-    return this->_length;
+    return _impl->_length;
 }
 
 uint32_t drizzle_binlog_event_header_st::next_pos()
 {
-    return this->_next_pos;
+    return _impl->_next_pos;
 }
 
 uint16_t drizzle_binlog_event_header_st::header_flags()
 {
-    return this->_header_flags;
+    return _impl->_header_flags;
 }
 
 uint16_t drizzle_binlog_event_header_st::extra_flags()
 {
-    return this->_extra_flags;
+    return _impl->_extra_flags;
 }
 
 uint32_t drizzle_binlog_event_header_st::checksum()
 {
-    return this->_checksum;
+    return _impl->_checksum;
 }
 
-drizzle_binlog_event_header_st::drizzle_binlog_event_header_st(drizzle_binlog_event_st *event)
+drizzle_binlog_event_header_st::drizzle_binlog_event_header_st(drizzle_binlog_event_st *event) :
+    _impl(new binlog_event_header_impl(event))
 {
-    if (event !=NULL)
-    {
-        this->_timestamp = event->timestamp;
-        this->_type = event->type;
-        this->_server_id = event->server_id;
-        this->_length = event->length;
-        this->_next_pos = event->next_pos;
-        this->_header_flags = event->flags;
-        this->_extra_flags = event->extra_flags;
-        this->_checksum = event->checksum;
-    }
 }
 
 drizzle_binlog_event_header_st::~drizzle_binlog_event_header_st() = default;
@@ -274,7 +303,7 @@ drizzle_binlog_xid_event_st *drizzle_binlog_get_xid_event(
                       drizzle_binlog_event_length(event));
     drizzle_binlog_xid_event_st *xid_event =
         new drizzle_binlog_xid_event_st(event);
-
+    xid_event->set_event_header(event);
     xid_event->parse(event);
     return xid_event;
 }
