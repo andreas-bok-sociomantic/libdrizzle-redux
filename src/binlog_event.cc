@@ -47,6 +47,24 @@
 
 using namespace std;
 
+struct drizzle_binlog_event_header_st::binlog_event_header_impl
+{
+public :
+  uint32_t _timestamp;
+  drizzle_binlog_event_types_t _type;
+  uint32_t _server_id;
+  uint32_t _length;
+  uint32_t _next_pos;
+  uint16_t _flags;
+  uint16_t _extra_flags;
+  uint32_t _checksum;
+};
+
+drizzle_binlog_event_header_st::drizzle_binlog_event_header_st() :
+    _impl(new binlog_event_header_impl())
+{}
+drizzle_binlog_event_header_st::~drizzle_binlog_event_header_st() = default;
+
 struct drizzle_binlog_xid_event_st::xid_event_impl
 {
 public:
@@ -251,9 +269,10 @@ drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
     return rows_event;
 }
 
-drizzle_binlog_xid_event_st::drizzle_binlog_xid_event_st() : _impl(
-        new xid_event_impl())
+drizzle_binlog_xid_event_st::drizzle_binlog_xid_event_st() :
+    drizzle_binlog_event_header_st(), _impl(new xid_event_impl())
 {
+
 }
 
 drizzle_binlog_xid_event_st::~drizzle_binlog_xid_event_st()
@@ -270,9 +289,9 @@ uint64_t drizzle_binlog_xid_event_st::xid()
     return _impl->_xid;
 }
 
-uint32_t drizzle_binlog_xid_event_st::binlog_event_header::timestamp()
+uint32_t drizzle_binlog_xid_event_st::drizzle_binlog_event_header_st::timestamp()
 {
-    return 1234;
+    return _impl->_timestamp;
 }
 
 std::ostream &operator<<(std::ostream &_stream, drizzle_binlog_xid_event_st &e)

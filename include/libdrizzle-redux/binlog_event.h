@@ -3,9 +3,12 @@
 #include <inttypes.h>
 #include <memory>
 
-struct binlog_event_header
+struct drizzle_binlog_event_header_st
 {
-  public:
+public:
+    drizzle_binlog_event_header_st();
+    ~drizzle_binlog_event_header_st();
+
     DRIZZLE_API
     uint32_t timestamp();
 
@@ -29,12 +32,16 @@ struct binlog_event_header
 
     DRIZZLE_API
     uint32_t checksum();
+
+private:
+    struct binlog_event_header_impl;
+    std::unique_ptr<binlog_event_header_impl> _impl;
 };
 
 /**
  * @brief      XID event
  */
-struct drizzle_binlog_xid_event_st : public binlog_event_header
+struct drizzle_binlog_xid_event_st : public drizzle_binlog_event_header_st
 {
 public:
     /**
@@ -55,6 +62,10 @@ public:
     DRIZZLE_API
     void parse(drizzle_binlog_event_st *event);
 
+
+    // DRIZZLE_API
+    // uint32_t timestamp();
+
     /**
      * @brief      Get the xid id for the transaction
      *
@@ -63,8 +74,11 @@ public:
     DRIZZLE_API
     uint64_t xid();
 
+    using drizzle_binlog_event_header_st::timestamp;
+
     friend std::ostream &operator<<(std::ostream & _stream, drizzle_binlog_xid_event_st const &e);
 
+    friend drizzle_binlog_event_header_st;
 private:
     /**
      * @brief      Struct hiding implementation

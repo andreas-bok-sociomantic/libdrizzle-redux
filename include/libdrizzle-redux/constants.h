@@ -587,6 +587,7 @@ typedef struct drizzle_result_st drizzle_result_st;
 typedef struct drizzle_column_st drizzle_column_st;
 typedef struct drizzle_binlog_st drizzle_binlog_st;
 typedef struct drizzle_binlog_rbr_st drizzle_binlog_rbr_st;
+typedef struct drizzle_binlog_event_header_st drizzle_binlog_event_header_st;
 typedef struct drizzle_binlog_event_st drizzle_binlog_event_st;
 typedef struct drizzle_binlog_xid_event_st drizzle_binlog_xid_event_st;
 typedef struct drizzle_binlog_query_event_st drizzle_binlog_query_event_st;
