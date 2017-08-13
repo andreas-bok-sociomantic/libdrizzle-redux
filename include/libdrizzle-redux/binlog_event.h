@@ -5,8 +5,18 @@
 
 struct drizzle_binlog_event_header_st
 {
+protected:
+    uint32_t _timestamp;
+    drizzle_binlog_event_types_t _type;
+    uint32_t _server_id;
+    uint32_t _length;
+    uint32_t _next_pos;
+    uint16_t _header_flags;
+    uint16_t _extra_flags;
+    uint32_t _checksum;
+
 public:
-    drizzle_binlog_event_header_st();
+    drizzle_binlog_event_header_st(drizzle_binlog_event_st *event=NULL);
     ~drizzle_binlog_event_header_st();
 
     DRIZZLE_API
@@ -25,7 +35,7 @@ public:
     uint32_t next_pos();
 
     DRIZZLE_API
-    uint16_t flags();
+    uint16_t header_flags();
 
     DRIZZLE_API
     uint16_t extra_flags();
@@ -33,9 +43,9 @@ public:
     DRIZZLE_API
     uint32_t checksum();
 
-private:
-    struct binlog_event_header_impl;
-    std::unique_ptr<binlog_event_header_impl> _impl;
+// private:
+//     struct binlog_event_header_impl;
+//     std::unique_ptr<binlog_event_header_impl> _impl;
 };
 
 /**
@@ -47,7 +57,7 @@ public:
     /**
      * @brief      Constructor
      */
-    drizzle_binlog_xid_event_st();
+    drizzle_binlog_xid_event_st(drizzle_binlog_event_st *event=NULL);
 
     /**
      * @brief      Destroys the object.
@@ -62,8 +72,6 @@ public:
     DRIZZLE_API
     void parse(drizzle_binlog_event_st *event);
 
-
-
     /**
      * Inherited methods from drizzle_binlog_event_header_st
      */
@@ -72,7 +80,7 @@ public:
     using drizzle_binlog_event_header_st::server_id;
     using drizzle_binlog_event_header_st::length;
     using drizzle_binlog_event_header_st::next_pos;
-    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::header_flags;
     using drizzle_binlog_event_header_st::extra_flags;
     using drizzle_binlog_event_header_st::checksum;
 
@@ -103,7 +111,7 @@ private:
 /**
  * @brief      Binlog QUERY_EVENT
  */
-struct drizzle_binlog_query_event_st
+struct drizzle_binlog_query_event_st : public drizzle_binlog_event_header_st
 {
 public:
     /**
@@ -131,7 +139,7 @@ public:
     using drizzle_binlog_event_header_st::server_id;
     using drizzle_binlog_event_header_st::length;
     using drizzle_binlog_event_header_st::next_pos;
-    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::header_flags;
     using drizzle_binlog_event_header_st::extra_flags;
     using drizzle_binlog_event_header_st::checksum;
 
@@ -213,7 +221,7 @@ private:
  * @description    Event used in Row Based Replication with definitions of db
  *                 tables used
  */
-struct drizzle_binlog_tablemap_event_st
+struct drizzle_binlog_tablemap_event_st : public drizzle_binlog_event_header_st
 {
 public:
     /**
@@ -241,7 +249,7 @@ public:
     using drizzle_binlog_event_header_st::server_id;
     using drizzle_binlog_event_header_st::length;
     using drizzle_binlog_event_header_st::next_pos;
-    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::header_flags;
     using drizzle_binlog_event_header_st::extra_flags;
     using drizzle_binlog_event_header_st::checksum;
 
@@ -346,7 +354,7 @@ private:
  * |                   |         | + the data to change                      |
  * +=========================================================================+
  */
-struct drizzle_binlog_rows_event_st
+struct drizzle_binlog_rows_event_st : public drizzle_binlog_event_header_st
 {
 public:
     /**
@@ -381,7 +389,7 @@ public:
     using drizzle_binlog_event_header_st::server_id;
     using drizzle_binlog_event_header_st::length;
     using drizzle_binlog_event_header_st::next_pos;
-    using drizzle_binlog_event_header_st::flags;
+    using drizzle_binlog_event_header_st::header_flags;
     using drizzle_binlog_event_header_st::extra_flags;
     using drizzle_binlog_event_header_st::checksum;
 
