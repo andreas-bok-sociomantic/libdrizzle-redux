@@ -39,17 +39,6 @@
 
 struct drizzle_binlog_rbr_st
 {
-private:
-
-    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st *>
-        map_table_map_events;
-    typedef map_table_map_events::iterator iterator_table_map_events;
-    map_table_map_events table_map_events;
-    typedef std::vector<drizzle_binlog_rows_event_st*> vec_rows_events;
-    typedef vec_rows_events::iterator iterator_rows_events;
-    vec_rows_events rows_events;
-
-public :
     drizzle_binlog_rbr_fn *rbr_fn;
     void *context;
     drizzle_binlog_xid_event_st *xid_event;
@@ -63,4 +52,14 @@ public :
      * @param      event  a drizzle_binlog_event structure
      */
     void add_event(drizzle_binlog_event_st *event);
+
+private:
+    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st *>
+        map_table_map_events;
+    typedef map_table_map_events::iterator iterator_table_map_events;
+    map_table_map_events table_map_events;
+    typedef std::vector<drizzle_binlog_rows_event_st*> vec_rows_events;
+    typedef vec_rows_events::iterator iterator_rows_events;
+    vec_rows_events rows_events;
+
 };
