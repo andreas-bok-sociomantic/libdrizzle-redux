@@ -67,6 +67,7 @@
 #include <libdrizzle-redux/binlog.h>
 #include <libdrizzle-redux/statement.h>
 #include <libdrizzle-redux/version.h>
+#include <libdrizzle-redux/binlog_rbr_client.h>
 
 #ifdef __cplusplus
 extern "C" {
