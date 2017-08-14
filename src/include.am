@@ -69,6 +69,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/statement.cc \
 	src/statement_param.cc \
 	src/binlog_helper.cc \
-	src/binlog_rbr.cc
+	src/binlog_rbr.cc \
+	src/binlog_event_header.cc
 
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}
