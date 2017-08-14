@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+
+/**
+ * @brief      Common header for all binlog events
+ */
 struct drizzle_binlog_event_header_st
 {
     /**
