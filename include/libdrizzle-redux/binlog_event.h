@@ -5,7 +5,6 @@
 
 struct drizzle_binlog_event_header_st
 {
-public:
     drizzle_binlog_event_header_st(drizzle_binlog_event_st *event=NULL);
     ~drizzle_binlog_event_header_st();
 
@@ -45,7 +44,6 @@ private:
  */
 struct drizzle_binlog_xid_event_st : public drizzle_binlog_event_header_st
 {
-public:
     /**
      * @brief      Constructor
      */
@@ -103,7 +101,6 @@ private:
  */
 struct drizzle_binlog_query_event_st : public drizzle_binlog_event_header_st
 {
-public:
     /**
      * @brief      Constructor
      */
@@ -213,7 +210,6 @@ private:
  */
 struct drizzle_binlog_tablemap_event_st : public drizzle_binlog_event_header_st
 {
-public:
     /**
      * @brief      Constructor
      */
@@ -346,7 +342,6 @@ private:
  */
 struct drizzle_binlog_rows_event_st : public drizzle_binlog_event_header_st
 {
-public:
     /**
      * @brief      Constructor
      */

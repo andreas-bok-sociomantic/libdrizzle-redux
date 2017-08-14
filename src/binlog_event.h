@@ -115,13 +115,11 @@ uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
 
 struct drizzle_binlog_xid_event_st::xid_event_impl
 {
-public:
     uint64_t _xid;
 };
 
 struct drizzle_binlog_query_event_st::query_event_impl
 {
-public:
     uint32_t _slave_proxy_id;
     uint32_t _execution_time;
     uint16_t _error_code;
@@ -133,7 +131,6 @@ public:
 
 struct drizzle_binlog_rows_event_st::rows_event_impl
 {
-public:
     uint64_t _table_id;
     uint64_t _column_count;
     uint32_t _field_metadata_len;
@@ -145,7 +142,6 @@ public:
 
 struct drizzle_binlog_tablemap_event_st::tablemap_event_impl
 {
-public:
     uint64_t _table_id;
     uint8_t _flags[2];
     unsigned char _schema_name[DRIZZLE_MAX_DB_SIZE];
