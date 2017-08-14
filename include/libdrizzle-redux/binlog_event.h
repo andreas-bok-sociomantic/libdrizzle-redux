@@ -3,6 +3,10 @@
 #include <inttypes.h>
 #include <memory>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct drizzle_binlog_event_header_st
 {
     drizzle_binlog_event_header_st(drizzle_binlog_event_st *event=NULL);
@@ -488,3 +492,7 @@ drizzle_binlog_query_event_st *drizzle_binlog_rbr_get_query_event(
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_set_rbr_fn(drizzle_binlog_st *binlog,
     drizzle_binlog_rbr_fn *rbr_fn, void *context);
+
+#ifdef __cplusplus
+}
+#endif
