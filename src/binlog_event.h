@@ -113,8 +113,14 @@ void drizzle_binlog_event_alloc_set_value(drizzle_binlog_event_st *binlog_event,
  */
 uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
 
+/**
+ * @brief      Implementation of xid event
+ */
 struct drizzle_binlog_xid_event_st::xid_event_impl
 {
+    /**
+     * The xid id for the transaction
+     */
     uint64_t _xid;
 };
 

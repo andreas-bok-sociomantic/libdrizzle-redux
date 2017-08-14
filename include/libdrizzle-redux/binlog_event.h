@@ -9,33 +9,104 @@ extern "C" {
 
 struct drizzle_binlog_event_header_st
 {
+    /**
+     * @brief      Constructor
+     *
+     * @param      event  Pointer to a drizzle_binlog_event structure
+     */
     drizzle_binlog_event_header_st(drizzle_binlog_event_st *event=NULL);
+
+    /**
+     * @brief      Destroys the object
+     */
     ~drizzle_binlog_event_header_st();
 
+    /**
+     * @brief      Seconds since Unix epoch at which the statement began
+     *             executing
+     *
+     * @return     Unix timestamp
+     */
     DRIZZLE_API
     uint32_t timestamp();
 
+    /**
+     * @brief      The type of event
+     *
+     * @return     a  drizzle_binlog_event_types_t enum value
+     */
     DRIZZLE_API
     drizzle_binlog_event_types_t type();
 
+    /**
+     * @brief      The unique server id of the replication slave
+     *             "unique", means that the 'id' must be different from every
+     *             other 'id' in use by any other replication master or slave
+     *             \sa https://dev.mysql.com/doc/refman/5.7/en/replication-options.html
+     *
+     * @return     id of the replication client
+     */
     DRIZZLE_API
     uint32_t server_id();
 
+    /**
+     * @brief       The total size in bytes of the event.
+     *              This includes both the header and data parts.
+     *
+     * @return     event size in bytes
+     */
     DRIZZLE_API
     uint32_t length();
 
+    /**
+     * @brief      The position of the next event in the binary log.
+     *             Offset to the end of the event, counting from the beginning
+     *             of the master's binlog file. In other words, equal to the
+     *             value of tell ( ) just after the event was written
+     *             So the first event of the binlog has
+     *             next_position = 4 + event_length, and for events number n and
+     *             n+1, it holds that
+     *                 next_position(n+1) = next_position(n) + event_length(n+1)
+
+     * @return     position of next event
+     */
     DRIZZLE_API
     uint32_t next_pos();
 
+    /**
+     * @brief      Flags for binlog settings
+     *
+     * @return     flags as unsigned short
+     */
     DRIZZLE_API
     uint16_t header_flags();
 
+
+    /**
+     * @brief      Currently unused, but reserved for use in future versions of
+     *             binlog
+     *
+     * @return     Always 0
+     */
     DRIZZLE_API
     uint16_t extra_flags();
 
+
+    /**
+     * @brief      The CRC32 checksum of the event
+     *
+     * @return     4 byte checksum
+     */
     DRIZZLE_API
     uint32_t checksum();
 
+    /**
+     * @brief      Sets the event header
+     *             Copies the values from the passed drizzle_binlog_event_st
+     *             struct
+     *
+     * @param      event  Pointer to a drizzle_binlog_event structure
+     */
     void set_event_header(drizzle_binlog_event_st *event);
 
 private:
@@ -50,6 +121,8 @@ struct drizzle_binlog_xid_event_st : public drizzle_binlog_event_header_st
 {
     /**
      * @brief      Constructor
+     *
+     * @param      event  Pointer to a drizzle_binlog_event structure
      */
     drizzle_binlog_xid_event_st(drizzle_binlog_event_st *event=NULL);
 
