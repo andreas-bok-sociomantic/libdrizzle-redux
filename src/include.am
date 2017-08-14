@@ -20,6 +20,7 @@ noinst_HEADERS+= src/state.h
 noinst_HEADERS+= src/statement_local.h
 noinst_HEADERS+= src/structs.h
 noinst_HEADERS+= src/windows.hpp
+noinst_HEADERS+= src/binlog_rbr.h
 
 lib_LTLIBRARIES+= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES=
@@ -67,6 +68,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/state.cc	\
 	src/statement.cc \
 	src/statement_param.cc \
-	src/binlog_helper.cc
+	src/binlog_helper.cc \
+	src/binlog_rbr.cc
 
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}

@@ -1,8 +1,8 @@
-/*
+/* vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
+ *
  * Drizzle Client & Protocol Library
  *
- * Copyright (C) 2008-2013 Drizzle Developer Group
- * Copyright (C) 2008 Eric Day (eday@oddments.org)
+ * Copyright (C) 2017 Drizzle Developer Group
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,65 +35,27 @@
  *
  */
 
-/**
- * @file
- * @brief System Include Files
- */
-
 #pragma once
 
-#include <libdrizzle-redux/drizzle_client.h>
+struct drizzle_binlog_rbr_st
+{
+    drizzle_binlog_xid_event_st *xid_event;
+    drizzle_binlog_query_event_st *query_event;
+    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st *>
+        map_table_map_events;
+    typedef map_table_map_events::iterator iterator_table_map_events;
+    map_table_map_events table_map_events;
+    typedef std::vector<drizzle_binlog_rows_event_st*> vec_rows_events;
+    vec_rows_events rows_events;
+    drizzle_binlog_rbr_fn *rbr_fn;
+    void *context;
+    drizzle_binlog_rbr_st();
+    ~drizzle_binlog_rbr_st();
 
-#include <cassert>
-#include <new>
-
-#ifdef HAVE_FCNTL_H
-# include <fcntl.h>
-#endif
-
-#if defined(_WIN32) || defined(__MINGW32__)
-# include "src/windows.hpp"
-# define get_socket_errno() WSAGetLastError()
-
-#else
-# include <netinet/tcp.h>
-# include <sys/uio.h>
-# include <unistd.h>
-# include <cerrno>
-# define INVALID_SOCKET -1
-# define SOCKET_ERROR -1
-# define closesocket(a) close(a)
-# define get_socket_errno() errno
-
-#endif // defined(_WIN32) || defined(__MINGW32__)
-
-#if defined(HAVE_POLL_H) && HAVE_POLL_H
-# include <poll.h>
-typedef struct pollfd pollfd_t;
-#else
-# include "src/poll.h"
-#endif
-
-#include <stddef.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "src/structs.h"
-#include "src/drizzle_local.h"
-#include "src/binlog_helper.h"
-#include "src/binlog_rbr.h"
-#include "src/binlog_event.h"
-#include "src/conn_local.h"
-#include "src/pack.h"
-#include "src/state.h"
-#include "src/sha1.h"
-#include "src/statement_local.h"
-#include "src/column.h"
-#include "src/binlog.h"
-#include "src/handshake_client.h"
-#include "src/result.h"
-
-#include <memory.h>
+    /**
+     * @brief      Adds a row based replication event to the structure
+     *
+     * @param      event  a drizzle_binlog_event structure
+     */
+    void add_event(drizzle_binlog_event_st *event);
+};

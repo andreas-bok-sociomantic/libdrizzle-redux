@@ -115,29 +115,3 @@ uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
 
 struct drizzle_binlog_event_object_pool_st;
 
-/**
- * @brief      Binlog Row based replication structure
- *
- * @description
- */
-struct drizzle_binlog_rbr_st
-{
-    drizzle_binlog_xid_event_st *xid_event;
-    drizzle_binlog_query_event_st *query_event;
-    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st *> map_table_map_events;
-    typedef map_table_map_events::iterator iterator_table_map_events;
-    map_table_map_events table_map_events;
-    typedef std::vector<drizzle_binlog_rows_event_st*> vec_rows_events;
-    vec_rows_events rows_events;
-    drizzle_binlog_rbr_fn *rbr_fn;
-    void *context;
-    drizzle_binlog_rbr_st();
-    ~drizzle_binlog_rbr_st();
-
-    /**
-     * @brief      Adds a row based replication event to the structure
-     *
-     * @param      event  a drizzle_binlog_event structure
-     */
-    void add_event(drizzle_binlog_event_st *event);
-};
