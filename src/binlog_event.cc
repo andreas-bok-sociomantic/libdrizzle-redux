@@ -246,8 +246,9 @@ std::ostream &operator<<(std::ostream &_stream, drizzle_binlog_xid_event_st &e)
 }
 
 
-drizzle_binlog_query_event_st::drizzle_binlog_query_event_st() : _impl(
-        new query_event_impl())
+drizzle_binlog_query_event_st::drizzle_binlog_query_event_st(
+    drizzle_binlog_event_st *event) : drizzle_binlog_event_header_st(event),
+    _impl(new query_event_impl())
 {
 }
 
@@ -315,7 +316,8 @@ unsigned char *drizzle_binlog_query_event_st::query()
 /**
  * @brief      Constructs the object.
  */
-drizzle_binlog_tablemap_event_st::drizzle_binlog_tablemap_event_st() :
+drizzle_binlog_tablemap_event_st::drizzle_binlog_tablemap_event_st(
+    drizzle_binlog_event_st *event) : drizzle_binlog_event_header_st(event),
     _impl(new tablemap_event_impl())
 {
 }
@@ -399,12 +401,12 @@ uint8_t *drizzle_binlog_tablemap_event_st::null_bitmap()
     return _impl->_null_bitmap;
 }
 
-
-drizzle_binlog_rows_event_st::drizzle_binlog_rows_event_st() :
-    _impl(new rows_event_impl())
+drizzle_binlog_rows_event_st::drizzle_binlog_rows_event_st(
+    drizzle_binlog_event_st *event) :
+    drizzle_binlog_event_header_st(event), _impl(new rows_event_impl())
 {
-
 }
+
 drizzle_binlog_rows_event_st::~drizzle_binlog_rows_event_st() = default;
 
 void drizzle_binlog_rows_event_st::parse(drizzle_binlog_event_st *event,

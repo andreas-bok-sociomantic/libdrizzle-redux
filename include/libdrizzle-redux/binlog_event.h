@@ -180,8 +180,10 @@ struct drizzle_binlog_query_event_st : public drizzle_binlog_event_header_st
 {
     /**
      * @brief      Constructor
+     *
+     * @param      event  Pointer to a drizzle_binlog_event structure
      */
-    drizzle_binlog_query_event_st();
+    drizzle_binlog_query_event_st(drizzle_binlog_event_st *event=NULL);
 
     /**
      * @brief      Destroys the object.
@@ -289,8 +291,10 @@ struct drizzle_binlog_tablemap_event_st : public drizzle_binlog_event_header_st
 {
     /**
      * @brief      Constructor
+     *
+     * @param      event  Pointer to a drizzle_binlog_event structure
      */
-    drizzle_binlog_tablemap_event_st();
+    drizzle_binlog_tablemap_event_st(drizzle_binlog_event_st *event=NULL);
 
     /**
      * @brief      Destroys the object.
@@ -421,8 +425,10 @@ struct drizzle_binlog_rows_event_st : public drizzle_binlog_event_header_st
 {
     /**
      * @brief      Constructor
+     *
+     * @param      event  Pointer to a drizzle_binlog_event structure
      */
-    drizzle_binlog_rows_event_st();
+    drizzle_binlog_rows_event_st(drizzle_binlog_event_st *event=NULL);
 
     /**
      * @brief      Destroys the object.
