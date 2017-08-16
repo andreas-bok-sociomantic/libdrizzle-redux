@@ -35,9 +35,9 @@
  *
  */
 
+#include <libdrizzle-redux/libdrizzle.h>
 #include <yatl/lite.h>
 
-#include <libdrizzle-redux/libdrizzle.h>
 
 #include "tests/unit/common.h"
 
