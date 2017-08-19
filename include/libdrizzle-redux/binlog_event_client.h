@@ -1,0 +1,6 @@
+#pragma once
+
+#ifndef BINLOG_EVENT_CLIENT_H
+#define BINLOG_EVENT_CLIENT_H
+
+#endif // BINLOG_EVENT_CLIENT_H
