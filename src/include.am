@@ -21,6 +21,7 @@ noinst_HEADERS+= src/structs.h
 noinst_HEADERS+= src/windows.hpp
 noinst_HEADERS+= src/xid_event.h
 noinst_HEADERS+= src/query_event.h
+noinst_HEADERS+= src/tablemap_event.h
 
 lib_LTLIBRARIES+= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES=
@@ -69,6 +70,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/statement.cc \
 	src/statement_param.cc \
 	src/xid_event.cc \
-	src/query_event.cc
+	src/query_event.cc \
+	src/tablemap_event.cc
 
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}

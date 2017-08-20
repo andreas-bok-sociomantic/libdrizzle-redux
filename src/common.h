@@ -95,5 +95,6 @@ typedef struct pollfd pollfd_t;
 #include "src/binlog_helper.h"
 #include "src/xid_event.h"
 #include "src/query_event.h"
+#include "src/tablemap_event.h"
 
 #include <memory.h>
