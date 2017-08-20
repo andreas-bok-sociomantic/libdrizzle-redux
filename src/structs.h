@@ -418,6 +418,7 @@ struct drizzle_binlog_event_st
   uint16_t extra_flags;
   uint32_t checksum;
   unsigned char *data;
+  unsigned char *data_ptr;
   unsigned char *raw_data;
   uint32_t raw_length;
   drizzle_binlog_event_st() :
@@ -430,6 +431,7 @@ struct drizzle_binlog_event_st
     extra_flags(0),
     checksum(0),
     data(NULL),
+    data_ptr(NULL),
     raw_data(NULL),
     raw_length(0)
   { }

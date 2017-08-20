@@ -386,6 +386,7 @@ drizzle_return_t drizzle_state_binlog_read(drizzle_st *con)
       }
       /* A checksum is basically a CRC32 at the end of the event data (4 bytes) */
       binlog_event->data= con->buffer_ptr;
+      binlog_event->data_ptr = binlog_event->data;
       con->buffer_ptr+= binlog_event->length;
       con->buffer_size-= binlog_event->length;
       con->packet_size-= binlog_event->length;
