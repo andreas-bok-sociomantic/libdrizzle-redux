@@ -59,13 +59,13 @@ uint64_t drizzle_binlog_tablemap_event_table_id(
     return event->table_id;
 }
 
-unsigned char *drizzle_binlog_tablemap_event_schema_name(
+const char *drizzle_binlog_tablemap_event_schema_name(
 	drizzle_binlog_tablemap_event_st* event)
 {
     return event->schema_name;
 }
 
-unsigned char *drizzle_binlog_tablemap_event_table_name(
+const char *drizzle_binlog_tablemap_event_table_name(
 	drizzle_binlog_tablemap_event_st* event)
 {
     return event->table_name;

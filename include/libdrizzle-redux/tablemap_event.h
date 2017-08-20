@@ -32,7 +32,7 @@ uint64_t drizzle_binlog_tablemap_event_table_id(
  * @return     database name
  */
 DRIZZLE_API
-unsigned char* drizzle_binlog_tablemap_event_schema_name(
+const char* drizzle_binlog_tablemap_event_schema_name(
 	drizzle_binlog_tablemap_event_st* event);
 
 /**
@@ -41,7 +41,7 @@ unsigned char* drizzle_binlog_tablemap_event_schema_name(
  * @return     table name
  */
 DRIZZLE_API
-unsigned char* drizzle_binlog_tablemap_event_table_name(
+const char* drizzle_binlog_tablemap_event_table_name(
 	drizzle_binlog_tablemap_event_st* event);
 
 /**

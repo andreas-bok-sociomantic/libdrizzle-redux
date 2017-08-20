@@ -6,8 +6,8 @@ struct drizzle_binlog_tablemap_event_st
 
     uint64_t table_id;
     uint8_t flags[2];
-    unsigned char schema_name[DRIZZLE_MAX_DB_SIZE];
-    unsigned char table_name[DRIZZLE_MAX_TABLE_SIZE];
+    char schema_name[DRIZZLE_MAX_DB_SIZE];
+    char table_name[DRIZZLE_MAX_TABLE_SIZE];
     uint64_t column_count;
     drizzle_column_type_t *column_type_def;
     uint8_t *field_metadata;
