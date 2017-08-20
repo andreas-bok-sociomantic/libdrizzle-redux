@@ -8,7 +8,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
     auto rows_event = new drizzle_binlog_rows_event_st();
     set_event_header(&rows_event->header, event);
 
-    rows_event->column_type_def = (uint8_t*) malloc(table_map_event->column_count);
+    rows_event->column_type_def = (drizzle_column_type_t*) malloc(table_map_event->column_count);
     memcpy(&rows_event->column_type_def, event->data_ptr, table_map_event->column_count);
     event->data_ptr+=table_map_event->column_count;
 
