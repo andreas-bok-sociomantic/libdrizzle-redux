@@ -72,6 +72,14 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
         printf("exucution time: %d\n",
           drizzle_binlog_query_event_execution_time(query_event));
     }
+
+    if ( type == DRIZZLE_EVENT_TYPE_TABLE_MAP )
+    {
+      drizzle_binlog_tablemap_event_st* tablemap_event =
+        drizzle_binlog_get_tablemap_event(event);
+        printf("table id: %" PRIu64 " \n",
+          drizzle_binlog_tablemap_event_table_id(tablemap_event));
+    }
 }
 
 int main(int argc, char *argv[])
