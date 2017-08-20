@@ -96,3 +96,42 @@ unsigned char *drizzle_binlog_query_event_query(
 {
     return query_event->query;
 }
+
+// unsigned char *drizzle_binlog_query_event_status_var_length(
+//      uint8_t *status_vars, drizzle_query_event_status_var_codes_t *status_code)
+//  {
+//     uint32_t length = 0;
+//     switch (status_var)
+//     {
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_FLAGS2:
+//             length = 4;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_SQL_MODE:
+//             length = 8;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_CATALOG:
+//             length = 0;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_AUTO_INCREMENT:
+//             length = 2;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_CHARSET:
+//             length = 0;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_TIME_ZONE:
+//             length = 0;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_CATALOG_NZ:
+//             length = 1;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_LC_TIME_NAMES:
+//             length = 2;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_CHARSET_DATABASE:
+//             length = 2;
+//             break;
+//         case DRIZZLE_QUERY_EVENT_STATUS_VAR_TABLE_MAP_FOR_UPDATE:
+//             length = 8;
+//             break;
+//     }
+//  }
