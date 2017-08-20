@@ -64,6 +64,21 @@ DRIZZLE_API
 uint8_t* drizzle_binlog_tablemap_event_column_type_def(
 	drizzle_binlog_tablemap_event_st* event);
 
+
+/**
+ * Get the columntype by index
+ *
+ * @param      event         A tablemap event
+ * @param[in]  column_index  The column index
+ *
+ * @return     a column type
+ */
+DRIZZLE_API
+drizzle_column_type_t drizzle_binlog_tablemap_event_column_type(
+    drizzle_binlog_tablemap_event_st* event, uint32_t column_index,
+    drizzle_return_t* ret);
+
+
 /**
  * @brief      Metadata for table columns
  *
