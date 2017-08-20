@@ -49,3 +49,4 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event);
  */
 void set_event_header(drizzle_binlog_event_st* dst,
     drizzle_binlog_event_st* src);
+
