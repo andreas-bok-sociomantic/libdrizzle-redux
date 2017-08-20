@@ -83,6 +83,19 @@ uint8_t *drizzle_binlog_tablemap_event_column_type_def(
     return event->column_type_def;
 }
 
+drizzle_column_type_t drizzle_binlog_tablemap_event_column_type(
+    drizzle_binlog_tablemap_event_st* event, uint32_t column_index,
+    drizzle_return_t* ret)
+{
+    if (column_index >= event->column_count )
+    {
+        *ret = DRIZZLE_RETURN_INVALID_ARGUMENT;
+        return DRIZZLE_COLUMN_TYPE_NONE;
+    }
+
+    return (drizzle_column_type_t) event->column_type_def[column_index];
+}
+
 uint8_t *drizzle_binlog_tablemap_event_field_metadata(
 	drizzle_binlog_tablemap_event_st* event)
 {
