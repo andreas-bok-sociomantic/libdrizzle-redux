@@ -92,5 +92,6 @@ typedef struct pollfd pollfd_t;
 #include "src/binlog.h"
 #include "src/handshake_client.h"
 #include "src/result.h"
+#include "src/binlog_helper.h"
 
 #include <memory.h>
