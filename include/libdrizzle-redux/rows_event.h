@@ -15,8 +15,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
  * @return     A table id
  */
 DRIZZLE_API
-uint64_t drizzle_binlog_rows_event_table_id(
-    drizzle_binlog_event_st *event);
+uint64_t drizzle_binlog_rows_event_table_id(drizzle_binlog_event_st *event);
 
 /**
  * @brief      The number of columns in the associated table
@@ -24,8 +23,7 @@ uint64_t drizzle_binlog_rows_event_table_id(
  * @return     Number of columns
  */
 DRIZZLE_API
-uint64_t drizzle_binlog_rows_event_column_count(
-    drizzle_binlog_event_st *event);
+uint64_t drizzle_binlog_rows_event_column_count(drizzle_binlog_event_st *event);
 
 #ifdef __cplusplus
 }
