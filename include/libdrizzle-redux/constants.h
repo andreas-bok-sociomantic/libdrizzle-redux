@@ -643,6 +643,9 @@ typedef drizzle_return_t (drizzle_event_watch_fn)(drizzle_st *con,
   ((uint32_t)(((uint8_t *)__buffer)[1]) << 8) |   \
   ((uint32_t)(((uint8_t *)__buffer)[2]) << 16) |  \
   ((uint32_t)(((uint8_t *)__buffer)[3]) << 24))
+#define drizzle_get_byte6(__buffer)               \
+  (drizzle_get_byte4(__buffer) | \
+  ((uint64_t)drizzle_get_byte2(((uint8_t *)__buffer)+4) << 32))
 #define drizzle_get_byte8(__buffer)               \
   (drizzle_get_byte4(__buffer) |                  \
   ((uint64_t)drizzle_get_byte4(((uint8_t *)__buffer)+4) << 32))
