@@ -17,6 +17,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
     event->data_ptr += table_map_event->field_metadata_len;
     // metadata definition
 
+    strcpy(rows_event->table_name, table_map_event->table_name);
 
     rows_event->table_id = drizzle_get_byte6(event->data_ptr);
     event->data_ptr+=6;
