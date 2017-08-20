@@ -1,7 +1,32 @@
 #pragma once
 
+
 struct drizzle_binlog_rows_event_st
 {
+    /**
+     *
+     * iterate rows
+     *      iterate columns
+     *          column by index
+     *      row by index
+     *
+     *
+     *
+     *
+     * drizzle_binlog_row_st
+     *  drizzle_column_st *next
+     *  drizzle_column_st *next
+     *  uint column_current;
+     *
+     *
+     *  drizzle_binlog_rows_event_st
+     *    drizzle_binlog_row_st *next
+     *    drizzle_binlog_row_st *prev
+     *
+     *
+     * combine result client and column client, field
+     */
+
     drizzle_binlog_event_st header;
 
     uint64_t table_id;
