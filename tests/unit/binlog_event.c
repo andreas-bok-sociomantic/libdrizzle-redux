@@ -64,6 +64,14 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
         uint64_t xid = drizzle_binlog_xid_event_xid(xid_event);
         printf("xid: %" PRIu64 "\n", xid);
     }
+
+    if ( type == DRIZZLE_EVENT_TYPE_QUERY )
+    {
+      drizzle_binlog_query_event_st * query_event =
+        drizzle_binlog_get_query_event(event);
+        printf("exucution time: %d\n",
+          drizzle_binlog_query_event_execution_time(query_event));
+    }
 }
 
 int main(int argc, char *argv[])
