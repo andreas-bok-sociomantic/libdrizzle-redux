@@ -78,6 +78,12 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
   binlog->binlog_context= context;
   binlog->verify_checksums= verify_checksums;
 
+  drizzle_binlog_rbr_st *binlog_rbr = new (std::nothrow) drizzle_binlog_rbr_st();
+  binlog->binlog_rbr = binlog_rbr;
+  binlog_rbr->binlog = binlog;
+
+  binlog->event.binlog_rbr = binlog_rbr;
+
   return binlog;
 }
 
