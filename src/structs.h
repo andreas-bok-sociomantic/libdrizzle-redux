@@ -421,6 +421,7 @@ struct drizzle_binlog_event_st
   unsigned char *data_ptr;
   unsigned char *raw_data;
   uint32_t raw_length;
+  drizzle_binlog_rbr_st *binlog_rbr;
   drizzle_binlog_event_st() :
     timestamp(0),
     type(DRIZZLE_EVENT_TYPE_UNKNOWN),
@@ -433,7 +434,8 @@ struct drizzle_binlog_event_st
     data(NULL),
     data_ptr(NULL),
     raw_data(NULL),
-    raw_length(0)
+    raw_length(0),
+    binlog_rbr(NULL)
   { }
 };
 
@@ -446,13 +448,15 @@ struct drizzle_binlog_st
   bool verify_checksums;
   bool has_checksums;
   drizzle_st *con;
+  drizzle_binlog_rbr_st *binlog_rbr;
   drizzle_binlog_st() :
     binlog_fn(NULL),
     error_fn(NULL),
     binlog_context(NULL),
     verify_checksums(false),
     has_checksums(false),
-    con(NULL)
+    con(NULL),
+    binlog_rbr(NULL)
   { }
 };
 
