@@ -49,4 +49,5 @@ struct drizzle_bind_st;
 struct drizzle_binlog_xid_event_st;
 struct drizzle_binlog_query_event_st;
 struct drizzle_binlog_tablemap_event_st;
+struct drizzle_binlog_rbr_st;
 #endif

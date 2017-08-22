@@ -23,6 +23,7 @@ noinst_HEADERS+= src/xid_event.h
 noinst_HEADERS+= src/query_event.h
 noinst_HEADERS+= src/tablemap_event.h
 noinst_HEADERS+= src/rows_event.h
+noinst_HEADERS+= src/binlog_rbr.h
 
 lib_LTLIBRARIES+= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES=
@@ -73,6 +74,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/xid_event.cc \
 	src/query_event.cc \
 	src/tablemap_event.cc \
-	src/rows_event.cc
+	src/rows_event.cc \
+	src/binlog_rbr.cc
 
 src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_LDFLAGS+= -version-info ${LIBDRIZZLE_LIBRARY_VERSION}
