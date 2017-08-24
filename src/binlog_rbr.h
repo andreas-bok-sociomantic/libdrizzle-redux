@@ -23,4 +23,7 @@ struct drizzle_binlog_rbr_st
     ~drizzle_binlog_rbr_st()
     {
     }
+
+    drizzle_binlog_tablemap_event_st * get_tablemap_event(uint64_t table_id);
+    drizzle_binlog_rows_event_st * get_rows_event( );
 };
