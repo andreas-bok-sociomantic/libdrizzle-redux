@@ -33,7 +33,7 @@ drizzle_binlog_query_event_st *drizzle_binlog_get_query_event(
     query_event->error_code = drizzle_get_byte2(event->data_ptr);
     event->data_ptr += 2;
 
-    uint32_t value_len = drizzle_get_byte2(event->data_ptr);
+    uint64_t value_len = drizzle_get_byte2(event->data_ptr);
     event->data_ptr += 2;
     query_event->status_vars = (uint8_t*) realloc(query_event->status_vars, value_len);
     memcpy(query_event->status_vars, event->data_ptr, value_len);

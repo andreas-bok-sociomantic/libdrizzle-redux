@@ -17,7 +17,7 @@ uint8_t drizzle_binlog_rows_event_version(
  *
  * @return     distance in bytes between pointers
  */
-uint32_t ptr_dist(unsigned char *ptr1, unsigned char *ptr2);
+uint64_t ptr_dist(unsigned char *ptr1, unsigned char *ptr2);
 
 
 /**
@@ -27,7 +27,7 @@ uint32_t ptr_dist(unsigned char *ptr1, unsigned char *ptr2);
  *
  * @return     number of available bytes
  */
-uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
+uint64_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event);
 
 /**
  * @brief      Gets the bytes for a length-encoded numeric value from raw bytes
