@@ -18,7 +18,7 @@ drizzle_binlog_event_st* drizzle_binlog_query_event_header(
 drizzle_binlog_query_event_st *drizzle_binlog_get_query_event(
     drizzle_binlog_event_st *event)
 {
-    auto query_event = new drizzle_binlog_query_event_st();
+    auto query_event = &event->binlog_rbr->query_event;
     set_event_header(&query_event->header, event);
 
     query_event->slave_proxy_id = (uint32_t) drizzle_get_byte4(event->data_ptr);
