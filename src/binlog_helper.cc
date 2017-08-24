@@ -55,12 +55,12 @@ void dump_array_to_hex(const unsigned char *ptr, uint32_t len)
     std::cout << "\n";
 }
 
-uint32_t ptr_dist(unsigned char *ptr1, unsigned char *ptr2)
+uint64_t ptr_dist(unsigned char *ptr1, unsigned char *ptr2)
 {
     return ((const char *) ptr1 - (const char *) ptr2);
 }
 
-uint32_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event)
+uint64_t drizzle_binlog_event_available_bytes(drizzle_binlog_event_st *event)
 {
     return (event->length - ptr_dist(event->data_ptr, event->data));
 }
