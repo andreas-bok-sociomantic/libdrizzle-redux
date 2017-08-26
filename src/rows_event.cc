@@ -2,11 +2,17 @@
 #include "src/common.h"
 
 drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
-    drizzle_binlog_event_st *event,
-    drizzle_binlog_tablemap_event_st *table_map_event)
+    drizzle_binlog_event_st *event)
 {
     auto rows_event = new drizzle_binlog_rows_event_st();
     set_event_header(&rows_event->header, event);
+
+    // Get the table id
+    rows_event->table_id = drizzle_get_byte6(event->data_ptr);
+    event->data_ptr+=6;
+
+    // Get the associated tablemap
+    auto table_map_event = event->binlog_rbr->get_tablemap_event(rows_event->table_id);
 
     rows_event->column_type_def = (drizzle_column_type_t*) malloc(table_map_event->column_count);
     memcpy(&rows_event->column_type_def, event->data_ptr, table_map_event->column_count);
@@ -15,12 +21,8 @@ drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
     rows_event->field_metadata = (uint8_t*) malloc(table_map_event->field_metadata_len);
     memcpy(&rows_event->field_metadata, event->data_ptr, table_map_event->field_metadata_len);
     event->data_ptr += table_map_event->field_metadata_len;
-    // metadata definition
 
     strcpy(rows_event->table_name, table_map_event->table_name);
-
-    rows_event->table_id = drizzle_get_byte6(event->data_ptr);
-    event->data_ptr+=6;
 
     uint16_t flags = drizzle_get_byte2(event->data_ptr);
     event->data_ptr+=2;
