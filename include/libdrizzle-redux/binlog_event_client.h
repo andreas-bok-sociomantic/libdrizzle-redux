@@ -5,6 +5,7 @@
 
 #include <libdrizzle-redux/xid_event.h>
 #include <libdrizzle-redux/query_event.h>
+#include <libdrizzle-redux/rows_event.h>
 #include <libdrizzle-redux/tablemap_event.h>
 #include <libdrizzle-redux/binlog_rbr.h>
 
