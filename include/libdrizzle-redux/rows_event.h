@@ -5,8 +5,7 @@ extern "C" {
 #endif
 
 drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
-    drizzle_binlog_event_st *event,
-    drizzle_binlog_tablemap_event_st *table_map_event);
+    drizzle_binlog_event_st *event);
 
 /**
  * @brief      The id of the table of assigned by the MySQL

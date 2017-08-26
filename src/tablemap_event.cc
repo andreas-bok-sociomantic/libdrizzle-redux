@@ -8,10 +8,11 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_get_tablemap_event(
     // If so skip parsing and return the pointer to that element.
     // Otherwise create get a new tablemap event from the RBR, parse it and
     // return that
-    auto tablemap_event = new drizzle_binlog_tablemap_event_st();
+    uint64_t table_id = drizzle_get_byte6(event->data_ptr);
+    auto tablemap_event = event->binlog_rbr->get_tablemap_event(table_id);
     set_event_header(&tablemap_event->header, event);
 
-    tablemap_event->table_id = drizzle_get_byte6(event->data_ptr);
+    tablemap_event->table_id = table_id;
     event->data_ptr+=6;
 
     memcpy(&tablemap_event->flags, event->data_ptr, 2);
