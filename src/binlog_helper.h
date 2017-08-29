@@ -50,3 +50,14 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event);
 void set_event_header(drizzle_binlog_event_st* dst,
     drizzle_binlog_event_st* src);
 
+
+
+/**
+ * Check if a bit is set
+ *
+ * @param ptr Pointer to start of bitfield
+ * @param columns Number of columns (bits)
+ * @param current_column Zero indexed column number
+ * @return True if the bit is set
+ */
+static bool bit_is_set(uint8_t *ptr, int columns, int current_column);

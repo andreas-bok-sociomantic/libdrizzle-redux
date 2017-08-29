@@ -69,6 +69,16 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
                                        bool verify_checksums);
 
 /**
+ * Set the callback function for row based replication
+ *
+ * @param binlog         A binlog object created using drizzle_binlog_init()
+ * @param binlog_rbr_fn  The function callback defined in drizzle_binlog_rbr_fn()
+ */
+DRIZZLE_API
+void drizzle_binlog_set_rbr_fn(drizzle_binlog_st *binlog,
+    drizzle_binlog_rbr_fn *binlog_rbr_fn);
+
+/**
 * Frees a binlog object created with drizzle_binlog_init()
 *
 * @param[in] binlog The binlog object to be freed
