@@ -87,6 +87,15 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
   return binlog;
 }
 
+void drizzle_binlog_set_rbr_fn(drizzle_binlog_st *binlog,
+  drizzle_binlog_rbr_fn *binlog_rbr_fn)
+{
+  // ensure binlog and callback function are NOT NULL
+  assert(binlog);
+  assert(binlog_rbr_fn);
+  binlog->binlog_rbr->binlog_rbr_fn = binlog_rbr_fn;
+}
+
 void drizzle_binlog_free(drizzle_binlog_st *binlog)
 {
   delete binlog;

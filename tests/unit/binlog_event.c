@@ -82,6 +82,13 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     }
 }
 
+void binlog_rbr(drizzle_binlog_event_st *event, void *context);
+void binlog_rbr(drizzle_binlog_event_st *event, void *context)
+{
+  (void)context;
+  drizzle_binlog_event_st VARIABLE_IS_NOT_USED *e = event;
+}
+
 int main(int argc, char *argv[])
 {
   (void)argc;
@@ -99,6 +106,9 @@ int main(int argc, char *argv[])
 
   binlog = drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
   ASSERT_NOT_NULL_(binlog, "Binlog object creation error");
+
+  drizzle_binlog_set_rbr_fn(binlog, &binlog_rbr);
+
   ret = drizzle_binlog_start(binlog, 0, binlog_file, 0);
 
   SKIP_IF_(ret == DRIZZLE_RETURN_ERROR_CODE, "Binlog is not open?: %s(%s)",
