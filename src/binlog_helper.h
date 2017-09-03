@@ -60,4 +60,4 @@ void set_event_header(drizzle_binlog_event_st* dst,
  * @param current_column Zero indexed column number
  * @return True if the bit is set
  */
-static bool bit_is_set(uint8_t *ptr, int columns, int current_column);
+//bool bit_is_set(uint8_t *ptr, int columns, int current_column);
