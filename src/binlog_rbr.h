@@ -15,12 +15,12 @@ struct drizzle_binlog_rbr_st
     map_tablemap_events tablemap_events;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
     vec_row_events rows_events;
-    size_t rows_count;
+    size_t row_events_count_;
 
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
-        rows_count(0)
+        row_events_count_(0)
     {
     }
 
