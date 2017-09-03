@@ -13,12 +13,12 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(uint
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
 {
-    if (rows_count++ > rows_events.size())
+    if (row_events_count_++ > rows_events.size())
     {
         rows_events.push_back(new drizzle_binlog_rows_event_st());
     }
 
-    return rows_events.at(rows_count);
+    return rows_events.at(row_events_count_);
 }
 
 
@@ -41,7 +41,7 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
 void drizzle_binlog_rbr_st::reset()
 {
     rows_events.clear();
-    rows_count = 0;
+    row_events_count_ = 0;
     tablemap_events.clear();
     current_row = NULL;
 }
