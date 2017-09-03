@@ -29,7 +29,8 @@ struct drizzle_binlog_rbr_st
 
     }
 
-    void reset();
+    void reset(bool free_rows=false);
+
 
     /**
      * Gets a tablemap event.
