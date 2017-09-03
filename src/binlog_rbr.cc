@@ -27,10 +27,24 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     if (event->type == DRIZZLE_EVENT_TYPE_XID)
     {
         drizzle_binlog_get_xid_event(event);
+        if (binlog_rbr_fn != NULL)
+        {
+            binlog_rbr_fn(this, binlog->binlog_context);
+        }
     }
     else if (event->type == DRIZZLE_EVENT_TYPE_QUERY)
     {
         drizzle_binlog_get_query_event(event);
+    }
+    else if (event->type == DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS ||
+        event->type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS ||
+        event->type == DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS)
+    {
+        drizzle_binlog_get_rows_event(event);
+    }
+    else if (event->type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
+    {
+        drizzle_binlog_get_tablemap_event(event);
     }
     else
     {
@@ -45,7 +59,12 @@ void drizzle_binlog_rbr_st::reset(bool free_rows)
         rows_events.clear();
     }
 
+    row_it = rows_events.end();
     row_events_count_ = 0;
     tablemap_events.clear();
-    current_row = NULL;
+}
+
+size_t drizzle_binlog_rbr_st::row_events_count()
+{
+    return row_events_count_;
 }
