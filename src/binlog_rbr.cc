@@ -38,9 +38,13 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     }
 }
 
-void drizzle_binlog_rbr_st::reset()
+void drizzle_binlog_rbr_st::reset(bool free_rows)
 {
-    rows_events.clear();
+    if (free_rows)
+    {
+        rows_events.clear();
+    }
+
     row_events_count_ = 0;
     tablemap_events.clear();
     current_row = NULL;
