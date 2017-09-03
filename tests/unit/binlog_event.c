@@ -82,11 +82,11 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     }
 }
 
-void binlog_rbr(drizzle_binlog_event_st *event, void *context);
-void binlog_rbr(drizzle_binlog_event_st *event, void *context)
+void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context);
+void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 {
   (void)context;
-  drizzle_binlog_event_st VARIABLE_IS_NOT_USED *e = event;
+  drizzle_binlog_rbr_st VARIABLE_IS_NOT_USED *rbr_ = rbr;
 }
 
 int main(int argc, char *argv[])
