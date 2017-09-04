@@ -75,6 +75,7 @@ enum drizzle_return_t
   DRIZZLE_RETURN_TRUNCATED,
   DRIZZLE_RETURN_INVALID_CONVERSION,
   DRIZZLE_RETURN_NOT_FOUND,
+  DRIZZLE_RETURN_ROW_REND,
   DRIZZLE_RETURN_MAX /* Always add new codes to the end before this one. */
 };
 
