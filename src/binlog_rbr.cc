@@ -76,31 +76,52 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr)
 }
 
 
-drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_read(
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr)
-
 {
-    if (binlog_rbr->rows_event_it == binlog_rbr->rows_events.end())
+    if (next(binlog_rbr->rows_event_it) >= binlog_rbr->rows_events.end())
     {
+        next(binlog_rbr->rows_event_it) = binlog_rbr->rows_events.end();
         *ret_ptr = DRIZZLE_RETURN_ROW_END;
         return NULL;
     }
 
+    binlog_rbr->rows_event_it++;
     drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it;
     *ret_ptr = DRIZZLE_RETURN_OK;
-    advance(binlog_rbr->rows_event_it, 1);
     return rows_event;
 }
 
-// drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
-//     drizzle_binlog_rbr_st *binlog_rbr)
-// {
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr)
+{
+    if (prev(binlog_rbr->rows_event_it) <= binlog_rbr->rows_events.begin() - 1)
+    {
+        binlog_rbr->rows_event_it = binlog_rbr->rows_events.begin() - 1;
+        *ret_ptr = DRIZZLE_RETURN_ROW_REND;
+        return NULL;
+    }
 
-// }
+    binlog_rbr->rows_event_it--;
+    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it;
+    *ret_ptr = DRIZZLE_RETURN_OK;
+    return rows_event;
+}
 
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
+    drizzle_binlog_rbr_st *binlog_rbr, uint64_t row_event_idx)
+{
+    if ( row_event_idx >= binlog_rbr->row_events_count_ )
+    {
+        return NULL;
+    }
+
+    return binlog_rbr->rows_events.at(row_event_idx);
+}
 
 int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr)
 {
-    return binlog_rbr->rows_event_it >= binlog_rbr->rows_events.end() ? -1 :
+    return binlog_rbr->rows_event_it >= binlog_rbr->rows_events.end() ||
+     binlog_rbr->rows_event_it < binlog_rbr->rows_events.begin() ? -1 :
         distance(binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it);
 }
