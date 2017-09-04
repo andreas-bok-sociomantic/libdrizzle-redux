@@ -24,23 +24,31 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr);
  * Read a row event from a binlog event group
  *
  * @param      binlog_rbr  A binlog rbr structure
- * @param      ret_ptr     ret_pointer Standard drizzle return value
+ * @param      ret_ptr     Standard drizzle return value
  *
  * @return     a row event struct, or NULL if there are no more rows events
  */
 DRIZZLE_API
-drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_read(
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
 
 
-// drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
-//     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
+/**
+ * Get the prev row event
+ *
+ * @param      binlog_rbr  a binlog rbr structure
+ * @param      ret_ptr     Standard drizzle return value
+ *
+ * @return     { description_of_the_return_value }
+ */
+DRIZZLE_API
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
 
-// drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
-//     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
 
-// drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
-//     drizzle_binlog_rbr_st *binlog_rbr, uint64_t row);
+DRIZZLE_API
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
+    drizzle_binlog_rbr_st *binlog_rbr, uint64_t row_event_idx);
 
 /**
  * @brief      { function_description }
@@ -51,6 +59,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_read(
  *             bounds
  *
  */
+DRIZZLE_API
 int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr);
 
 #ifdef __cplusplus
