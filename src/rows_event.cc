@@ -59,3 +59,9 @@ uint64_t drizzle_binlog_rows_event_column_count(
 {
     return event->column_count;
 }
+
+const char* drizzle_binlog_rows_event_table_name(
+    drizzle_binlog_rows_event_st *event)
+{
+    return event->table_name;
+}
