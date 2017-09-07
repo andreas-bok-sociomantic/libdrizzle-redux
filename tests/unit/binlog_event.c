@@ -80,6 +80,14 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
         printf("table id: %" PRIu64 " \n",
           drizzle_binlog_tablemap_event_table_id(tablemap_event));
     }
+
+    if (drizzle_binlog_is_rows_event(type))
+    {
+      drizzle_binlog_rows_event_st *rows_event =
+        drizzle_binlog_get_rows_event(event);
+      printf("table name: %s\n",
+          drizzle_binlog_rows_event_table_name(rows_event));
+    }
 }
 
 void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context);
