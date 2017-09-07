@@ -134,3 +134,13 @@ void set_event_header(drizzle_binlog_event_st* dst,
 
 //     return ((*ptr) & (1 << current_column));
 // }
+
+bool drizzle_binlog_is_rows_event(drizzle_binlog_event_types_t event_type)
+{
+    return (event_type == DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS ||
+        event_type == DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS ||
+        event_type == DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS ||
+        event_type == DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS ||
+        event_type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS ||
+        event_type == DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS );
+}
