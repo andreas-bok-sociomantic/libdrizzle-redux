@@ -45,7 +45,15 @@ DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
 
-
+/**
+ * @brief      Get a rows event by index
+ *
+ * @param      binlog_rbr     A binlog rbr struct
+ * @param[in]  row_event_idx  An index
+ *
+ * @return     Pointer to a drizzle_binlog_rows_event struct or NULL if the
+ *             index is out of bounds
+ */
 DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
     drizzle_binlog_rbr_st *binlog_rbr, uint64_t row_event_idx);
@@ -57,11 +65,35 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
  *
  * @return     the zero based row number, or -1 if the current row is out of
  *             bounds
- *
  */
 DRIZZLE_API
 int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr);
 
+
+
+/**
+ * @brief      Get the next rows event from a table
+ *
+ * @param      binlog_rbr  A binlog_rbr struct
+ * @param[in]  table_name  A table name
+ *
+ * @return     { description_of_the_return_value }
+ */
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_from_table_next(
+    drizzle_binlog_rbr_st *binlog_rbr, const char* table_name);
+
+
+DRIZZLE_API
+/**
+ * @brief      Get the number of rows events collected from a table
+ *
+ * @param      binlog_rbr  A binlog_rbr struct
+ * @param[in]  table_name  A table name
+ *
+ * @return     -1 if the table was not found otherwise the number of rows events
+ */
+int64_t drizzle_binlog_rbr_rows_event_from_table_count(
+    drizzle_binlog_rbr_st *binlog_rbr, const char* table_name);
 #ifdef __cplusplus
 }
 #endif

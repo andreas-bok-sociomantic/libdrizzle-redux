@@ -125,3 +125,18 @@ int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr)
      binlog_rbr->rows_event_it < binlog_rbr->rows_events.begin() ? -1 :
         distance(binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it);
 }
+
+
+int64_t drizzle_binlog_rbr_rows_event_from_table_count(
+    drizzle_binlog_rbr_st *binlog_rbr, const char* table_name)
+{
+    return binlog_rbr->map_tablename_row_events.find(table_name) ==
+        binlog_rbr->map_tablename_row_events.end() ? -1 :
+        binlog_rbr->map_tablename_row_events.find(table_name)->second.size();
+}
+// drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_from_table_next(
+//     drizzle_binlog_rbr_st *binlog_rbr, const char* table_name)
+
+// {
+
+// }

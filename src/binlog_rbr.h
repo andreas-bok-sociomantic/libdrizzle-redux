@@ -15,9 +15,11 @@ struct drizzle_binlog_rbr_st
     map_tablemap_events tablemap_events;
     typedef std::unordered_map<const char*, std::vector<drizzle_binlog_rows_event_st** >>
         map_tablename_vec_row_events_ptr;
+    map_tablename_vec_row_events_ptr map_tablename_row_events;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
     vec_row_events rows_events;
     vec_row_events::iterator rows_event_it;
+    vec_row_events::iterator table_rows_event_it;
     size_t row_events_count_;
 
     drizzle_binlog_rbr_st() :
