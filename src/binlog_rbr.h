@@ -19,6 +19,7 @@ struct drizzle_binlog_rbr_st
     vec_row_events rows_events;
     vec_row_events::iterator rows_event_it;
     size_t row_events_count_;
+    size_t rows_events_parsed;
     uint64_t current_tablemap_id;
 
     drizzle_binlog_rbr_st() :
