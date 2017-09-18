@@ -14,8 +14,13 @@ drizzle_binlog_event_st* drizzle_binlog_query_event_header(
     return &event->header;
 }
 
-
 drizzle_binlog_query_event_st *drizzle_binlog_get_query_event(
+    drizzle_binlog_event_st *event)
+{
+    return &event->binlog_rbr->query_event;
+}
+
+drizzle_binlog_query_event_st *drizzle_binlog_parse_query_event(
     drizzle_binlog_event_st *event)
 {
     auto query_event = &event->binlog_rbr->query_event;

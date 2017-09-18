@@ -19,11 +19,13 @@ struct drizzle_binlog_rbr_st
     vec_row_events rows_events;
     vec_row_events::iterator rows_event_it;
     size_t row_events_count_;
+    uint64_t current_tablemap_id;
 
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
-        row_events_count_(0)
+        row_events_count_(0),
+        current_tablemap_id(0)
     {
 
     }
@@ -43,7 +45,9 @@ struct drizzle_binlog_rbr_st
      *
      * @return     Pointer to a tablemap event struct
      */
-    drizzle_binlog_tablemap_event_st * get_tablemap_event(uint64_t table_id);
+    drizzle_binlog_tablemap_event_st * get_tablemap_event(uint64_t table_id=0);
+    drizzle_binlog_tablemap_event_st * add_tablemap_event(uint64_t table_id);
+
 
     /**
      * Get a rows event
@@ -54,6 +58,7 @@ struct drizzle_binlog_rbr_st
      * @return     Pointer a rows event struct
      */
     drizzle_binlog_rows_event_st * get_rows_event();
+    drizzle_binlog_rows_event_st * add_rows_event();
 
     /**
      * Adds a drizzle binlog event
