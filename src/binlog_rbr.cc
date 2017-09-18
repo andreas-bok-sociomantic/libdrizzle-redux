@@ -41,6 +41,9 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::add_rows_event()
         rows_events.push_back(new drizzle_binlog_rows_event_st());
     }
 
+    // increment the number of parsed rows
+    rows_events_parsed++;
+
     auto *rows_event = rows_events.at(row_events_count_);
     // Reuse the rows event if the client has not set the rbr callback function
     row_events_count_ += binlog_rbr_fn != NULL ? 1 : 0;
