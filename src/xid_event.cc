@@ -12,8 +12,13 @@ uint64_t drizzle_binlog_xid_event_xid(drizzle_binlog_xid_event_st* event)
     return event->xid;
 }
 
-
 drizzle_binlog_xid_event_st *drizzle_binlog_get_xid_event(
+    drizzle_binlog_event_st *event)
+{
+    return &event->binlog_rbr->xid_event;
+}
+
+drizzle_binlog_xid_event_st *drizzle_binlog_parse_xid_event(
     drizzle_binlog_event_st *event)
 {
     auto *xid_event = &event->binlog_rbr->xid_event;

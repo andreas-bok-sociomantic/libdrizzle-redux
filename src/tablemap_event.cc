@@ -4,12 +4,19 @@
 drizzle_binlog_tablemap_event_st *drizzle_binlog_get_tablemap_event(
     drizzle_binlog_event_st *event)
 {
+    return event->binlog_rbr->get_tablemap_event();
+}
+
+drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
+    drizzle_binlog_event_st *event)
+{
     // check if a tablemap event with that table id exists in the RBR
     // If so skip parsing and return the pointer to that element.
     // Otherwise create get a new tablemap event from the RBR, parse it and
     // return that
     uint64_t table_id = drizzle_get_byte6(event->data_ptr);
-    auto tablemap_event = event->binlog_rbr->get_tablemap_event(table_id);
+
+    auto tablemap_event = event->binlog_rbr->add_tablemap_event(table_id);
     set_event_header(&tablemap_event->header, event);
 
     tablemap_event->table_id = table_id;
