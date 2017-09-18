@@ -21,3 +21,7 @@ struct drizzle_binlog_query_event_st
         query(NULL)
     {}
 };
+
+
+drizzle_binlog_query_event_st *drizzle_binlog_parse_query_event(
+    drizzle_binlog_event_st *event);

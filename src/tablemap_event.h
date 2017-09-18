@@ -23,3 +23,7 @@ struct drizzle_binlog_tablemap_event_st
     null_bitmap(NULL)
     {}
 };
+
+
+drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
+    drizzle_binlog_event_st *event);

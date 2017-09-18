@@ -3,15 +3,38 @@
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(uint64_t table_id)
 {
+    auto table_id_ = table_id == 0 ? this->current_tablemap_id : table_id;
+    if (tablemap_events.find(table_id_) == tablemap_events.end())
+    {
+        return NULL;
+    }
+
+    return tablemap_events.find(table_id_)->second;
+}
+
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::add_tablemap_event(
+    uint64_t table_id)
+{
     if (tablemap_events.find(table_id) == tablemap_events.end())
     {
         tablemap_events.insert(std::make_pair(table_id, new drizzle_binlog_tablemap_event_st()));
     }
 
+    this->current_tablemap_id = table_id;
     return tablemap_events.find(table_id)->second;
 }
 
-drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
+drizzle_binlog_rows_event_st * drizzle_binlog_rbr_st::get_rows_event()
+{
+    if ( row_events_count_ == 0 )
+    {
+        return NULL;
+    }
+
+    return rows_events.at(row_events_count_ - 1);
+}
+
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::add_rows_event()
 {
     if (row_events_count_ + 1 > rows_events.size())
     {
@@ -26,7 +49,7 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
 {
     if (event->type == DRIZZLE_EVENT_TYPE_XID)
     {
-        drizzle_binlog_get_xid_event(event);
+        drizzle_binlog_parse_xid_event(event);
         if (binlog_rbr_fn != NULL)
         {
             binlog_rbr_fn(this, binlog->binlog_context);
@@ -34,17 +57,15 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     }
     else if (event->type == DRIZZLE_EVENT_TYPE_QUERY)
     {
-        drizzle_binlog_get_query_event(event);
+        drizzle_binlog_parse_query_event(event);
     }
-    else if (event->type == DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS ||
-        event->type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS ||
-        event->type == DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS)
+    else if (drizzle_binlog_is_rows_event(event->type))
     {
-        drizzle_binlog_get_rows_event(event);
+        drizzle_binlog_parse_rows_event(event);
     }
     else if (event->type == DRIZZLE_EVENT_TYPE_TABLE_MAP)
     {
-        drizzle_binlog_get_tablemap_event(event);
+        drizzle_binlog_parse_tablemap_event(event);
     }
     else
     {

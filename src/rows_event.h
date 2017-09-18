@@ -46,3 +46,7 @@ struct drizzle_binlog_rows_event_st
         bitmap_size(0)
     {}
 };
+
+
+drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
+    drizzle_binlog_event_st *event);
