@@ -4,7 +4,7 @@
 drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
     drizzle_binlog_event_st *event)
 {
-    auto rows_event = new drizzle_binlog_rows_event_st();
+    auto rows_event = event->binlog_rbr->get_rows_event();
     set_event_header(&rows_event->header, event);
 
     // Get the table id
