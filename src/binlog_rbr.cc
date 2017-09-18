@@ -46,8 +46,29 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::add_rows_event()
 
     auto *rows_event = rows_events.at(row_events_count_);
     // Reuse the rows event if the client has not set the rbr callback function
-    row_events_count_ += binlog_rbr_fn != NULL ? 1 : 0;
+    if ( binlog_rbr_fn != NULL )
+    {
+        row_events_count_++;
+    }
+
     return rows_event;
+}
+
+void drizzle_binlog_rbr_st::add_table_row_mapping(drizzle_binlog_rows_event_st *rows_event)
+{
+    if (binlog_rbr_fn != NULL )
+    {
+        if ( map_tablename_rows_events.find(rows_event->table_name) ==
+            map_tablename_rows_events.end() )
+        {
+            vec_ptr_row_events vec;
+            map_tablename_rows_events.insert(
+                std::make_pair(rows_event->table_name, vec));
+        }
+
+        auto vec_rows = &map_tablename_rows_events.find(rows_event->table_name)->second;
+        vec_rows->push_back(&rows_event);
+    }
 }
 
 

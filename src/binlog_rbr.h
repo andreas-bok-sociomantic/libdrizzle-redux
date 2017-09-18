@@ -13,7 +13,8 @@ struct drizzle_binlog_rbr_st
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
         map_tablemap_events;
     map_tablemap_events tablemap_events;
-    typedef std::unordered_map<const char*, std::vector<drizzle_binlog_rows_event_st** >>
+    typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
+    typedef std::unordered_map<const char*, vec_ptr_row_events>
         map_tablename_vec_row_events_ptr;
     map_tablename_vec_row_events_ptr map_tablename_rows_events;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
@@ -61,6 +62,9 @@ struct drizzle_binlog_rbr_st
      */
     drizzle_binlog_rows_event_st * get_rows_event();
     drizzle_binlog_rows_event_st * add_rows_event();
+
+
+    void add_table_row_mapping(drizzle_binlog_rows_event_st *event);
 
     /**
      * Adds a drizzle binlog event
