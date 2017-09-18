@@ -13,12 +13,12 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(uint
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
 {
-    if (row_events_count_++ > rows_events.size())
+    if (row_events_count_ + 1 > rows_events.size())
     {
         rows_events.push_back(new drizzle_binlog_rows_event_st());
     }
 
-    return rows_events.at(row_events_count_);
+    return rows_events.at(row_events_count_++);
 }
 
 
