@@ -44,11 +44,24 @@ struct drizzle_binlog_rbr_st
     /**
      * Gets a tablemap event.
      *
+     *             Get either the table map event just parsed or by table id
+     *
      * @param[in]  table_id  The table identifier
      *
      * @return     Pointer to a tablemap event struct
      */
-    drizzle_binlog_tablemap_event_st * get_tablemap_event(uint64_t table_id=0);
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(uint64_t table_id=0);
+
+    /**
+     * @brief      Creates a tablemap event.
+     *
+     *             Create and return a new tablemap event or an existing one if
+     *             an event with the same table id already exists
+     *
+     * @param[in]  table_id  The table identifier
+     *
+     * @return     Pointer to a tablemap event struct
+     */
     drizzle_binlog_tablemap_event_st *create_tablemap_event(uint64_t table_id);
 
 
@@ -60,10 +73,25 @@ struct drizzle_binlog_rbr_st
      *
      * @return     Pointer a rows event struct
      */
-    drizzle_binlog_rows_event_st * get_rows_event();
+    drizzle_binlog_rows_event_st *get_rows_event();
 
+    /**
+     * @brief      Get a rows event.
+     *
+     *             If the number of rows events is less than the number of
+     *             available events an unused event is returned otherwise a
+     *             new rows event is created
+     *
+     * @return     Pointer to a rows event
+     */
     drizzle_binlog_rows_event_st *create_rows_event();
 
+
+    /**
+     * @brief      Adds a table row mapping.
+     *
+     * @param      event  The event
+     */
     void add_table_row_mapping(drizzle_binlog_rows_event_st *event);
 
     /**
