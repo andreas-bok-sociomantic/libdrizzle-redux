@@ -4,39 +4,104 @@
 #include <vector>
 #include <iterator>
 
+
+struct tablename_rows_events_map
+{
+    typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
+    typedef std::unordered_map<const char*, vec_ptr_row_events>
+        map_tablename_vec_row_events_ptr;
+
+    bool active;
+    uint64_t table_id;
+    char table_name[DRIZZLE_MAX_TABLE_SIZE];
+
+    map_tablename_vec_row_events_ptr mapping;
+    vec_ptr_row_events::iterator row_events_it;
+    vec_ptr_row_events *curr_row_events;
+    char table_name_curr[DRIZZLE_MAX_TABLE_SIZE];
+
+    tablename_rows_events_map() :
+        active(false),
+        table_id(0)
+
+    {
+        table_name_curr[0] = '\0';
+    }
+
+
+    bool has_table(const char *tablename)
+    {
+        return mapping.find(tablename) != mapping.end();
+    }
+
+    bool set_rows_events_it(const char *tablename)
+    {
+        if (!has_table(tablename))
+        {
+            return false;
+        }
+        else
+        {
+            if (table_name_curr != tablename)
+            {
+                curr_row_events = &mapping.find(tablename)->second;
+                row_events_it = curr_row_events->begin();
+                strcpy(table_name_curr, tablename);
+            }
+
+            return true;
+        }
+    }
+
+    drizzle_binlog_rows_event_st* next_row_event(const char *tablename)
+    {
+        if (!set_rows_events_it(tablename))
+        {
+            return NULL;
+        }
+
+        if (next(row_events_it) != curr_row_events->end())
+        {
+            return **(++row_events_it);
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+
+    void add_mapping(drizzle_binlog_rows_event_st *rows_event)
+    {
+        if (mapping.find(rows_event->table_name) == mapping.end())
+        {
+            vec_ptr_row_events vec;
+            mapping.insert(std::make_pair(rows_event->table_name, vec));
+        }
+
+        auto vec_rows = &mapping.find(rows_event->table_name)->second;
+        vec_rows->push_back(&rows_event);
+    }
+
+    void reset()
+    {
+        active = false;
+        table_name_curr[0] = '\0';
+
+        for (auto kv : mapping)
+        {
+            kv.second.clear();
+        }
+    }
+};
+
 struct drizzle_binlog_rbr_st
 {
-
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
         map_tablemap_events;
     typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
     typedef std::unordered_map<const char*, vec_ptr_row_events>
         map_tablename_vec_row_events_ptr;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
-
-    struct tablename_rows_events_iterator
-    {
-        bool active;
-        uint64_t table_id;
-        char table_name[DRIZZLE_MAX_TABLE_SIZE];
-        map_tablename_vec_row_events_ptr::iterator it;
-
-        tablename_rows_events_iterator() :
-            active(false),
-            table_id(0)
-        {
-        }
-
-        void reset()
-        {
-            active = false;
-        }
-
-        map_tablename_vec_row_events_ptr::iterator curr()
-        {
-            return it;
-        }
-    };
 
     struct rows_events_iterator
     {
@@ -73,12 +138,11 @@ struct drizzle_binlog_rbr_st
     // callback function
     drizzle_binlog_rbr_fn *binlog_rbr_fn;
 
-
     drizzle_binlog_xid_event_st xid_event;
     drizzle_binlog_query_event_st query_event;
 
     map_tablemap_events tablemap_events;
-    map_tablename_vec_row_events_ptr map_tablename_rows_events;
+    tablename_rows_events_map tablename_rows_events;
 
     vec_row_events rows_events;
     rows_events_iterator rows_event_it;
@@ -86,16 +150,12 @@ struct drizzle_binlog_rbr_st
     size_t rows_events_parsed;
     uint64_t current_tablemap_id;
 
-    tablename_rows_events_iterator tablename_rows_events_it;
-
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
         row_events_count_(0),
         current_tablemap_id(0)
-
     {
-        tablename_rows_events_it.it = map_tablename_rows_events.end();
     }
 
     ~drizzle_binlog_rbr_st()

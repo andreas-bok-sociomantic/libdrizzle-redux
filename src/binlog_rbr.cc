@@ -60,16 +60,7 @@ void drizzle_binlog_rbr_st::add_table_row_mapping(drizzle_binlog_rows_event_st *
 {
     if (binlog_rbr_fn != NULL )
     {
-        if ( map_tablename_rows_events.find(rows_event->table_name) ==
-            map_tablename_rows_events.end() )
-        {
-            vec_ptr_row_events vec;
-            map_tablename_rows_events.insert(
-                std::make_pair(rows_event->table_name, vec));
-        }
-
-        auto vec_rows = &map_tablename_rows_events.find(rows_event->table_name)->second;
-        vec_rows->push_back(&rows_event);
+        tablename_rows_events.add_mapping(rows_event);
     }
 }
 
@@ -117,18 +108,13 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
     }
 
     // clear the mapping between tables and rows events
-    for(auto kv : map_tablename_rows_events)
-    {
-        kv.second.clear();
-    }
+    tablename_rows_events.reset();
 
     rows_event_it.it = rows_events.end();
     row_events_count_ = 0;
     current_tablemap_id = 0;
     rows_events_parsed = 0;
-    tablename_rows_events_it.reset();
     rows_event_it.reset();
-    //tablemap_events.clear();
 }
 
 size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr)
@@ -144,8 +130,7 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr)
 
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
-    ...)
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
 {
     const char *table_name = NULL;
     va_list args;
