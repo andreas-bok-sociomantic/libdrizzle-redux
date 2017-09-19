@@ -48,5 +48,12 @@ struct drizzle_binlog_rows_event_st
 };
 
 
+/**
+ * @brief      Parse a rows event from binary stream
+ *
+ * @param      event  a binlog event struct
+ *
+ * @return     Pointer to the parsed rows event struct
+ */
 drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     drizzle_binlog_event_st *event);
