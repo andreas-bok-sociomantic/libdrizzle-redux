@@ -6,31 +6,96 @@
 
 struct drizzle_binlog_rbr_st
 {
-    drizzle_binlog_st *binlog;
-    drizzle_binlog_rbr_fn *binlog_rbr_fn;
-    drizzle_binlog_xid_event_st xid_event;
-    drizzle_binlog_query_event_st query_event;
+
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
         map_tablemap_events;
-    map_tablemap_events tablemap_events;
     typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
     typedef std::unordered_map<const char*, vec_ptr_row_events>
         map_tablename_vec_row_events_ptr;
-    map_tablename_vec_row_events_ptr map_tablename_rows_events;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
+
+    struct tablename_rows_events_iterator
+    {
+        bool active;
+        uint64_t table_id;
+        char table_name[DRIZZLE_MAX_TABLE_SIZE];
+        map_tablename_vec_row_events_ptr::iterator it;
+
+        tablename_rows_events_iterator() :
+            active(false),
+            table_id(0)
+        {
+        }
+
+        void reset()
+        {
+            active = false;
+        }
+
+        map_tablename_vec_row_events_ptr::iterator curr()
+        {
+            return it;
+        }
+    };
+
+/*    struct rows_events_iterator
+    {
+        bool active;
+        vec_row_events::iterator it;
+        rows_events_iterator() :
+        active(false)
+        {}
+
+        void reset()
+        {
+            active = false;
+        }
+
+        vec_row_events::iterator curr()
+        {
+            return it;
+        }
+
+        void operator++()
+        {
+            it++;
+        }
+
+        void operator--(int)
+        {
+            it--;
+        }
+    };
+*/
+    // pointer to binlog struct
+    drizzle_binlog_st *binlog;
+
+    // callback function
+    drizzle_binlog_rbr_fn *binlog_rbr_fn;
+
+
+    drizzle_binlog_xid_event_st xid_event;
+    drizzle_binlog_query_event_st query_event;
+
+    map_tablemap_events tablemap_events;
+    map_tablename_vec_row_events_ptr map_tablename_rows_events;
+
     vec_row_events rows_events;
-    vec_row_events::iterator rows_event_it;
+    rows_events_iterator rows_event_it;
     size_t row_events_count_;
     size_t rows_events_parsed;
     uint64_t current_tablemap_id;
+
+    tablename_rows_events_iterator tablename_rows_events_it;
 
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
         row_events_count_(0),
         current_tablemap_id(0)
-    {
 
+    {
+        tablename_rows_events_it.it = map_tablename_rows_events.end();
     }
 
     ~drizzle_binlog_rbr_st()
