@@ -11,7 +11,7 @@ struct tablename_rows_events_map
     typedef std::unordered_map<const char*, vec_ptr_row_events>
         map_tablename_vec_row_events_ptr;
 
-    bool active;
+    bool table_changed;
     uint64_t table_id;
     char table_name[DRIZZLE_MAX_TABLE_SIZE];
 
@@ -21,7 +21,7 @@ struct tablename_rows_events_map
     char table_name_curr[DRIZZLE_MAX_TABLE_SIZE];
 
     tablename_rows_events_map() :
-        active(false),
+        table_changed(false),
         table_id(0)
 
     {
@@ -42,11 +42,12 @@ struct tablename_rows_events_map
         }
         else
         {
+            curr_row_events = &mapping.find(tablename)->second;
             if (table_name_curr != tablename)
             {
-                curr_row_events = &mapping.find(tablename)->second;
                 row_events_it = curr_row_events->begin();
                 strcpy(table_name_curr, tablename);
+                table_changed = true;
             }
 
             return true;
@@ -59,14 +60,20 @@ struct tablename_rows_events_map
         {
             return NULL;
         }
-
-        if (next(row_events_it) != curr_row_events->end())
-        {
-            return **(++row_events_it);
-        }
         else
         {
-            return NULL;
+            if (table_changed)
+            {
+                return **(row_events_it++);
+            }
+            else if (next(row_events_it) != curr_row_events->end())
+            {
+                return **(++row_events_it);
+            }
+            else
+            {
+                return NULL;
+            }
         }
     }
 
@@ -84,7 +91,7 @@ struct tablename_rows_events_map
 
     void reset()
     {
-        active = false;
+        table_changed = false;
         table_name_curr[0] = '\0';
 
         for (auto kv : mapping)
