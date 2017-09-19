@@ -132,15 +132,20 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr)
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
 {
+    drizzle_binlog_rows_event_st *rows_event;
     const char *table_name = NULL;
     va_list args;
     va_start(args, ret_ptr);
     table_name = va_arg(args, const char*);
     va_end(args);
 
-    if (table_name == NULL)
+
+    if (table_name != NULL)
     {
-        printf("%s\n", "No table");
+        printf("Table name %s\n", table_name);
+        rows_event = binlog_rbr->tablename_rows_events.next_row_event(table_name);
+        *ret_ptr = rows_event == NULL ? DRIZZLE_RETURN_ROW_END : DRIZZLE_RETURN_OK;
+        return rows_event;
     }
 
     if (!binlog_rbr->rows_event_it.active)
@@ -155,7 +160,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
         return NULL;
     }
 
-    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it.it;
+    rows_event = *binlog_rbr->rows_event_it.it;
     binlog_rbr->rows_event_it.it++;
     *ret_ptr = DRIZZLE_RETURN_OK;
     return rows_event;
