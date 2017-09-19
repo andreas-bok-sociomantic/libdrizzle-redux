@@ -49,7 +49,7 @@ struct drizzle_binlog_rbr_st
      * @return     Pointer to a tablemap event struct
      */
     drizzle_binlog_tablemap_event_st * get_tablemap_event(uint64_t table_id=0);
-    drizzle_binlog_tablemap_event_st * add_tablemap_event(uint64_t table_id);
+    drizzle_binlog_tablemap_event_st *create_tablemap_event(uint64_t table_id);
 
 
     /**
@@ -61,8 +61,8 @@ struct drizzle_binlog_rbr_st
      * @return     Pointer a rows event struct
      */
     drizzle_binlog_rows_event_st * get_rows_event();
-    drizzle_binlog_rows_event_st * add_rows_event();
 
+    drizzle_binlog_rows_event_st *create_rows_event();
 
     void add_table_row_mapping(drizzle_binlog_rows_event_st *event);
 

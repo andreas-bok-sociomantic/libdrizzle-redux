@@ -16,7 +16,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
     // return that
     uint64_t table_id = drizzle_get_byte6(event->data_ptr);
 
-    auto tablemap_event = event->binlog_rbr->add_tablemap_event(table_id);
+    auto tablemap_event = event->binlog_rbr->create_tablemap_event(table_id);
     set_event_header(&tablemap_event->header, event);
 
     tablemap_event->table_id = table_id;
