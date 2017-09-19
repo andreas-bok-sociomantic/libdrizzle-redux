@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 
 struct drizzle_binlog_rows_event_st
 {
@@ -71,7 +73,7 @@ struct drizzle_binlog_row_events_st
             it_ = rows_events.begin();
         }
 
-        return it_
+        return it_;
     }
 
     drizzle_binlog_rows_event_st* curr()
@@ -93,9 +95,7 @@ struct drizzle_binlog_row_events_st
     {
         it_--;
     }
-
-
-}
+};
 
 
 /**
