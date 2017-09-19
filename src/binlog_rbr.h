@@ -38,7 +38,7 @@ struct drizzle_binlog_rbr_st
         }
     };
 
-/*    struct rows_events_iterator
+    struct rows_events_iterator
     {
         bool active;
         vec_row_events::iterator it;
@@ -66,7 +66,7 @@ struct drizzle_binlog_rbr_st
             it--;
         }
     };
-*/
+
     // pointer to binlog struct
     drizzle_binlog_st *binlog;
 
