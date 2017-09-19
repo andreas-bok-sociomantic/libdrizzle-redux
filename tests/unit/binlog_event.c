@@ -94,7 +94,10 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context);
 void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 {
   (void)context;
-  drizzle_binlog_rbr_st VARIABLE_IS_NOT_USED *rbr_ = rbr;
+  //drizzle_binlog_rbr_st VARIABLE_IS_NOT_USED *rbr_ = rbr;
+
+  size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
+  printf("Binlog RBR, rows count : %ld\n", rows_count);
 }
 
 int main(int argc, char *argv[])
