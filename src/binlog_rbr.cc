@@ -1,5 +1,7 @@
 #include "config.h"
 #include "src/common.h"
+#include <cstdarg>
+
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(uint64_t table_id)
 {
@@ -77,6 +79,7 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     if (event->type == DRIZZLE_EVENT_TYPE_XID)
     {
         drizzle_binlog_parse_xid_event(event);
+        printf("binlog_rbr_fn is null %d", (binlog_rbr_fn == NULL));
         if (binlog_rbr_fn != NULL)
         {
             binlog_rbr_fn(this, binlog->binlog_context);
@@ -119,10 +122,12 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
         kv.second.clear();
     }
 
-    rows_event_it = rows_events.end();
+    rows_event_it.it = rows_events.end();
     row_events_count_ = 0;
     current_tablemap_id = 0;
     rows_events_parsed = 0;
+    tablename_rows_events_it.reset();
+    rows_event_it.reset();
     //tablemap_events.clear();
 }
 
@@ -139,33 +144,50 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr)
 
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr)
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
+    ...)
 {
-    if (next(binlog_rbr->rows_event_it) >= binlog_rbr->rows_events.end())
+    const char *table_name = NULL;
+    va_list args;
+    va_start(args, ret_ptr);
+    table_name = va_arg(args, const char*);
+    va_end(args);
+
+    if (table_name == NULL)
     {
-        next(binlog_rbr->rows_event_it) = binlog_rbr->rows_events.end();
+        printf("%s\n", "No table");
+    }
+
+    if (!binlog_rbr->rows_event_it.active)
+    {
+        binlog_rbr->rows_event_it.it =binlog_rbr->rows_events.begin();
+        binlog_rbr->rows_event_it.active =true;
+    }
+
+    if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
+    {
         *ret_ptr = DRIZZLE_RETURN_ROW_END;
         return NULL;
     }
 
-    binlog_rbr->rows_event_it++;
-    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it;
+    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it.it;
+    binlog_rbr->rows_event_it.it++;
     *ret_ptr = DRIZZLE_RETURN_OK;
     return rows_event;
 }
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr)
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
 {
-    if (prev(binlog_rbr->rows_event_it) <= binlog_rbr->rows_events.begin() - 1)
+    if (prev(binlog_rbr->rows_event_it.it) <= binlog_rbr->rows_events.begin() - 1)
     {
-        binlog_rbr->rows_event_it = binlog_rbr->rows_events.begin() - 1;
+        binlog_rbr->rows_event_it.it = binlog_rbr->rows_events.begin() - 1;
         *ret_ptr = DRIZZLE_RETURN_ROW_REND;
         return NULL;
     }
 
-    binlog_rbr->rows_event_it--;
-    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it;
+    binlog_rbr->rows_event_it.it--;
+    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it.it;
     *ret_ptr = DRIZZLE_RETURN_OK;
     return rows_event;
 }
@@ -183,7 +205,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
 
 int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr)
 {
-    return binlog_rbr->rows_event_it >= binlog_rbr->rows_events.end() ||
-     binlog_rbr->rows_event_it < binlog_rbr->rows_events.begin() ? -1 :
-        distance(binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it);
+    return binlog_rbr->rows_event_it.it >= binlog_rbr->rows_events.end() ||
+     binlog_rbr->rows_event_it.it < binlog_rbr->rows_events.begin() ? -1 :
+        distance(binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it.it);
 }

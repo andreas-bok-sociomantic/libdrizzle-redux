@@ -50,9 +50,20 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event);
 void set_event_header(drizzle_binlog_event_st* dst,
     drizzle_binlog_event_st* src);
 
+/*#define get_var_arg(arg, last_arg, ...)
+{
+    va_list args;
+    va_start(args, last_arg);
+    auto i = 0;
+    while (i < n && (*arg = va_arg(args, U)) != NULL)
+    {
+        i++;
+    }
+    va_end(*args);
+    return (i == n || arg != NULL);
+}
 
-
-/**
+*//**
  * Check if a bit is set
  *
  * @param ptr Pointer to start of bitfield

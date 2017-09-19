@@ -47,6 +47,56 @@ struct drizzle_binlog_rows_event_st
     {}
 };
 
+struct drizzle_binlog_row_events_st
+{
+    typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
+
+    vec_row_events rows_events;
+    bool active;
+    vec_row_events::iterator it_;
+    size_t count_;
+    drizzle_binlog_row_events_st() :
+    active(false)
+    {}
+
+    void reset()
+    {
+        active = false;
+    }
+
+    vec_row_events::iterator it()
+    {
+        if (!active)
+        {
+            it_ = rows_events.begin();
+        }
+
+        return it_
+    }
+
+    drizzle_binlog_rows_event_st* curr()
+    {
+        return *it_;
+    }
+
+    drizzle_binlog_rows_event_st* at(size_t index)
+    {
+        return index < rows_events.size() ? rows_events.at(index) : NULL;
+    }
+
+    void operator++()
+    {
+        it_++;
+    }
+
+    void operator--(int)
+    {
+        it_--;
+    }
+
+
+}
+
 
 /**
  * @brief      Parse a rows event from binary stream
@@ -57,3 +107,4 @@ struct drizzle_binlog_rows_event_st
  */
 drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     drizzle_binlog_event_st *event);
+
