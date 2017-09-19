@@ -30,7 +30,8 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr);
  */
 DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
+    ...);
 
 
 /**
@@ -43,7 +44,8 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
  */
 DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr);
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
+    ...);
 
 
 DRIZZLE_API

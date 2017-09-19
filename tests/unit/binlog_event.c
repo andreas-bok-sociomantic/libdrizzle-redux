@@ -98,6 +98,14 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 
   size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
   printf("Binlog RBR, rows count : %ld\n", rows_count);
+
+  drizzle_binlog_rows_event_st *rows_event;
+  drizzle_return_t ret;
+  rows_event =drizzle_binlog_rbr_rows_event_next(rbr, &ret);
+  if (rows_event)
+  {
+    printf("rbr_callback %ld\n", drizzle_binlog_rows_event_table_id(rows_event));
+  }
 }
 
 int main(int argc, char *argv[])
