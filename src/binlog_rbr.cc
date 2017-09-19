@@ -139,8 +139,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     table_name = va_arg(args, const char*);
     va_end(args);
 
-
-    if (table_name != NULL)
+    if (table_name[0] != '\0')
     {
         printf("Table name %s\n", table_name);
         rows_event = binlog_rbr->tablename_rows_events.next_row_event(table_name);
