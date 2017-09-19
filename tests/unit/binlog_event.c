@@ -101,7 +101,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 
   drizzle_binlog_rows_event_st *rows_event;
   drizzle_return_t ret;
-  rows_event =drizzle_binlog_rbr_rows_event_next(rbr, &ret);
+  rows_event =drizzle_binlog_rbr_rows_event_next(rbr, &ret, "t1");
   if (rows_event)
   {
     printf("rbr_callback %ld\n", drizzle_binlog_rows_event_table_id(rows_event));
