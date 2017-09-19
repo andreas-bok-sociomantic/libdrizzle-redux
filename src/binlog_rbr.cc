@@ -84,6 +84,7 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     }
     else if (event->type == DRIZZLE_EVENT_TYPE_QUERY)
     {
+        reset();
         drizzle_binlog_parse_query_event(event);
     }
     else if (drizzle_binlog_is_rows_event(event->type))
@@ -100,16 +101,29 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     }
 }
 
-void drizzle_binlog_rbr_st::reset(bool free_rows)
+void drizzle_binlog_rbr_st::reset(bool free_all)
 {
-    if (free_rows)
+    if (free_all)
     {
         rows_events.clear();
+        for(auto kv : tablemap_events)
+        {
+            free(kv.second);
+        }
+        tablemap_events.clear();
+    }
+
+    // clear the mapping between tables and rows events
+    for(auto kv : map_tablename_rows_events)
+    {
+        kv.second.clear();
     }
 
     rows_event_it = rows_events.end();
     row_events_count_ = 0;
-    tablemap_events.clear();
+    current_tablemap_id = 0;
+    rows_events_parsed = 0;
+    //tablemap_events.clear();
 }
 
 size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr)
