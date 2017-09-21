@@ -139,24 +139,43 @@ struct drizzle_binlog_rbr_st
         }
     };
 
-    // pointer to binlog struct
+    /** pointer to binlog struct */
     drizzle_binlog_st *binlog;
 
-    // callback function
+    //** callback function */
     drizzle_binlog_rbr_fn *binlog_rbr_fn;
 
+    //** xid event struct */
     drizzle_binlog_xid_event_st xid_event;
+
+    //** query event struct  */
     drizzle_binlog_query_event_st query_event;
 
+    //** mapping from table id to table map event struct */
     map_tablemap_events tablemap_events;
+
+    //** mapping between a table name to the table's rows event structs     */
     tablename_rows_events_map tablename_rows_events;
 
+    //** vector of parsed row event structs */
     vec_row_events rows_events;
+
+    //** iterator for accessing the vector of row events structs */
     rows_events_iterator rows_event_it;
+
+    //* total number of row event in the current binlog event group.
+    //  If row events are not buffered this is always 1  */
     size_t row_events_count_;
+
+    //** number of parsed row events. */
     size_t rows_events_parsed;
+
+    //** the id of the table from which to get row events */
     uint64_t current_tablemap_id;
 
+    /**
+     * @brief      Constructor
+     */
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
@@ -165,11 +184,20 @@ struct drizzle_binlog_rbr_st
     {
     }
 
+    /**
+     * @brief      Destroys the object.
+     */
     ~drizzle_binlog_rbr_st()
     {
 
     }
 
+    /**
+     * @brief      Reset the state
+     *             If free_rows is true all rows events are freed
+     *
+     * @param[in]  free_rows  bool flag
+     */
     void reset(bool free_rows=false);
 
 
