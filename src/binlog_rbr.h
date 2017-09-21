@@ -1,3 +1,37 @@
+/*
+ * Drizzle Client & Protocol Library
+ *
+ * Copyright: Copyright (c) 2017 sociomantic labs GmbH
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ *     * Redistributions in binary form must reproduce the above
+ * copyright notice, this list of conditions and the following disclaimer
+ * in the documentation and/or other materials provided with the
+ * distribution.
+ *
+ *     * The names of its contributors may not be used to endorse or
+ * promote products derived from this software without specific prior
+ * written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #pragma once
 
 #include <unordered_map>
@@ -11,29 +45,69 @@ struct tablename_rows_events_map
     typedef std::unordered_map<const char*, vec_ptr_row_events>
         map_tablename_vec_row_events_ptr;
 
+    /**
+     * Flag which indicates whether the client has changed the table from which
+     * to retrieve row events
+     */
     bool table_changed;
+
+    /**
+     * The id of the db table from which row events are retrieved
+     */
     uint64_t table_id;
+
+    /**
+     * The name of the db table from which row events are retrieved
+     */
     char table_name[DRIZZLE_MAX_TABLE_SIZE];
 
+    /**
+     * Mapping between table name and associated row events
+     */
     map_tablename_vec_row_events_ptr mapping;
-    vec_ptr_row_events::iterator row_events_it;
-    vec_ptr_row_events *curr_row_events;
-    char table_name_curr[DRIZZLE_MAX_TABLE_SIZE];
 
+    /**
+     * Iterator to access the vector of row events
+     */
+    vec_ptr_row_events::iterator row_events_it;
+
+    /**
+     * A pointer to the current vector of row events being requested
+     */
+    vec_ptr_row_events *curr_row_events;
+
+
+    /**
+     * @brief      Constructor
+     */
     tablename_rows_events_map() :
         table_changed(false),
         table_id(0)
 
     {
-        table_name_curr[0] = '\0';
+        table_name[0] = '\0';
     }
 
 
+    /**
+     * @brief      Determines if a mapping for a table exists
+     *
+     * @param[in]  tablename  A tablename
+     *
+     * @return     True if has a mapping exists, False otherwise.
+     */
     bool has_table(const char *tablename)
     {
         return mapping.find(tablename) != mapping.end();
     }
 
+    /**
+     * @brief      Sets the rows events iterator.
+     *
+     * @param[in]  tablename  A tablename
+     *
+     * @return     True if the table was found, False otherwise
+     */
     bool set_rows_events_it(const char *tablename)
     {
         if (!has_table(tablename))
@@ -43,10 +117,10 @@ struct tablename_rows_events_map
         else
         {
             curr_row_events = &mapping.find(tablename)->second;
-            if (table_name_curr != tablename)
+            if (table_name != tablename)
             {
                 row_events_it = curr_row_events->begin();
-                strcpy(table_name_curr, tablename);
+                strcpy(table_name, tablename);
                 table_changed = true;
             }
 
@@ -54,6 +128,14 @@ struct tablename_rows_events_map
         }
     }
 
+    /**
+     * @brief      Get the next row event from a table
+     *
+     * @param[in]  tablename  The tablename
+     *
+     * @return     A pointer to a event struct, False if no more
+     *             events are available
+     */
     drizzle_binlog_rows_event_st* next_row_event(const char *tablename)
     {
         if (!set_rows_events_it(tablename))
@@ -77,6 +159,12 @@ struct tablename_rows_events_map
         }
     }
 
+    /**
+     * @brief      Adds a mapping between a table and an associated row event
+     *             struct
+     *
+     * @param      rows_event  Pointer to a rows event struct
+     */
     void add_mapping(drizzle_binlog_rows_event_st *rows_event)
     {
         if (mapping.find(rows_event->table_name) == mapping.end())
@@ -89,10 +177,16 @@ struct tablename_rows_events_map
         vec_rows->push_back(&rows_event);
     }
 
+
+    /**
+     * @brief      Reset the state
+     *
+     * @detailed   Clears the mapping from table to parsed row events
+     */
     void reset()
     {
         table_changed = false;
-        table_name_curr[0] = '\0';
+        table_name[0] = '\0';
 
         for (auto kv : mapping)
         {
