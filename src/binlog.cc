@@ -41,8 +41,7 @@
 #include <zlib.h>
 #include <inttypes.h>
 
-drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
-                                       drizzle_binlog_fn *binlog_fn,
+drizzle_binlog_st *drizzle_binlog_create(drizzle_st *con,
                                        drizzle_binlog_error_fn *error_fn,
                                        void *context,
                                        bool verify_checksums)
@@ -52,28 +51,23 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
     return NULL;
   }
 
-  if (con->options.socket_owner == DRIZZLE_SOCKET_OWNER_NATIVE)
-  {
-    if (binlog_fn == NULL)
-    {
-      drizzle_set_error(con, __FILE_LINE_FUNC__, "binlog event callback function is NULL");
-      return NULL;
-    }
-    else if (error_fn == NULL)
-    {
-      drizzle_set_error(con, __FILE_LINE_FUNC__, "binlog error callback function is NULL");
-      return NULL;
-    }
-  }
-
   drizzle_binlog_st *binlog= new (std::nothrow) drizzle_binlog_st;
   if (binlog == NULL)
   {
     drizzle_set_error(con, __FILE_LINE_FUNC__, "error allocating binlog struct");
     return NULL;
   }
+
   binlog->con= con;
-  binlog->binlog_fn= binlog_fn;
+
+  if (con->options.socket_owner == DRIZZLE_SOCKET_OWNER_NATIVE)
+  {
+    if (error_fn == NULL)
+    {
+      drizzle_set_error(con, __FILE_LINE_FUNC__, "binlog error callback function is NULL");
+      return NULL;
+    }
+  }
   binlog->error_fn= error_fn;
   binlog->binlog_context= context;
   binlog->verify_checksums= verify_checksums;
@@ -87,13 +81,70 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
   return binlog;
 }
 
-void drizzle_binlog_set_rbr_fn(drizzle_binlog_st *binlog,
-  drizzle_binlog_rbr_fn *binlog_rbr_fn)
+drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
+                                       drizzle_binlog_fn *binlog_fn,
+                                       drizzle_binlog_error_fn *error_fn,
+                                       void *context,
+                                       bool verify_checksums)
 {
-  // ensure binlog and callback function are NOT NULL
-  assert(binlog);
-  assert(binlog_rbr_fn);
+
+  drizzle_binlog_st *binlog = drizzle_binlog_create(con, error_fn, context,
+    verify_checksums);
+  if (binlog == NULL)
+  {
+    return NULL;
+  }
+
+  if (binlog->con->options.socket_owner == DRIZZLE_SOCKET_OWNER_NATIVE)
+  {
+    if (binlog_fn == NULL)
+    {
+      drizzle_set_error(binlog->con, __FILE_LINE_FUNC__,
+        "binlog event callback function is NULL");
+      return NULL;
+    }
+  }
+
+  binlog->binlog_fn= binlog_fn;
+
+  return binlog;
+}
+
+/**
+ * @brief      Initialize binlog with row based replication
+ *
+ * @param      con               The con
+ * @param      binlog_fn         The binlog function
+ * @param      error_fn          The error function
+ * @param      context           The context
+ * @param[in]  verify_checksums  The verify checksums
+ *
+ * @return     { description_of_the_return_value }
+ */
+drizzle_binlog_st *drizzle_binlog_rbr_init(drizzle_st *con,
+                                       drizzle_binlog_rbr_fn *binlog_rbr_fn,
+                                       drizzle_binlog_error_fn *error_fn,
+                                       void *context,
+                                       bool verify_checksums)
+{
+
+  drizzle_binlog_st *binlog = drizzle_binlog_create(con, error_fn, context,
+    verify_checksums);
+  if (binlog == NULL)
+  {
+    return NULL;
+  }
+
+  if (binlog_rbr_fn == NULL)
+  {
+    drizzle_set_error(binlog->con, __FILE_LINE_FUNC__,
+      "binlog rbr event callback function is NULL");
+    return NULL;
+  }
+
   binlog->binlog_rbr->binlog_rbr_fn = binlog_rbr_fn;
+
+  return binlog;
 }
 
 void drizzle_binlog_free(drizzle_binlog_st *binlog)

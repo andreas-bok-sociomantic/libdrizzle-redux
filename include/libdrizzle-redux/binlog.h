@@ -69,14 +69,31 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
                                        bool verify_checksums);
 
 /**
- * Set the callback function for row based replication
- *
- * @param binlog         A binlog object created using drizzle_binlog_init()
- * @param binlog_rbr_fn  The function callback defined in drizzle_binlog_rbr_fn()
- */
+* Initializes a binlog object for the connection
+*
+* If the connection is blocking, 'binlog_fn' and 'error_fn' specify the callback
+* functions for event data and errors respectively.
+* However, if the connection is non-blocking the client is expected to read the
+* binlog data directly from the file descriptor obtained from drizzle_fd().
+* Hence for non-blocking connections specifying 'binlog_fn' and 'error_fn' have
+* no effect.
+*
+* @param[in] con              The connection the binlog retrieval will be on
+* @param[in] binlog_rbr_fn    The function callback defined in drizzle_binlog_rbr_fn()
+* @param[in] error_fn         The function callback defined in (drizzle_binlog_error_fn)()
+* @param[in] context          A pointer to user data which will be used for the
+*                             callback functions
+* @param[in] verify_checksums Set to true if MySQL 5.6 and higher checksums
+*                             should be verified
+* @return    On success, a pointer to the (possibly allocated) structure. On
+*            failure this will be NULL.
+*/
 DRIZZLE_API
-void drizzle_binlog_set_rbr_fn(drizzle_binlog_st *binlog,
-    drizzle_binlog_rbr_fn *binlog_rbr_fn);
+drizzle_binlog_st *drizzle_binlog_rbr_init(drizzle_st *con,
+                                       drizzle_binlog_rbr_fn *binlog_rbr_fn,
+                                       drizzle_binlog_error_fn *error_fn,
+                                       void *context,
+                                       bool verify_checksums);
 
 /**
 * Frees a binlog object created with drizzle_binlog_init()
