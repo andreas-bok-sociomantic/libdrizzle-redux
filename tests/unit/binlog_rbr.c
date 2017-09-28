@@ -80,10 +80,8 @@ int main(int argc, char *argv[])
                "Couldn't retrieve binlog filename: %s(%s)",
                drizzle_error(con), drizzle_strerror(ret));
 
-    binlog = drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
+    binlog = drizzle_binlog_rbr_init(con, binlog_rbr, binlog_error, NULL, true);
     ASSERT_NOT_NULL_(binlog, "Binlog object creation error");
-
-    drizzle_binlog_set_rbr_fn(binlog, &binlog_rbr);
 
     ret = drizzle_binlog_start(binlog, 0, binlog_file, 0);
 
