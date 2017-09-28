@@ -69,7 +69,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     {
       drizzle_binlog_query_event_st * query_event =
         drizzle_binlog_get_query_event(event);
-        printf("exucution time: %d\n",
+        printf("query_event: exucution time: %d\n",
           drizzle_binlog_query_event_execution_time(query_event));
     }
 
@@ -90,24 +90,6 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
     }
 }
 
-void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context);
-void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
-{
-  (void)context;
-  //drizzle_binlog_rbr_st VARIABLE_IS_NOT_USED *rbr_ = rbr;
-
-  size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
-  printf("Binlog RBR, rows count : %ld\n", rows_count);
-
-  drizzle_binlog_rows_event_st *rows_event;
-  drizzle_return_t ret;
-  rows_event =drizzle_binlog_rbr_rows_event_next(rbr, &ret, "t1");
-  if (rows_event)
-  {
-    printf("rbr_callback %ld\n", drizzle_binlog_rows_event_table_id(rows_event));
-  }
-}
-
 int main(int argc, char *argv[])
 {
   (void)argc;
@@ -125,8 +107,6 @@ int main(int argc, char *argv[])
 
   binlog = drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
   ASSERT_NOT_NULL_(binlog, "Binlog object creation error");
-
-  drizzle_binlog_set_rbr_fn(binlog, &binlog_rbr);
 
   ret = drizzle_binlog_start(binlog, 0, binlog_file, 0);
 

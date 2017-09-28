@@ -47,11 +47,9 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::create_rows_event()
     rows_events_parsed++;
 
     auto *rows_event = rows_events.at(row_events_count_);
+
     // Reuse the rows event if the client has not set the rbr callback function
-    if ( binlog_rbr_fn != NULL )
-    {
-        row_events_count_++;
-    }
+    row_events_count_ = binlog_rbr_fn != NULL ? row_events_count_ + 1 : 1;
 
     return rows_event;
 }
@@ -70,7 +68,6 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     if (event->type == DRIZZLE_EVENT_TYPE_XID)
     {
         drizzle_binlog_parse_xid_event(event);
-        printf("binlog_rbr_fn is null %d", (binlog_rbr_fn == NULL));
         if (binlog_rbr_fn != NULL)
         {
             binlog_rbr_fn(this, binlog->binlog_context);
