@@ -178,6 +178,13 @@ struct tablename_rows_events_map
     }
 
 
+    size_t row_events_count(const char* _table_name)
+    {
+
+        return has_table(_table_name) ?
+            mapping.find(_table_name)->second.size() : 0;
+    }
+
     /**
      * @brief      Reset the state
      *
@@ -328,6 +335,15 @@ struct drizzle_binlog_rbr_st
      * @return     Pointer a rows event struct
      */
     drizzle_binlog_rows_event_st *get_rows_event();
+
+    /**
+     * @brief      Number of row events count for a specific table
+     *
+     * @param[in]  table_name  name of a db table
+     *
+     * @return     The row events count.
+     */
+    size_t get_row_events_count(const char* table_name);
 
     /**
      * @brief      Get a rows event.
