@@ -195,3 +195,23 @@ int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr)
      binlog_rbr->rows_event_it.it < binlog_rbr->rows_events.begin() ? -1 :
         distance(binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it.it);
 }
+
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
+    drizzle_binlog_rbr_st *binlog_rbr, uint64_t table_id)
+{
+    if ( table_id == 0 )
+    {
+        drizzle_set_error(binlog_rbr->binlog->con, __FILE_LINE_FUNC__,
+        "table id must be greater than 0");
+        return NULL;
+    }
+    return binlog_rbr->get_tablemap_event(table_id);
+}
+
+
+
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_binlog_rows_event_st *event)
+{
+    return binlog_rbr->get_tablemap_event(event->table_id);
+}

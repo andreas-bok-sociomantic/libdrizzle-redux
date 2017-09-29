@@ -65,6 +65,32 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
 DRIZZLE_API
 int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr);
 
+
+
+/**
+ * @brief      Get a table map event by id
+ *
+ * @param      binlog_rbr  The binlog rbr
+ * @param[in]  table_id    The table identifier
+ *
+ * @return     Pointer to a tablemap event struct or NULL if not found
+ */
+DRIZZLE_API
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
+    drizzle_binlog_rbr_st *binlog_rbr, uint64_t table_id);
+
+
+/**
+ * @brief      Get a tablemap event from the associated rows event
+ *
+ * @param      event  a rows event
+ *
+ * @return     Pointer to a tablemap event struct or NULL if not found
+ */
+DRIZZLE_API
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
+    drizzle_binlog_rbr_st *binlog_rbr, drizzle_binlog_rows_event_st *event);
+
 #ifdef __cplusplus
 }
 #endif
