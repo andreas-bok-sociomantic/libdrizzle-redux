@@ -58,8 +58,11 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret, "t1");
     if (rows_event)
     {
-        printf("rbr_callback %ld\n",
-               drizzle_binlog_rows_event_table_id(rows_event));
+        uint64_t table_id = drizzle_binlog_rows_event_table_id(rows_event);
+        drizzle_binlog_tablemap_event_st *tablemap_event =
+            drizzle_binlog_rbr_rows_event_tablemap(rbr, rows_event);
+        printf("rbr_callback for table %s with id %ld\n",
+            drizzle_binlog_tablemap_event_table_name(tablemap_event), table_id);
     }
 }
 
