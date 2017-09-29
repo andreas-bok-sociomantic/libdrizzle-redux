@@ -50,19 +50,34 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context);
 void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 {
     (void) context;
-    size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
-    printf("Binlog RBR, rows count : %ld\n", rows_count);
-
     drizzle_binlog_rows_event_st *rows_event;
     drizzle_return_t ret;
-    rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret, "t1");
-    if (rows_event)
+    size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
+
+    // xid
+    printf("Binlog RBR xid: %ld\n", drizzle_binlog_rbr_xid(rbr));
+
+    // number of roww events in binlog group
+    printf("Binlog RBR, rows count : %ld\n", rows_count);
+
+    // Get the rows event in the binlog event group
+    while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret, "t1") ) != NULL )
     {
+        // get id of the row event's associated tablemap event
         uint64_t table_id = drizzle_binlog_rows_event_table_id(rows_event);
+
+        // get the row event's associated tablemap event
         drizzle_binlog_tablemap_event_st *tablemap_event =
             drizzle_binlog_rbr_rows_event_tablemap(rbr, rows_event);
+
         printf("rbr_callback for table %s with id %ld\n",
             drizzle_binlog_tablemap_event_table_name(tablemap_event), table_id);
+    }
+
+    for (auto unsigned row_idx = 0; row_idx < rows_count; row_idx++)
+    {
+        rows_event = drizzle_binlog_rbr_rows_event_index(rbr, row_idx);
+        ASSERT_NOT_NULL_(rows_event, "Extracted rows event is NULL");
     }
 }
 
