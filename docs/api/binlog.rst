@@ -22,6 +22,10 @@ Structs
 
    The internal struct containing the binlog stream information
 
+.. c:type:: drizzle_binlog_rbr_st
+
+   The internal struct containing the binlog row based replication information
+
 .. c:type:: drizzle_binlog_event_st
 
    The internal struct containing the binlog event header and data
@@ -32,6 +36,18 @@ Callback Functions
 There are two callback functions.  The first is called whenever a new event is
 available to retrieve.  The second is triggered whenever an error (or EOF)
 occurs.
+
+.. c:function:: void (drizzle_binlog_rbr_fn)(drizzle_binlog_rbr_st *event, void *context)
+
+   This defines the function that will be supplied to accept row based
+   replication binlog groups
+
+   .. warning::
+      Event data needs to be copied/processed before exiting the function, it
+      will be erased before the next callback.
+
+   :param event: A pointer to the binlog rbr struct
+   :param context: A user defined pointer supplied in :c:func:`drizzle_binlog_rbr_init`
 
 .. c:function:: void (drizzle_binlog_fn)(drizzle_binlog_event_st *event, void *context)
 
