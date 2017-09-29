@@ -3,9 +3,11 @@
 #include <cstdarg>
 
 
-drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(uint64_t table_id)
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
+    uint64_t table_id)
 {
     auto table_id_ = table_id == 0 ? this->current_tablemap_id : table_id;
+
     if (tablemap_events.find(table_id_) == tablemap_events.end())
     {
         return NULL;
@@ -19,14 +21,16 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
 {
     if (tablemap_events.find(table_id) == tablemap_events.end())
     {
-        tablemap_events.insert(std::make_pair(table_id, new drizzle_binlog_tablemap_event_st()));
+        tablemap_events.insert(std::make_pair(table_id,
+                                              new
+                                              drizzle_binlog_tablemap_event_st()));
     }
 
     this->current_tablemap_id = table_id;
     return tablemap_events.find(table_id)->second;
 }
 
-drizzle_binlog_rows_event_st * drizzle_binlog_rbr_st::get_rows_event()
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
 {
     if ( row_events_count_ == 0 )
     {
@@ -54,7 +58,8 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::create_rows_event()
     return rows_event;
 }
 
-void drizzle_binlog_rbr_st::add_table_row_mapping(drizzle_binlog_rows_event_st *rows_event)
+void drizzle_binlog_rbr_st::add_table_row_mapping(
+    drizzle_binlog_rows_event_st *rows_event)
 {
     if (binlog_rbr_fn != NULL )
     {
@@ -63,7 +68,7 @@ void drizzle_binlog_rbr_st::add_table_row_mapping(drizzle_binlog_rows_event_st *
 }
 
 
-void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
+void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st *event)
 {
     if (event->type == DRIZZLE_EVENT_TYPE_XID)
     {
@@ -90,14 +95,14 @@ void drizzle_binlog_rbr_st::add_binlog_event(drizzle_binlog_event_st* event)
     {
         return;
     }
-}
+} // drizzle_binlog_rbr_st::add_binlog_event
 
 void drizzle_binlog_rbr_st::reset(bool free_all)
 {
     if (free_all)
     {
         rows_events.clear();
-        for(auto kv : tablemap_events)
+        for (auto kv : tablemap_events)
         {
             free(kv.second);
         }
@@ -114,9 +119,30 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
     rows_event_it.reset();
 }
 
-size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr)
+size_t drizzle_binlog_rbr_st::get_row_events_count(const char *table_name)
 {
-    return binlog_rbr->row_events_count_;
+    return tablename_rows_events.row_events_count(table_name);
+}
+
+size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr,
+                                           ...)
+{
+
+    const char *table_name = NULL;
+    va_list args;
+
+    va_start(args, binlog_rbr);
+    table_name = va_arg(args, const char *);
+    va_end(args);
+
+    if (table_name == NULL)
+    {
+        return binlog_rbr->row_events_count_;
+    }
+    else
+    {
+        return binlog_rbr->get_row_events_count(table_name);
+    }
 }
 
 
@@ -132,22 +158,25 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     drizzle_binlog_rows_event_st *rows_event;
     const char *table_name = NULL;
     va_list args;
+
     va_start(args, ret_ptr);
-    table_name = va_arg(args, const char*);
+    table_name = va_arg(args, const char *);
     va_end(args);
 
     if (table_name[0] != '\0')
     {
         printf("Table name %s\n", table_name);
-        rows_event = binlog_rbr->tablename_rows_events.next_row_event(table_name);
-        *ret_ptr = rows_event == NULL ? DRIZZLE_RETURN_ROW_END : DRIZZLE_RETURN_OK;
+        rows_event =
+            binlog_rbr->tablename_rows_events.next_row_event(table_name);
+        *ret_ptr = rows_event ==
+            NULL ? DRIZZLE_RETURN_ROW_END : DRIZZLE_RETURN_OK;
         return rows_event;
     }
 
     if (!binlog_rbr->rows_event_it.active)
     {
-        binlog_rbr->rows_event_it.it =binlog_rbr->rows_events.begin();
-        binlog_rbr->rows_event_it.active =true;
+        binlog_rbr->rows_event_it.it = binlog_rbr->rows_events.begin();
+        binlog_rbr->rows_event_it.active = true;
     }
 
     if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
@@ -160,12 +189,13 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     binlog_rbr->rows_event_it.it++;
     *ret_ptr = DRIZZLE_RETURN_OK;
     return rows_event;
-}
+} // drizzle_binlog_rbr_rows_event_next
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
 {
-    if (prev(binlog_rbr->rows_event_it.it) <= binlog_rbr->rows_events.begin() - 1)
+    if (prev(binlog_rbr->rows_event_it.it) <=
+        binlog_rbr->rows_events.begin() - 1)
     {
         binlog_rbr->rows_event_it.it = binlog_rbr->rows_events.begin() - 1;
         *ret_ptr = DRIZZLE_RETURN_ROW_REND;
@@ -192,8 +222,9 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
 int64_t drizzle_binlog_rbr_rows_event_current(drizzle_binlog_rbr_st *binlog_rbr)
 {
     return binlog_rbr->rows_event_it.it >= binlog_rbr->rows_events.end() ||
-     binlog_rbr->rows_event_it.it < binlog_rbr->rows_events.begin() ? -1 :
-        distance(binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it.it);
+           binlog_rbr->rows_event_it.it < binlog_rbr->rows_events.begin() ? -1 :
+           distance(
+        binlog_rbr->rows_events.begin(), binlog_rbr->rows_event_it.it);
 }
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
@@ -202,7 +233,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
     if ( table_id == 0 )
     {
         drizzle_set_error(binlog_rbr->binlog->con, __FILE_LINE_FUNC__,
-        "table id must be greater than 0");
+                          "table id must be greater than 0");
         return NULL;
     }
     return binlog_rbr->get_tablemap_event(table_id);

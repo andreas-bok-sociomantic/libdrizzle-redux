@@ -4,11 +4,17 @@ extern "C" {
 
 /**
  * @brief      Get the number of row events in the binlog event group
+ *             If a table name is passed as optional parameter the count for
+ *             that specific table is returned
+ *
+ * @param      binlog_rbr  The binlog rbr
+ * @param[in]  ...         optional table name
  *
  * @return     number of row events
  */
 DRIZZLE_API
-size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr);
+size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr,
+    ...);
 
 /**
  * @brief      Get the transaction id for the binlog event group
