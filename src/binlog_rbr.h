@@ -108,7 +108,8 @@ struct tablename_rows_events_map
      *
      * @return     True if the table was found, False otherwise
      */
-    bool set_rows_events_it(const char *tablename)
+    bool set_rows_events_it(const char *tablename, drizzle_list_position_t
+        pos=DRIZZLE_LIST_BEGIN)
     {
         if (!has_table(tablename))
         {
@@ -117,9 +118,11 @@ struct tablename_rows_events_map
         else
         {
             curr_row_events = &mapping.find(tablename)->second;
+            row_events_it = pos == DRIZZLE_LIST_BEGIN ?
+                curr_row_events->begin() :
+                curr_row_events->end();
             if (table_name != tablename)
             {
-                row_events_it = curr_row_events->begin();
                 strcpy(table_name, tablename);
                 table_changed = true;
             }

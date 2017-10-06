@@ -79,6 +79,9 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
         rows_event = drizzle_binlog_rbr_rows_event_index(rbr, row_idx);
         ASSERT_NOT_NULL_(rows_event, "Extracted rows event is NULL");
     }
+
+    drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, "t1");
+    drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_END, "t1");
 }
 
 
