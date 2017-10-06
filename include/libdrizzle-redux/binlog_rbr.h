@@ -97,6 +97,20 @@ DRIZZLE_API
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_binlog_rows_event_st *event);
 
+
+/**
+ * @brief      Seek to the beginning of a list of row events
+ *
+ * @param      binlog_rbr  binlog rbr struct
+ * @param[in]  pos         The position to seek
+ * @param[in]  <unnamed>   Optional table name can be parsed
+ *
+ * @return     { description_of_the_return_value }
+ */
+DRIZZLE_API
+drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlog_rbr,
+    drizzle_list_position_t pos, ...);
+
 #ifdef __cplusplus
 }
 #endif
