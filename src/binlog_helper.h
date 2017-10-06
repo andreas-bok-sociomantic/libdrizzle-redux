@@ -1,6 +1,19 @@
 #pragma once
 
 #include <cstdarg>
+enum protocol_datatype_t
+{
+    NOT_FOUND,
+    BLOB,
+    VARIABLE_STRING,
+    BIT,
+    TEMPORAL,
+    FIXED_STRING,
+    DECIMAL,
+    ENUM,
+    NUMERICAL
+};
+
 /**
  * @brief      Get the version of the RBR replication Rows Event
  *
@@ -60,7 +73,7 @@ void set_event_header(drizzle_binlog_event_st* dst,
  * @param current_column Zero indexed column number
  * @return True if the bit is set
  */
-//bool bit_is_set(uint8_t *ptr, int columns, int current_column);
+bool bit_is_set(const unsigned char *ptr, int current_column);
 
 
 
@@ -101,3 +114,10 @@ inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src=NULL)
 
   mem_alloc_cpy<T, U>(dst, size_alloc, src, size_alloc);
 }
+bool fixed_string_is_enum(drizzle_column_type_t type);
+bool column_is_fixed_string(drizzle_column_type_t type);
+
+protocol_datatype_t column_protocol_datatype(drizzle_column_type_t type);
+
+
+uint get_metadata_len(drizzle_column_type_t column_type);
