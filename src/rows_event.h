@@ -90,6 +90,31 @@
  *
  * \sa: https://dev.mysql.com/doc/internals/en/rows-event.html
  */
+
+struct drizzle_binlog_column_value_st
+{
+    uint8_t *metadata;
+    unsigned char *data_ptr;
+    drizzle_column_type_t type;
+
+    drizzle_binlog_column_value_st() :
+        metadata(NULL),
+        data_ptr(NULL),
+        type(DRIZZLE_COLUMN_TYPE_NONE)
+    {}
+};
+
+struct drizzle_binlog_row_st
+{
+    drizzle_binlog_column_value_st *column_values_before;
+    drizzle_binlog_column_value_st *column_values_after;
+
+    drizzle_binlog_row_st() :
+        column_values_before(NULL),
+        column_values_after(NULL)
+        {}
+};
+
 struct drizzle_binlog_rows_event_st
 {
     /**
@@ -155,6 +180,11 @@ struct drizzle_binlog_rows_event_st
      * Number of bytes required to represent the columns present bitmap
      */
     uint64_t bitmap_size;
+
+    /**
+     * List of parsed rows
+     */
+    drizzle_binlog_row_st *rows;
 
     /**
      * @brief      Constructor
@@ -238,3 +268,7 @@ struct drizzle_binlog_row_events_st
 drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     drizzle_binlog_event_st *event);
 
+
+drizzle_return_t drizzle_binlog_parse_row(
+    drizzle_binlog_rows_event_st *event, unsigned char *ptr,
+    unsigned char *columns_present);
