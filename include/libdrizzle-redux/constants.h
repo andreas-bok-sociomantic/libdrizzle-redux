@@ -589,6 +589,13 @@ typedef enum
 typedef enum drizzle_column_flags_t drizzle_column_flags_t;
 #endif
 
+
+typedef enum
+{
+  DRIZZLE_LIST_BEGIN,
+  DRIZZLE_LIST_END
+} drizzle_list_position_t;
+
 /**
  * @addtogroup drizzle_types Types
  * @ingroup drizzle_client_interface

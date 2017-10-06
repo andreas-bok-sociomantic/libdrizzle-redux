@@ -246,3 +246,38 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
 {
     return binlog_rbr->get_tablemap_event(event->table_id);
 }
+
+
+drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlog_rbr,
+    drizzle_list_position_t pos, ...)
+{
+    const char *table_name = NULL;
+    va_list args;
+
+    va_start(args, pos);
+    table_name = va_arg(args, const char *);
+    va_end(args);
+
+    if (table_name[0] != '\0')
+    {
+        if (binlog_rbr->tablename_rows_events.has_table(table_name))
+        {
+            binlog_rbr->tablename_rows_events.set_rows_events_it(table_name,
+                pos);
+        }
+        else
+        {
+            sprintf(binlog_rbr->binlog->con->last_error,
+                "table: %s does not exist ", table_name);
+            return DRIZZLE_RETURN_INVALID_ARGUMENT;
+        }
+    }
+    else
+    {
+        binlog_rbr->rows_event_it.it = pos == DRIZZLE_LIST_BEGIN ?
+            binlog_rbr->rows_events.begin() : binlog_rbr->rows_events.end();
+        binlog_rbr->rows_event_it.active = false;
+    }
+
+    return DRIZZLE_RETURN_OK;
+}
