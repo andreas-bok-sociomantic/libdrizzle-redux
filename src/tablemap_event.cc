@@ -59,6 +59,8 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
     memcpy(tablemap_event->null_bitmap, event->data_ptr, len_enc);
     event->data_ptr+=len_enc;
 
+    event->binlog_rbr->add_tablemap_event(tablemap_event);
+
     return tablemap_event;
 }
 
