@@ -65,6 +65,7 @@ struct tablename_rows_events_map
      * Mapping between table name and associated row events
      */
     map_tablename_vec_row_events_ptr mapping;
+    map_tablename_vec_row_events_ptr::iterator mapping_it;
 
     /**
      * Iterator to access the vector of row events
@@ -145,20 +146,18 @@ struct tablename_rows_events_map
         {
             return NULL;
         }
+
+        if (table_changed)
+        {
+            return **(row_events_it++);
+        }
+        else if (next(row_events_it) != curr_row_events->end())
+        {
+            return **(++row_events_it);
+        }
         else
         {
-            if (table_changed)
-            {
-                return **(row_events_it++);
-            }
-            else if (next(row_events_it) != curr_row_events->end())
-            {
-                return **(++row_events_it);
-            }
-            else
-            {
-                return NULL;
-            }
+            return NULL;
         }
     }
 
@@ -178,6 +177,7 @@ struct tablename_rows_events_map
 
         auto vec_rows = &mapping.find(rows_event->table_name)->second;
         vec_rows->push_back(&rows_event);
+        printf("add_mapping: %ld\n", vec_rows->size());
     }
 
 
@@ -198,10 +198,17 @@ struct tablename_rows_events_map
         table_changed = false;
         table_name[0] = '\0';
 
-        for (auto kv : mapping)
+        mapping_it = mapping.begin();
+        for(;mapping_it != mapping.end(); mapping_it++)
+        {
+            mapping_it->second.clear();
+        }
+
+        mapping.clear();
+        /*for (auto kv : mapping)
         {
             kv.second.clear();
-        }
+        }*/
     }
 };
 
@@ -399,4 +406,30 @@ struct drizzle_binlog_rbr_st
      * @param      binlog_event  a drizzle binlog event struct
      */
     void add_binlog_event(drizzle_binlog_event_st* binlog_event);
+
+
+
+    /**
+     * @brief      Return a schema and table name formatted as
+     *             <schema.table>
+     *             If schema is not specified the default schema is used
+     *
+     * @param[in]  table_name  The table name
+     * @param[in]  <unnamed>   { parameter_description }
+     *
+     * @return     string consisting of schema.table
+     */
+    const char *schema_table_name(const char *table_name_, ...)
+    {
+        va_list args;
+        const char *schema_name = NULL;
+        va_start(args, table_name_);
+        schema_name = va_arg(args, const char*);
+        va_end(args);
+
+        schema_name = schema_name == NULL ? db : schema_name;
+
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name_);
+        return fmt_buffer;
+    }
 };
