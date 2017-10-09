@@ -21,7 +21,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(cons
     va_list args;
     const char *schema_name = NULL;
     va_start(args, table_name);
-    table_name = va_arg(args, const char*);
+    schema_name = va_arg(args, const char*);
     va_end(args);
 
     schema_name = schema_name == NULL ? db : schema_name;
@@ -98,6 +98,9 @@ void drizzle_binlog_rbr_st::add_table_row_mapping(
     {
         tablename_rows_events.add_mapping(rows_event);
     }
+
+    printf("After add_table_row_mapping: %ld\n",
+        tablename_rows_events.row_events_count(rows_event->table_name));
 }
 
 
@@ -196,6 +199,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     table_name = va_arg(args, const char *);
     va_end(args);
 
+    // get the next event for a specific table
     if (table_name[0] != '\0')
     {
         printf("Table name %s\n", table_name);
@@ -210,9 +214,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
     {
         binlog_rbr->rows_event_it.it = binlog_rbr->rows_events.begin();
         binlog_rbr->rows_event_it.active = true;
-    }
-
-    if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
+    } else if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
     {
         *ret_ptr = DRIZZLE_RETURN_ROW_END;
         return NULL;
