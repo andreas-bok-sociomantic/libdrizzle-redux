@@ -16,6 +16,25 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
     return tablemap_events.find(table_id_)->second;
 }
 
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(const char* table_name, ...)
+{
+    va_list args;
+    const char *schema_name = NULL;
+    va_start(args, table_name);
+    table_name = va_arg(args, const char*);
+    va_end(args);
+
+    schema_name = schema_name == NULL ? db : schema_name;
+
+    sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+
+    if (tablename_tablemap_event.find(fmt_buffer) == tablename_tablemap_event.end())
+    {
+        return NULL;
+    }
+    return tablename_tablemap_event.find(fmt_buffer)->second;
+}
+
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
     uint64_t table_id)
 {

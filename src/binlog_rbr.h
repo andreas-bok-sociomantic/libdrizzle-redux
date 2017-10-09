@@ -209,6 +209,8 @@ struct drizzle_binlog_rbr_st
 {
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
         map_tablemap_events;
+    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st*>
+        map_tablename_tablemap_event;
     typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
     typedef std::unordered_map<const char*, vec_ptr_row_events>
         map_tablename_vec_row_events_ptr;
@@ -257,6 +259,9 @@ struct drizzle_binlog_rbr_st
 
     //** mapping from table id to table map event struct */
     map_tablemap_events tablemap_events;
+
+    //** mapping from table name to table map event struct */
+    map_tablename_tablemap_event tablename_tablemap_event;
 
     //** mapping between a table name to the table's rows event structs     */
     tablename_rows_events_map tablename_rows_events;
@@ -318,6 +323,19 @@ struct drizzle_binlog_rbr_st
      * @return     Pointer to a tablemap event struct
      */
     drizzle_binlog_tablemap_event_st *get_tablemap_event(uint64_t table_id=0);
+
+    /**
+     * @brief      Gets a tablemap event by name
+     *
+     *             A schema name can be specified to avoid conflicts with
+     *             duplicate tables.
+     *
+     * @param[in]  table_name  The table name
+     * @param[in]  <unnamed>   schema name, optional
+     *
+     * @return     The tablemap event.
+     */
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char* table_name, ...);
 
     /**
      * @brief      Creates a tablemap event.
