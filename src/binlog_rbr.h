@@ -282,6 +282,9 @@ struct drizzle_binlog_rbr_st
     //** the id of the table from which to get row events */
     uint64_t current_tablemap_id;
 
+    //** buffer used for formatting */
+    char fmt_buffer[1024];
+
     //** default database as specified with drizzle_create */
     char db[DRIZZLE_MAX_DB_SIZE];
 
@@ -387,6 +390,8 @@ struct drizzle_binlog_rbr_st
      * @param      event  The event
      */
     void add_table_row_mapping(drizzle_binlog_rows_event_st *event);
+
+    void add_tablemap_event(drizzle_binlog_tablemap_event_st *event);
 
     /**
      * Adds a drizzle binlog event
