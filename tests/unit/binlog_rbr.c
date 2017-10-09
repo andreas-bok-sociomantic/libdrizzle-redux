@@ -38,6 +38,8 @@
 #include <yatl/lite.h>
 #include "tests/unit/common.h"
 
+drizzle_result_st *result;
+
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {
@@ -53,6 +55,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     drizzle_binlog_rows_event_st *rows_event;
     drizzle_return_t ret;
     size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
+    const char* table = "binlog_rbr_tbl";
 
     // xid
     printf("Binlog RBR xid: %ld\n", drizzle_binlog_rbr_xid(rbr));
@@ -61,7 +64,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     printf("Binlog RBR, rows count : %ld\n", rows_count);
 
     // Get the rows event in the binlog event group
-    while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret, "t1") ) != NULL )
+    while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret, table) ) != NULL )
     {
         // get id of the row event's associated tablemap event
         uint64_t table_id = drizzle_binlog_rows_event_table_id(rows_event);
@@ -80,8 +83,8 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
         ASSERT_NOT_NULL_(rows_event, "Extracted rows event is NULL");
     }
 
-    drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, "t1");
-    drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_END, "t1");
+    drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, table);
+    drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_END, table);
 }
 
 
@@ -91,8 +94,20 @@ int main(int argc, char *argv[])
     (void) argv;
     drizzle_binlog_st *binlog;
     drizzle_return_t ret;
+    //
+    drizzle_return_t driz_ret;
 
     set_up_connection();
+    set_up_schema("test_binlog_rbr");
+
+    CHECKED_QUERY("CREATE TABLE test_binlog_rbr.binlog_rbr_tbl"
+                  "(a INT PRIMARY KEY AUTO_INCREMENT, "
+                  "b TINYINT, c SMALLINT, d MEDIUMINT, e INT, f BIGINT, g FLOAT, "
+                  "h DOUBLE(16,13))");
+
+    CHECKED_QUERY("INSERT INTO test_binlog_rbr.binlog_rbr_tbl "
+                  "(b,c,d,e,f,g,h) VALUES "
+                  "(1,1,1,1,1,1,1)");
 
     char *binlog_file;
     uint32_t end_position;
