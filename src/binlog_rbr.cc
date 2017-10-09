@@ -49,6 +49,20 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
     return tablemap_events.find(table_id)->second;
 }
 
+void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st *event)
+{
+    sprintf(&fmt_buffer[0], "%s.%s", event->schema_name, event->table_name);
+    auto it = tablename_tablemap_event.find(fmt_buffer);
+    if (it == tablename_tablemap_event.end())
+    {
+        tablename_tablemap_event.insert(std::make_pair(fmt_buffer, event));
+    }
+    else
+    {
+        it->second = event;
+    }
+}
+
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
 {
     if ( row_events_count_ == 0 )
