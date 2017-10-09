@@ -166,19 +166,22 @@ size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr,
 
     const char *table_name = NULL;
     va_list args;
-
     va_start(args, binlog_rbr);
     table_name = va_arg(args, const char *);
-    va_end(args);
+    size_t rows_count = 0;
 
     if (table_name == NULL)
     {
-        return binlog_rbr->row_events_count_;
+        rows_count = binlog_rbr->row_events_count_;
     }
     else
     {
-        return binlog_rbr->get_row_events_count(table_name);
+        const char *schema_table_name_ = binlog_rbr->schema_table_name(table_name, args);
+        printf("drizzle_binlog_rbr_row_events_count: %s\n", schema_table_name_);
+        rows_count = binlog_rbr->get_row_events_count(schema_table_name_);
     }
+    va_end(args);
+    return rows_count;
 }
 
 
@@ -304,7 +307,7 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlo
     table_name = va_arg(args, const char *);
     va_end(args);
 
-    if (table_name[0] != '\0')
+    if (table_name[0] != 0x10)
     {
         if (binlog_rbr->tablename_rows_events.has_table(table_name))
         {

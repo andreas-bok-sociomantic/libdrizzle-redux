@@ -421,15 +421,15 @@ struct drizzle_binlog_rbr_st
      */
     const char *schema_table_name(const char *table_name_, ...)
     {
+        assert(table_name_ != NULL);
         va_list args;
         const char *schema_name = NULL;
         va_start(args, table_name_);
         schema_name = va_arg(args, const char*);
         va_end(args);
 
-        schema_name = schema_name == NULL ? db : schema_name;
-
-        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name_);
-        return fmt_buffer;
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name[0] == 0x10 ?
+            db : schema_name, table_name_);
+        return &fmt_buffer[0];
     }
 };
