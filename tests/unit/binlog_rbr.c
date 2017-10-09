@@ -53,24 +53,33 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 {
     (void) context;
     drizzle_binlog_rows_event_st *rows_event;
+    size_t rows_count;
+    drizzle_binlog_tablemap_event_st * tablemap_event;
     drizzle_return_t ret;
-    size_t rows_count = drizzle_binlog_rbr_row_events_count(rbr);
+
     const char* table = "binlog_rbr_tbl";
 
     // xid
     printf("Binlog RBR xid: %ld\n", drizzle_binlog_rbr_xid(rbr));
 
-    // number of roww events in binlog group
-    printf("Binlog RBR, rows count : %ld\n", rows_count);
+    // number of row events in binlog group
+    tablemap_event = drizzle_binlog_rbr_tablemap_by_tablename(rbr, table);
+    unsigned column_count = drizzle_binlog_tablemap_event_column_count(tablemap_event);
+    ASSERT_EQ_(column_count, 8, "Wrong number of column in table %s, expected 8 got %d",
+               table, column_count);
 
     // Get the rows event in the binlog event group
     while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret, table) ) != NULL )
     {
+        rows_count = drizzle_binlog_rbr_row_events_count(rbr);
+        ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %ld",
+        rows_count);
+
         // get id of the row event's associated tablemap event
         uint64_t table_id = drizzle_binlog_rows_event_table_id(rows_event);
 
         // get the row event's associated tablemap event
-        drizzle_binlog_tablemap_event_st *tablemap_event =
+        tablemap_event =
             drizzle_binlog_rbr_rows_event_tablemap(rbr, rows_event);
 
         printf("rbr_callback for table %s with id %ld\n",
@@ -127,5 +136,9 @@ int main(int argc, char *argv[])
                drizzle_error(con), drizzle_strerror(ret));
 
     free(binlog_file);
+
+    CHECKED_QUERY("DROP TABLE test_binlog_rbr.binlog_rbr_tbl");
+
+    tear_down_schema("test_binlog_rbr");
     return EXIT_SUCCESS;
 } /* main */
