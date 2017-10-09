@@ -85,6 +85,18 @@ DRIZZLE_API
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
     drizzle_binlog_rbr_st *binlog_rbr, uint64_t table_id);
 
+/**
+ * @brief      Get a table map event by table name and schema
+ *
+ * @param      binlog_rbr  A binlog rbr struct
+ * @param[in]  table_name  The table name
+ * @param[in]  <unnamed>   schema name, optional
+ *
+ * @return     Pointer to a tablemap event struct or NULL if not found
+ */
+DRIZZLE_API
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
+    drizzle_binlog_rbr_st *binlog_rbr, const char *table_name, ...);
 
 /**
  * @brief      Get a tablemap event from the associated rows event

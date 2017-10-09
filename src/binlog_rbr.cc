@@ -273,13 +273,24 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
 }
 
 
-
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_binlog_rows_event_st *event)
 {
     return binlog_rbr->get_tablemap_event(event->table_id);
 }
 
+
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
+    drizzle_binlog_rbr_st *binlog_rbr, const char *table_name, ...)
+{
+    va_list args;
+    drizzle_binlog_tablemap_event_st *event;
+    va_start(args, table_name);
+    event = binlog_rbr->get_tablemap_event(table_name, args);
+    va_end(args);
+
+    return event;
+}
 
 drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlog_rbr,
     drizzle_list_position_t pos, ...)
