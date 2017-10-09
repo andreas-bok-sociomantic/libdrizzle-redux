@@ -277,6 +277,9 @@ struct drizzle_binlog_rbr_st
     //** the id of the table from which to get row events */
     uint64_t current_tablemap_id;
 
+    //** default database as specified with drizzle_create */
+    char db[DRIZZLE_MAX_DB_SIZE];
+
     /**
      * @brief      Constructor
      */
