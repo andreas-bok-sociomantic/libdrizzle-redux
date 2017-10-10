@@ -207,10 +207,6 @@ struct tablename_rows_events_map
         }
 
         mapping.clear();
-        /*for (auto kv : mapping)
-        {
-            kv.second.clear();
-        }*/
     }
 };
 
@@ -347,7 +343,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     The tablemap event.
      */
-    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char* table_name, ...);
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char* table_name);
 
     /**
      * @brief      Creates a tablemap event.
@@ -414,18 +410,15 @@ struct drizzle_binlog_rbr_st
     /**
      * @brief      Return a schema and table name formatted as
      *             <schema.table>
-     *             If schema is not specified the default schema is used
      *
      * @param[in]  table_name  The table name
-     * @param[in]  <unnamed>   { parameter_description }
      *
      * @return     string consisting of schema.table
      */
-    const char *schema_table_name(const char *table_name_, const char *schema_name_)
+    const char *schema_table_name(const char *table_name_)
     {
         assert(table_name_ != NULL);
-        schema_name_ = schema_name_ == NULL ? db : schema_name_;
-        sprintf(&fmt_buffer[0], "%s.%s", schema_name_, table_name_);
+        sprintf(&fmt_buffer[0], "%s.%s", db, table_name_);
         return &fmt_buffer[0];
     }
 };

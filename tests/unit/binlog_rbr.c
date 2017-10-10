@@ -57,9 +57,9 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     drizzle_binlog_tablemap_event_st * tablemap_event;
     drizzle_return_t ret_val;
 
-    char expected_str[1024];
     char actual_str[1024];
     uint64_t expected_number;
+    const char *schema="test_binlog_rbr";
     const char* table = "binlog_rbr_tbl";
 
     // xid
@@ -68,13 +68,14 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     // number of row events in binlog group
     tablemap_event = drizzle_binlog_rbr_tablemap_by_tablename(rbr, table);
 
+    if (tablemap_event == NULL )
+        return;
     sprintf(actual_str, "%s", drizzle_binlog_tablemap_event_schema_name(tablemap_event));
-    sprintf(&expected_str[0], "%s", "test_binlog_rbr");
-    ASSERT_STREQ_(expected_str, actual_str, "Wrong schema name. Expected %s got %s",
-        expected_str, actual_str);
+    if (actual_str != schema)
+        return;
 
     sprintf(&actual_str[0], "%s", drizzle_binlog_tablemap_event_table_name(tablemap_event));
-    ASSERT_STREQ_(table, actual_str, "Wrong schema name. Expected %s got %s",
+    ASSERT_STREQ_(table, actual_str, "Wrong table name. Expected %s got %s",
         table, actual_str);
 
     unsigned column_count = drizzle_binlog_tablemap_event_column_count(tablemap_event);
@@ -82,7 +83,6 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                table, column_count);
 
     expected_number = drizzle_binlog_tablemap_event_table_id(tablemap_event);
-
     printf("rows count %ld\n", drizzle_binlog_rbr_row_events_count(rbr, table));
 
     // Get the rows event in the binlog event group

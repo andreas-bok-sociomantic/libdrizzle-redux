@@ -16,23 +16,14 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
     return tablemap_events.find(table_id_)->second;
 }
 
-drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(const char* table_name, ...)
+drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(const char* table_name)
 {
-    va_list args;
-    const char *schema_name = NULL;
-    va_start(args, table_name);
-    schema_name = va_arg(args, const char*);
-    va_end(args);
-
-    schema_name = schema_name == NULL ? db : schema_name;
-
-    sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
-
-    if (tablename_tablemap_event.find(fmt_buffer) == tablename_tablemap_event.end())
+    auto schema_table = schema_table_name(table_name);
+    if (tablename_tablemap_event.find(schema_table) == tablename_tablemap_event.end())
     {
         return NULL;
     }
-    return tablename_tablemap_event.find(fmt_buffer)->second;
+    return tablename_tablemap_event.find(schema_table)->second;
 }
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
@@ -51,11 +42,11 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
 
 void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st *event)
 {
-    sprintf(&fmt_buffer[0], "%s.%s", event->schema_name, event->table_name);
-    auto it = tablename_tablemap_event.find(fmt_buffer);
+    auto schema_table = schema_table_name(event->table_name);
+    auto it = tablename_tablemap_event.find(schema_table);
     if (it == tablename_tablemap_event.end())
     {
-        tablename_tablemap_event.insert(std::make_pair(fmt_buffer, event));
+        tablename_tablemap_event.insert(std::make_pair(schema_table, event));
     }
     else
     {
@@ -157,7 +148,7 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
 
 size_t drizzle_binlog_rbr_st::get_row_events_count(const char *table_name)
 {
-    return tablename_rows_events.row_events_count(table_name);
+    return tablename_rows_events.row_events_count(schema_table_name(table_name));
 }
 
 
@@ -165,31 +156,10 @@ size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
                                            ...)
 {
     size_t rows_count = 0;
-    uint arg_idx = 0;
-    const char *arg = NULL;
     const char *table_name = NULL;
-    const char *schema_name = NULL;
     va_list args;
     va_start(args, binlog_rbr);
-
-    while (true)
-    {
-        if ( (arg = va_arg(args, const char*)) == NULL )
-            break;
-
-        switch (arg_idx)
-        {
-            case 0 :
-                table_name = arg;
-                break;
-            case 1 :
-                schema_name = arg;
-                break;
-            default:
-                break;
-        }
-        arg_idx++;
-    }
+    table_name = va_arg(args, const char*);
     va_end(args);
 
     if (table_name == NULL)
@@ -198,7 +168,7 @@ size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
     }
     else
     {
-        rows_count = binlog_rbr->get_row_events_count(binlog_rbr->schema_table_name(table_name, schema_name));
+        rows_count = binlog_rbr->get_row_events_count(table_name);
     }
 
     return rows_count;
@@ -218,17 +188,17 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     const char *table_name = NULL;
 
     va_list args;
-
     va_start(args, ret_ptr);
     table_name = va_arg(args, const char *);
     va_end(args);
 
     // get the next event for a specific table
-    if (table_name[0] != '\0')
+    if (table_name != NULL)
     {
         printf("Table name %s\n", table_name);
+        auto schema_table = binlog_rbr->schema_table_name(table_name);
         rows_event =
-            binlog_rbr->tablename_rows_events.next_row_event(table_name);
+            binlog_rbr->tablename_rows_events.next_row_event(schema_table);
         *ret_ptr = rows_event ==
             NULL ? DRIZZLE_RETURN_ROW_END : DRIZZLE_RETURN_OK;
         return rows_event;
@@ -238,7 +208,8 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     {
         binlog_rbr->rows_event_it.it = binlog_rbr->rows_events.begin();
         binlog_rbr->rows_event_it.active = true;
-    } else if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
+    }
+    else if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
     {
         *ret_ptr = DRIZZLE_RETURN_ROW_END;
         return NULL;
@@ -307,13 +278,12 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
 
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
-    drizzle_binlog_rbr_st *binlog_rbr, const char *table_name, ...)
+    drizzle_binlog_rbr_st *binlog_rbr, const char *table_name)
 {
-    va_list args;
+    if ( table_name == NULL )
+        return NULL;
     drizzle_binlog_tablemap_event_st *event;
-    va_start(args, table_name);
-    event = binlog_rbr->get_tablemap_event(table_name, args);
-    va_end(args);
+    event = binlog_rbr->get_tablemap_event(table_name);
 
     return event;
 }
@@ -363,7 +333,7 @@ drizzle_return_t drizzle_binlog_rbr_change_db(drizzle_binlog_rbr_st *binlog_rbr,
     return DRIZZLE_RETURN_OK;
 }
 
-const char* drizzle_binlog_rbr_set_db(const drizzle_binlog_rbr_st *binlog_rbr)
+const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr)
 {
     if (binlog_rbr == NULL)
     {
