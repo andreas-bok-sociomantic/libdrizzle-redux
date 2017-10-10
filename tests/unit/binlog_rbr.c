@@ -88,7 +88,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     // Get the rows event in the binlog event group
     while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret_val, table) ) != NULL )
     {
-        rows_count = drizzle_binlog_rbr_row_events_count(rbr);
+        rows_count = drizzle_binlog_rbr_row_events_count(rbr, table);
         ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %ld",
         rows_count);
 
@@ -121,7 +121,6 @@ int main(int argc, char *argv[])
     (void) argv;
     drizzle_binlog_st *binlog;
     drizzle_return_t ret;
-    //
     drizzle_return_t driz_ret;
 
     set_up_connection();
