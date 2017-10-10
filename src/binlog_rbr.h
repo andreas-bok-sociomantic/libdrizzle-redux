@@ -37,6 +37,8 @@
 #include <unordered_map>
 #include <vector>
 #include <iterator>
+#include <cstdarg>
+
 
 
 struct tablename_rows_events_map
@@ -419,17 +421,18 @@ struct drizzle_binlog_rbr_st
      *
      * @return     string consisting of schema.table
      */
-    const char *schema_table_name(const char *table_name_, ...)
+    const char *schema_table_name(const char *table_name_, const char *schema_name_)
     {
         assert(table_name_ != NULL);
-        va_list args;
-        const char *schema_name = NULL;
-        va_start(args, table_name_);
-        schema_name = va_arg(args, const char*);
-        va_end(args);
-
-        sprintf(&fmt_buffer[0], "%s.%s", schema_name[0] == 0x10 ?
-            db : schema_name, table_name_);
+        schema_name_ = schema_name_ == NULL ? db : schema_name_;
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name_, table_name_);
         return &fmt_buffer[0];
     }
 };
+
+/*size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
+                                           ...);*/
+
+/*#define __drizzle_binlog_rbr_row_events_count__(...) \
+    drizzle_binlog_rbr_row_events_count_(binlog_rbr, ##__VA_ARGS__, NULL)
+*/
