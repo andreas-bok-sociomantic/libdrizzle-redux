@@ -18,12 +18,8 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(const char* table_name)
 {
-    auto schema_table = schema_table_name(table_name);
-    if (tablename_tablemap_event.find(schema_table) == tablename_tablemap_event.end())
-    {
-        return NULL;
-    }
-    return tablename_tablemap_event.find(schema_table)->second;
+    auto table_id = tableid_by_tablename(table_name);
+    return table_id != 0 ? get_tablemap_event(table_id) : NULL;
 }
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
@@ -43,14 +39,13 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
 void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st *event)
 {
     auto schema_table = schema_table_name(event->table_name);
-    auto it = tablename_tablemap_event.find(schema_table);
-    if (it == tablename_tablemap_event.end())
+    if (tableid_by_tablename(schema_table) == 0)
     {
-        tablename_tablemap_event.insert(std::make_pair(schema_table, event));
+        tablename_tableid.insert(std::make_pair(schema_table, event->table_id));
     }
     else
     {
-        it->second = event;
+        tablename_tableid[schema_table] = event->table_id;
     }
 }
 
@@ -280,12 +275,9 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
     drizzle_binlog_rbr_st *binlog_rbr, const char *table_name)
 {
-    if ( table_name == NULL )
-        return NULL;
-    drizzle_binlog_tablemap_event_st *event;
-    event = binlog_rbr->get_tablemap_event(table_name);
+    if (table_name == NULL) return NULL;
 
-    return event;
+    return binlog_rbr->get_tablemap_event(table_name);
 }
 
 drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlog_rbr,
