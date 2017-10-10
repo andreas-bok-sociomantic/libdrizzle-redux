@@ -1,4 +1,6 @@
 #pragma once
+
+#include <cstdarg>
 /**
  * @brief      Get the version of the RBR replication Rows Event
  *
@@ -72,3 +74,36 @@ void set_event_header(drizzle_binlog_event_st* dst,
  * @return True if the bit is set
  */
 //bool bit_is_set(uint8_t *ptr, int columns, int current_column);
+
+
+template <typename T>
+bool __get_var_arg(uint n, T *val, ...) {
+  uint arg_idx = 0;
+  va_list args;
+  va_start(args, val);
+  bool ret_val = false;
+  T arg;
+  while (true) {
+    arg = va_arg(args, T);
+    if (arg == NULL || arg_idx > n)
+    {
+      break;
+    }
+    else if (arg_idx == n) {
+        *val= arg;
+        ret_val = true;
+    }
+    arg_idx++;
+  }
+  va_end(args);
+  return ret_val;
+}
+
+#define var_arg_const_char(...) \
+    __get_var_arg<const char*>(__VA_ARGS__, NULL)
+
+#define var_arg_uint(...) \
+    __get_var_arg<uint32_t>(__VA_ARGS__, NULL)
+
+#define var_arg_char(...) \
+    __get_var_arg<char*>(__VA_ARGS__, NULL)

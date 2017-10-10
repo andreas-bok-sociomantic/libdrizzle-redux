@@ -8,13 +8,18 @@ extern "C" {
  *             that specific table is returned
  *
  * @param      binlog_rbr  The binlog rbr
- * @param[in]  ...         optional table name
+ * @param[in]  ...         optional table name and schema name
  *
  * @return     number of row events
  */
+//DRIZZLE_API
+//size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr, ...);
 DRIZZLE_API
-size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr,
-    ...);
+size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
+                                           ...);
+#define drizzle_binlog_rbr_row_events_count(binlog_rbr, ...) \
+    drizzle_binlog_rbr_row_events_count_(binlog_rbr, ##__VA_ARGS__, NULL)
+
 
 /**
  * @brief      Get the transaction id for the binlog event group
@@ -35,9 +40,11 @@ uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr);
  * @return     a row event struct, or NULL if there are no more rows events
  */
 DRIZZLE_API
-drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next(
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
     ...);
+#define drizzle_binlog_rbr_rows_event_next(binlog_rbr, ret_ptr, ...) \
+    drizzle_binlog_rbr_rows_event_next_(binlog_rbr, ret_ptr, ##__VA_ARGS__, NULL)
 
 
 /**
@@ -122,6 +129,13 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlog_rbr,
     drizzle_list_position_t pos, ...);
+
+
+DRIZZLE_API
+drizzle_return_t drizzle_binlog_rbr_set_db(const drizzle_binlog_rbr_st *binlog_rbr, const char *db);
+
+DRIZZLE_API
+const char* drizzle_binlog_rbr_get_db(const drizzle_binlog_rbr_st *binlog_rbr);
 
 #ifdef __cplusplus
 }
