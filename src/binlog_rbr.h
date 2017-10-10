@@ -214,11 +214,11 @@ struct drizzle_binlog_rbr_st
 {
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
         map_tablemap_events;
-    typedef std::unordered_map<const char*, drizzle_binlog_tablemap_event_st*>
-        map_tablename_tablemap_event;
-    typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
+    typedef std::unordered_map<const char*, uint64_t>
+        map_tablename_tableid;
+/*    typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
     typedef std::unordered_map<const char*, vec_ptr_row_events>
-        map_tablename_vec_row_events_ptr;
+        map_tablename_vec_row_events_ptr;*/
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
 
     struct rows_events_iterator
@@ -266,7 +266,7 @@ struct drizzle_binlog_rbr_st
     map_tablemap_events tablemap_events;
 
     //** mapping from table name to table map event struct */
-    map_tablename_tablemap_event tablename_tablemap_event;
+    map_tablename_tableid tablename_tableid;
 
     //** mapping between a table name to the table's rows event structs     */
     tablename_rows_events_map tablename_rows_events;
@@ -420,6 +420,15 @@ struct drizzle_binlog_rbr_st
         assert(table_name_ != NULL);
         sprintf(&fmt_buffer[0], "%s.%s", db, table_name_);
         return &fmt_buffer[0];
+    }
+
+    uint64_t tableid_by_tablename(const char *table_name_)
+    {
+        auto schema_table = schema_table_name(table_name_);
+        if (schema_table == NULL) return 0;
+
+        auto it = tablename_tableid.find(schema_table);
+        return it == tablename_tableid.end() ? 0 : it->second;
     }
 };
 
