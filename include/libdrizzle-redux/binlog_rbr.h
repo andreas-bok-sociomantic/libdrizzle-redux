@@ -103,7 +103,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
  */
 DRIZZLE_API
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
-    drizzle_binlog_rbr_st *binlog_rbr, const char *table_name, ...);
+    drizzle_binlog_rbr_st *binlog_rbr, const char *table_name);
 
 /**
  * @brief      Get a tablemap event from the associated rows event
@@ -132,10 +132,10 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlo
 
 
 DRIZZLE_API
-drizzle_return_t drizzle_binlog_rbr_set_db(const drizzle_binlog_rbr_st *binlog_rbr, const char *db);
+drizzle_return_t drizzle_binlog_rbr_change_db(drizzle_binlog_rbr_st *binlog_rbr, const char *db);
 
 DRIZZLE_API
-const char* drizzle_binlog_rbr_get_db(const drizzle_binlog_rbr_st *binlog_rbr);
+const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr);
 
 #ifdef __cplusplus
 }
