@@ -57,9 +57,11 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
  *             events
  */
 DRIZZLE_API
-drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev(
+drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev_(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
     ...);
+#define drizzle_binlog_rbr_rows_event_prev(binlog_rbr, ret_ptr, ...) \
+    drizzle_binlog_rbr_rows_event_prev_(binlog_rbr, ret_ptr, ##__VA_ARGS__, NULL)
 
 
 DRIZZLE_API
@@ -127,8 +129,10 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
  * @return     { description_of_the_return_value }
  */
 DRIZZLE_API
-drizzle_return_t drizzle_binlog_rbr_row_events_seek(drizzle_binlog_rbr_st *binlog_rbr,
+drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binlog_rbr,
     drizzle_list_position_t pos, ...);
+#define drizzle_binlog_rbr_row_events_seek(binlog_rbr, pos, ...) \
+    drizzle_binlog_rbr_row_events_seek_(binlog_rbr, pos, ##__VA_ARGS__, NULL)
 
 
 DRIZZLE_API
