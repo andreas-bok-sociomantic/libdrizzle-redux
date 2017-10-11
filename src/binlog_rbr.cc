@@ -20,7 +20,6 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
     const char* table_name)
 {
     auto table_id = tableid_by_tablename(table_name);
-    printf("get_tablemap_event: %ld\n", table_id);
     return table_id != 0 ? get_tablemap_event(table_id) : NULL;
 }
 
@@ -41,7 +40,6 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
 void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st *event)
 {
     std::string schema_table(schema_table_name(event->table_name));
-    printf("adding tablemap: %s\n", schema_table.c_str());
     if (tableid_by_tablename(schema_table.c_str()) == 0)
     {
         tablename_tableid.insert(std::make_pair(schema_table,
@@ -52,8 +50,6 @@ void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st 
         tablename_tableid[schema_table] = event->table_id;
     }
     std::string key = schema_table_name(event->table_name);
-    printf("tablemap exists: %d\n", tablename_tableid.find(key) != tablename_tableid.end());
-    printf("keys equal: %d\n", key == schema_table);
 }
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
@@ -76,7 +72,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::create_rows_event()
     // increment the number of parsed rows
     rows_events_parsed++;
 
-    auto *rows_event = rows_events.at(row_events_count_);
+    auto rows_event = rows_events.at(row_events_count_);
 
     // Reuse the rows event if the client has not set the rbr callback function
     row_events_count_ = binlog_rbr_fn != NULL ? row_events_count_ + 1 : 1;
@@ -184,7 +180,7 @@ uint64_t drizzle_binlog_rbr_xid(const drizzle_binlog_rbr_st *binlog_rbr)
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
 {
-    drizzle_binlog_rows_event_st *rows_event;
+    drizzle_binlog_rows_event_st *rows_event = NULL;
     const char *table_name = NULL;
 
     va_list args;
