@@ -38,14 +38,15 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
 
 void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st *event)
 {
-    auto schema_table = schema_table_name(event->table_name);
-    if (tableid_by_tablename(schema_table) == 0)
+    std::string schema_table(schema_table_name(event->table_name));
+    if (tableid_by_tablename(schema_table.c_str()) == 0)
     {
-        tablename_tableid.insert(std::make_pair(schema_table, event->table_id));
+        tablename_tableid.insert(std::make_pair(schema_table.c_str(),
+            event->table_id));
     }
     else
     {
-        tablename_tableid[schema_table] = event->table_id;
+        tablename_tableid[schema_table.c_str()] = event->table_id;
     }
 }
 
