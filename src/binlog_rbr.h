@@ -206,7 +206,7 @@ struct drizzle_binlog_rbr_st
 {
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
         map_tablemap_events;
-    typedef std::unordered_map<const char*, uint64_t>
+    typedef std::unordered_map<std::string, uint64_t>
         map_tablename_tableid;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
 
@@ -278,6 +278,8 @@ struct drizzle_binlog_rbr_st
 
     //** buffer used for formatting */
     char fmt_buffer[1024];
+
+    std::string _schema_table;
 
     //** default database as specified with drizzle_create */
     char db[DRIZZLE_MAX_DB_SIZE];
@@ -413,10 +415,8 @@ struct drizzle_binlog_rbr_st
 
     uint64_t tableid_by_tablename(const char *table_name_)
     {
-        auto schema_table = schema_table_name(table_name_);
-        if (schema_table == NULL) return 0;
-
-        auto it = tablename_tableid.find(schema_table);
+        _schema_table = schema_table_name(table_name_);
+        auto it = tablename_tableid.find(_schema_table);
         return it == tablename_tableid.end() ? 0 : it->second;
     }
 };
