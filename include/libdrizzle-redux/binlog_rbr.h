@@ -3,17 +3,15 @@ extern "C" {
 #endif
 
 /**
- * @brief      Get the number of row events in the binlog event group
- *             If a table name is passed as optional parameter the count for
- *             that specific table is returned
+ * @brief      Get the number of row events in the binlog event group If a table
+ *             name is passed as optional parameter the count for that specific
+ *             table is returned
  *
  * @param      binlog_rbr  The binlog rbr
- * @param[in]  ...         optional table name and schema name
+ * @param[in]  ...   optional table name
  *
  * @return     number of row events
  */
-//DRIZZLE_API
-//size_t drizzle_binlog_rbr_row_events_count(drizzle_binlog_rbr_st *binlog_rbr, ...);
 DRIZZLE_API
 size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
                                            ...);
@@ -24,12 +22,12 @@ size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
 /**
  * @brief      Get the transaction id for the binlog event group
  *
- * @param      a drizzle_binlog_rbr structure
+ * @param[in]  a drizzle_binlog_rbr structure
  *
  * @return     id of the transaction
  */
 DRIZZLE_API
-uint64_t drizzle_binlog_rbr_xid(drizzle_binlog_rbr_st *binlog_rbr);
+uint64_t drizzle_binlog_rbr_xid(const drizzle_binlog_rbr_st *binlog_rbr);
 
 /**
  * Read a row event from a binlog event group
@@ -135,9 +133,30 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binl
     drizzle_binlog_rbr_row_events_seek_(binlog_rbr, pos, ##__VA_ARGS__, NULL)
 
 
+/**
+ * @brief      Change the database schema used selecting binlog data
+ *
+ *             Tables are identified uniquely as <schema_name.table_name>.
+ *             If tables with identical names exist in multiple schemas it
+ *
+ * @todo Add more docs about why it is needed and when
+ *
+ * @param      binlog_rbr  The binlog rbr struct
+ * @param[in]  db          The database name
+ *
+ * @return     { description_of_the_return_value }
+ */
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_rbr_change_db(drizzle_binlog_rbr_st *binlog_rbr, const char *db);
 
+
+/**
+ * @brief      Get schema used to identify table
+ *
+ * @param[in]  binlog_rbr  A binlog rbr struct
+ *
+ * @return     the schema name
+ */
 DRIZZLE_API
 const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr);
 
