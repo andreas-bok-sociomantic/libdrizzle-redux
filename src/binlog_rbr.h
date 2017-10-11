@@ -41,11 +41,11 @@
 
 
 
-struct tablename_rows_events_map
+struct tableid_rows_events_map
 {
     typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
-    typedef std::unordered_map<const char*, vec_ptr_row_events>
-        map_tablename_vec_row_events_ptr;
+    typedef std::unordered_map<uint64_t, vec_ptr_row_events>
+        map_tableid_vec_row_events_ptr;
 
     /**
      * Flag which indicates whether the client has changed the table from which
@@ -59,15 +59,10 @@ struct tablename_rows_events_map
     uint64_t table_id;
 
     /**
-     * The name of the db table from which row events are retrieved
-     */
-    char table_name[DRIZZLE_MAX_TABLE_SIZE];
-
-    /**
      * Mapping between table name and associated row events
      */
-    map_tablename_vec_row_events_ptr mapping;
-    map_tablename_vec_row_events_ptr::iterator mapping_it;
+    map_tableid_vec_row_events_ptr mapping;
+    map_tableid_vec_row_events_ptr::iterator mapping_it;
 
     /**
      * Iterator to access the vector of row events
@@ -83,12 +78,10 @@ struct tablename_rows_events_map
     /**
      * @brief      Constructor
      */
-    tablename_rows_events_map() :
+    tableid_rows_events_map() :
         table_changed(false),
         table_id(0)
-
     {
-        table_name[0] = '\0';
     }
 
 
@@ -99,9 +92,9 @@ struct tablename_rows_events_map
      *
      * @return     True if has a mapping exists, False otherwise.
      */
-    bool has_table(const char *tablename)
+    bool has_table(uint64_t _table_id)
     {
-        return mapping.find(tablename) != mapping.end();
+        return mapping.find(_table_id) != mapping.end();
     }
 
     /**
@@ -111,23 +104,23 @@ struct tablename_rows_events_map
      *
      * @return     True if the table was found, False otherwise
      */
-    bool set_rows_events_it(const char *tablename, drizzle_list_position_t
+    bool set_rows_events_it(uint64_t _table_id, drizzle_list_position_t
         pos=DRIZZLE_LIST_BEGIN)
     {
-        if (!has_table(tablename))
+        if (!has_table(_table_id))
         {
             return false;
         }
         else
         {
-            curr_row_events = &mapping.find(tablename)->second;
+            curr_row_events = &mapping.find(_table_id)->second;
             row_events_it = pos == DRIZZLE_LIST_BEGIN ?
                 curr_row_events->begin() :
                 curr_row_events->end();
-            if (table_name != tablename)
+            if (this->table_id != _table_id)
             {
-                strcpy(table_name, tablename);
-                table_changed = true;
+                this->table_id = _table_id;
+                this->table_changed = true;
             }
 
             return true;
@@ -142,9 +135,9 @@ struct tablename_rows_events_map
      * @return     A pointer to a event struct, False if no more
      *             events are available
      */
-    drizzle_binlog_rows_event_st* next_row_event(const char *tablename)
+    drizzle_binlog_rows_event_st* next_row_event(uint64_t _table_id)
     {
-        if (!set_rows_events_it(tablename))
+        if (!set_rows_events_it(_table_id))
         {
             return NULL;
         }
@@ -171,23 +164,23 @@ struct tablename_rows_events_map
      */
     void add_mapping(drizzle_binlog_rows_event_st *rows_event)
     {
-        if (mapping.find(rows_event->table_name) == mapping.end())
+        if (mapping.find(rows_event->table_id) == mapping.end())
         {
             vec_ptr_row_events vec;
-            mapping.insert(std::make_pair(rows_event->table_name, vec));
+            mapping.insert(std::make_pair(rows_event->table_id, vec));
         }
 
-        auto vec_rows = &mapping.find(rows_event->table_name)->second;
+        auto vec_rows = &mapping.find(rows_event->table_id)->second;
         vec_rows->push_back(&rows_event);
         printf("add_mapping: %ld\n", vec_rows->size());
     }
 
 
-    size_t row_events_count(const char* _table_name)
+    size_t row_events_count(uint64_t _table_id)
     {
 
-        return has_table(_table_name) ?
-            mapping.find(_table_name)->second.size() : 0;
+        return has_table(_table_id) ?
+            mapping.find(_table_id)->second.size() : 0;
     }
 
     /**
@@ -197,16 +190,15 @@ struct tablename_rows_events_map
      */
     void reset()
     {
-        table_changed = false;
-        table_name[0] = '\0';
-
-        mapping_it = mapping.begin();
+        this->table_changed = false;
+        this->table_id = 0;
+        this->mapping_it = mapping.begin();
         for(;mapping_it != mapping.end(); mapping_it++)
         {
-            mapping_it->second.clear();
+            this->mapping_it->second.clear();
         }
 
-        mapping.clear();
+        this->mapping.clear();
     }
 };
 
@@ -216,9 +208,6 @@ struct drizzle_binlog_rbr_st
         map_tablemap_events;
     typedef std::unordered_map<const char*, uint64_t>
         map_tablename_tableid;
-/*    typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
-    typedef std::unordered_map<const char*, vec_ptr_row_events>
-        map_tablename_vec_row_events_ptr;*/
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
 
     struct rows_events_iterator
@@ -269,7 +258,7 @@ struct drizzle_binlog_rbr_st
     map_tablename_tableid tablename_tableid;
 
     //** mapping between a table name to the table's rows event structs     */
-    tablename_rows_events_map tablename_rows_events;
+    tableid_rows_events_map tableid_rows_events;
 
     //** vector of parsed row event structs */
     vec_row_events rows_events;
