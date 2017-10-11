@@ -71,8 +71,11 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     if (tablemap_event == NULL )
         return;
     sprintf(actual_str, "%s", drizzle_binlog_tablemap_event_schema_name(tablemap_event));
-    if (actual_str != schema)
+    if (strcmp(actual_str, schema) != 0)
+    {
+        printf("skipping\n");
         return;
+    }
 
     sprintf(&actual_str[0], "%s", drizzle_binlog_tablemap_event_table_name(tablemap_event));
     ASSERT_STREQ_(table, actual_str, "Wrong table name. Expected %s got %s",
