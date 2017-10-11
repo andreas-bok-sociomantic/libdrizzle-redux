@@ -43,7 +43,7 @@
 
 struct tableid_rows_events_map
 {
-    typedef std::vector<drizzle_binlog_rows_event_st** > vec_ptr_row_events;
+    typedef std::vector<drizzle_binlog_rows_event_st* > vec_ptr_row_events;
     typedef std::unordered_map<uint64_t, vec_ptr_row_events>
         map_tableid_vec_row_events_ptr;
 
@@ -117,11 +117,9 @@ struct tableid_rows_events_map
             row_events_it = pos == DRIZZLE_LIST_BEGIN ?
                 curr_row_events->begin() :
                 curr_row_events->end();
-            if (this->table_id != _table_id)
-            {
-                this->table_id = _table_id;
-                this->table_changed = true;
-            }
+
+            this->table_changed = this->table_id != _table_id;
+            this->table_id = _table_id;
 
             return true;
         }
@@ -144,11 +142,11 @@ struct tableid_rows_events_map
 
         if (table_changed)
         {
-            return **(row_events_it++);
+            return *(row_events_it++);
         }
         else if (next(row_events_it) != curr_row_events->end())
         {
-            return **(++row_events_it);
+            return *(++row_events_it);
         }
         else
         {
@@ -171,7 +169,7 @@ struct tableid_rows_events_map
         }
 
         auto vec_rows = &mapping.find(rows_event->table_id)->second;
-        vec_rows->push_back(&rows_event);
+        vec_rows->push_back(rows_event);
         printf("add_mapping: %ld\n", vec_rows->size());
     }
 
