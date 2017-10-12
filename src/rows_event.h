@@ -167,6 +167,15 @@ struct drizzle_binlog_rows_event_st
         field_metadata(NULL),
         bitmap_size(0)
     {}
+
+    ~drizzle_binlog_rows_event_st()
+    {
+        printf("called drizzle_binlog_rows_event_st destructor\n");
+        if (column_type_def != NULL)
+            free(column_type_def);
+        if (field_metadata != NULL)
+            free(field_metadata);
+    }
 };
 
 
@@ -179,7 +188,7 @@ struct drizzle_binlog_row_events_st
     vec_row_events::iterator it_;
     size_t count_;
     drizzle_binlog_row_events_st() :
-    active(false)
+        active(false)
     {}
 
     void reset()

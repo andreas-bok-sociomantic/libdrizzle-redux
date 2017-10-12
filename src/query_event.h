@@ -117,6 +117,14 @@ struct drizzle_binlog_query_event_st
         status_vars(NULL),
         query(NULL)
     {}
+
+    ~drizzle_binlog_query_event_st()
+    {
+        if (status_vars != NULL)
+            free(status_vars);
+        if (query!=NULL)
+            free(query);
+    }
 };
 
 
