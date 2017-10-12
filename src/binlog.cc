@@ -101,6 +101,7 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
     {
       drizzle_set_error(binlog->con, __FILE_LINE_FUNC__,
         "binlog event callback function is NULL");
+      drizzle_binlog_free(binlog);
       return NULL;
     }
   }
