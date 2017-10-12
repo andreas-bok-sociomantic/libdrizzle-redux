@@ -39,6 +39,12 @@
 #include "tests/unit/common.h"
 
 drizzle_result_st *result;
+/*
+void test_row();
+void test_row(drizzle_binlog_rbr_st *rbr, drizzle_binlog_rows_event_st *event)
+{
+
+}*/
 
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
@@ -114,9 +120,12 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
         ASSERT_NOT_NULL_(rows_event, "Extracted rows event is NULL");
     }
 
-
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, table);
+
+
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_END, table);
+
+
     printf("FINISHED\n");
 }
 

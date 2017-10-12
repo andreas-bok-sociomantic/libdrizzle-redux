@@ -49,7 +49,6 @@ void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st 
     {
         tablename_tableid[schema_table] = event->table_id;
     }
-    std::string key = schema_table_name(event->table_name);
 }
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::get_rows_event()
@@ -123,7 +122,10 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
 {
     if (free_all)
     {
+        // delete created row event structs
         rows_events.clear();
+
+        // delete created tablemap event structs
         for (auto kv : tablemap_events)
         {
             free(kv.second);
@@ -134,6 +136,7 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
     // clear the mapping between tables and rows events
     tableid_rows_events.reset();
 
+    // clear the mapping between tablename and table id
     tablename_tableid.clear();
 
     rows_event_it.it = rows_events.end();
