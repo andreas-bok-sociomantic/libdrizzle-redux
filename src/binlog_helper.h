@@ -52,20 +52,7 @@ uint64_t drizzle_binlog_get_encoded_len(drizzle_binlog_event_st *binlog_event);
 void set_event_header(drizzle_binlog_event_st* dst,
     drizzle_binlog_event_st* src);
 
-/*#define get_var_arg(arg, last_arg, ...)
-{
-    va_list args;
-    va_start(args, last_arg);
-    auto i = 0;
-    while (i < n && (*arg = va_arg(args, U)) != NULL)
-    {
-        i++;
-    }
-    va_end(*args);
-    return (i == n || arg != NULL);
-}
-
-*//**
+/**
  * Check if a bit is set
  *
  * @param ptr Pointer to start of bitfield
@@ -75,29 +62,6 @@ void set_event_header(drizzle_binlog_event_st* dst,
  */
 //bool bit_is_set(uint8_t *ptr, int columns, int current_column);
 
-
-template <typename T>
-bool __get_var_arg(uint n, T *val, ...) {
-  uint arg_idx = 0;
-  va_list args;
-  va_start(args, val);
-  bool ret_val = false;
-  T arg;
-  while (true) {
-    arg = va_arg(args, T);
-    if (arg == NULL || arg_idx > n)
-    {
-      break;
-    }
-    else if (arg_idx == n) {
-        *val= arg;
-        ret_val = true;
-    }
-    arg_idx++;
-  }
-  va_end(args);
-  return ret_val;
-}
 
 
 /**
@@ -137,4 +101,3 @@ inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src=NULL)
 
   mem_alloc_cpy<T, U>(dst, size_alloc, src, size_alloc);
 }
-
