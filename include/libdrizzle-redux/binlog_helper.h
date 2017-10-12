@@ -34,6 +34,7 @@ bool bit_is_set(const unsigned char *ptr, int current_column);
  *
  * @return     { description_of_the_return_value }
  */
+DRIZZLE_API
 drizzle_column_protocol_datatype_t column_protocol_datatype(drizzle_column_type_t type);
 
 /**
