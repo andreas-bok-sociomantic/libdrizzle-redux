@@ -174,3 +174,12 @@ tests_unit_statement_nulls_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_statement_nulls_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/statement_nulls
 noinst_PROGRAMS+= tests/unit/statement_nulls
+
+tests_unit_binlog_helper_SOURCES= tests/unit/binlog_helper.c
+tests_unit_binlog_helper_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_binlog_helper_SOURCES = dummy.cxx
+check_PROGRAMS+= tests/unit/binlog_helper
+noinst_PROGRAMS+= tests/unit/binlog_helper
+
+check-binlog_helper: tests/unit/binlog_helper
+	tests/unit/binlog_helper
