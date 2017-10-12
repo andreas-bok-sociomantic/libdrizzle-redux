@@ -92,7 +92,7 @@ struct tableid_rows_events_map
      *
      * @return     True if has a mapping exists, False otherwise.
      */
-    bool has_table(uint64_t _table_id)
+    bool has_table(uint64_t _table_id) const
     {
         return mapping.find(_table_id) != mapping.end();
     }
@@ -174,7 +174,7 @@ struct tableid_rows_events_map
     }
 
 
-    size_t row_events_count(uint64_t _table_id)
+    size_t row_events_count(uint64_t _table_id) const
     {
 
         return has_table(_table_id) ?
@@ -208,29 +208,54 @@ struct drizzle_binlog_rbr_st
         map_tablename_tableid;
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
 
+    /**
+     * @brief      Iterator for traversing a vector of rows
+     */
     struct rows_events_iterator
     {
-        bool active;
-        vec_row_events::iterator it;
-        rows_events_iterator() :
-        active(false)
-        {}
 
+        //** flag indicating if the iterator is active   */
+        bool active;
+
+        //** iterate to traverse a vector of rows events */
+        vec_row_events::iterator it;
+
+        /**
+         * @brief      Constructor
+         */
+        rows_events_iterator() : active(false)
+            {}
+
+        /**
+         * @brief      Reset the state of the object
+         */
         void reset()
         {
             active = false;
         }
 
+        /**
+         * @brief      Returns the iterator for the rows events currently being
+         *             iterated
+         *
+         * @return     an iterator
+         */
         vec_row_events::iterator curr()
         {
             return it;
         }
 
+        /**
+         * @brief      Defines post increment on the struct
+         */
         void operator++()
         {
             it++;
         }
 
+        /**
+         * @brief      Defines post decrement on the struct
+         */
         void operator--(int)
         {
             it--;
@@ -277,6 +302,7 @@ struct drizzle_binlog_rbr_st
     //** buffer used for formatting */
     char fmt_buffer[1024];
 
+    //** string used to create the unique schema.table identifier */
     std::string _schema_table;
 
     //** default database as specified with drizzle_create */
@@ -298,7 +324,7 @@ struct drizzle_binlog_rbr_st
      */
     ~drizzle_binlog_rbr_st()
     {
-
+        reset(true);
     }
 
     /**
@@ -308,7 +334,6 @@ struct drizzle_binlog_rbr_st
      * @param[in]  free_rows  bool flag
      */
     void reset(bool free_rows=false);
-
 
     /**
      * Gets a tablemap event.
@@ -385,6 +410,11 @@ struct drizzle_binlog_rbr_st
      */
     void add_table_row_mapping(drizzle_binlog_rows_event_st *event);
 
+    /**
+     * @brief      Adds a mapping between the id and the name of a table
+     *
+     * @param      event  The tablemap event struct
+     */
     void add_tablemap_event(drizzle_binlog_tablemap_event_st *event);
 
     /**
@@ -394,11 +424,9 @@ struct drizzle_binlog_rbr_st
      */
     void add_binlog_event(drizzle_binlog_event_st* binlog_event);
 
-
-
     /**
-     * @brief      Return a schema and table name formatted as
-     *             <schema.table>
+     * @brief      Returns a string of a table name with its schema in the
+     *             format <schema.table>
      *
      * @param[in]  table_name  The table name
      *
@@ -411,6 +439,16 @@ struct drizzle_binlog_rbr_st
         return &fmt_buffer[0];
     }
 
+    /**
+     * @brief      Get the table id by table name
+     *
+     *             Check if unique the `schema.table` identifier exists and
+     *             returns the associated table id otherwise returns 0
+     *
+     * @param[in]  table_name_  The table name
+     *
+     * @return     the table id or 0 the table couldn't be found
+     */
     uint64_t tableid_by_tablename(const char *table_name_)
     {
         _schema_table = schema_table_name(table_name_);
@@ -418,10 +456,3 @@ struct drizzle_binlog_rbr_st
         return it == tablename_tableid.end() ? 0 : it->second;
     }
 };
-
-/*size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
-                                           ...);*/
-
-/*#define __drizzle_binlog_rbr_row_events_count__(...) \
-    drizzle_binlog_rbr_row_events_count_(binlog_rbr, ##__VA_ARGS__, NULL)
-*/

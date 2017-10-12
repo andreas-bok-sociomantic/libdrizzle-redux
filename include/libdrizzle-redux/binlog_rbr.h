@@ -46,12 +46,13 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
 
 
 /**
- * @brief      Get the prev row event
+ * @brief      Get the previous row event
  *
  * @param      binlog_rbr  a binlog rbr structure
  * @param      ret_ptr     Standard drizzle return value
+ * @param[in]  <unnamed>   table name optional.
  *
- * @return     Pointer ti a row event struct, or NULL if there are no more rows
+ * @return     Pointer to a row event struct, or NULL if there are no more rows
  *             events
  */
 DRIZZLE_API
@@ -122,7 +123,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
  *
  * @param      binlog_rbr  binlog rbr struct
  * @param[in]  pos         The position to seek
- * @param[in]  <unnamed>   Optional table name can be parsed
+ * @param[in]  <unnamed>   Optional table name
  *
  * @return     { description_of_the_return_value }
  */
@@ -137,7 +138,7 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binl
  * @brief      Change the database schema used selecting binlog data
  *
  *             Tables are identified uniquely as <schema_name.table_name>.
- *             If tables with identical names exist in multiple schemas it
+ *             If tables with identical names exist in multiple schemas
  *
  * @todo Add more docs about why it is needed and when
  *

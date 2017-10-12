@@ -7,7 +7,7 @@ drizzle_binlog_event_st* drizzle_binlog_xid_event_header(
     return &event->header;
 }
 
-uint64_t drizzle_binlog_xid_event_xid(drizzle_binlog_xid_event_st* event)
+uint64_t drizzle_binlog_xid_event_xid(const drizzle_binlog_xid_event_st* event)
 {
     return event->xid;
 }

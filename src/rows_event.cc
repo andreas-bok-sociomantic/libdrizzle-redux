@@ -54,6 +54,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
 
     rows_event->bitmap_size = (rows_event->column_count + 7)/8;
 
+    // update the mapping between table id and table row
     event->binlog_rbr->add_table_row_mapping(rows_event);
     return rows_event;
 }
