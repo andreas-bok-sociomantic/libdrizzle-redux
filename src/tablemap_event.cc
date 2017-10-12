@@ -41,10 +41,13 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
 
     tablemap_event->column_count = drizzle_binlog_get_encoded_len(event);
 
-    tablemap_event->column_type_def =
+    /*tablemap_event->column_type_def =
         (drizzle_column_type_t*) malloc(tablemap_event->column_count);
     memcpy(tablemap_event->column_type_def, event->data_ptr,
         tablemap_event->column_count);
+    */
+    mem_alloc_cpy(&tablemap_event->column_type_def,
+        tablemap_event->column_count, &event->data_ptr);
     event->data_ptr+=tablemap_event->column_count;
 
     len_enc = drizzle_binlog_get_encoded_len(event);
@@ -61,9 +64,8 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
     /*tablemap_event->null_bitmap = (uint8_t*)malloc(len_enc);
     memcpy(tablemap_event->null_bitmap, event->data_ptr, len_enc);*/
     mem_alloc_cpy<uint8_t*>(&tablemap_event->null_bitmap, len_enc,
-        &event->data_ptr, len_enc);
+        &event->data_ptr);
     event->data_ptr+=len_enc;
-
     event->binlog_rbr->add_tablemap_event(tablemap_event);
 
     return tablemap_event;
