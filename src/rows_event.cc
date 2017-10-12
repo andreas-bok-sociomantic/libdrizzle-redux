@@ -33,10 +33,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
 
     //rows_event->field_metadata = (uint8_t*) malloc(table_map_event->field_metadata_len);
     mem_alloc_cpy<uint8_t*>(&rows_event->field_metadata,
-        table_map_event->field_metadata_len,
-        &event->data_ptr,
-        table_map_event->field_metadata_len);
-    //memcpy(rows_event->field_metadata, event->data_ptr, table_map_event->field_metadata_len);
+        table_map_event->field_metadata_len, &event->data_ptr);
     event->data_ptr += table_map_event->field_metadata_len;
 
     strcpy(rows_event->table_name, table_map_event->table_name);
