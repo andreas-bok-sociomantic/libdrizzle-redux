@@ -134,6 +134,8 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
     // clear the mapping between tables and rows events
     tableid_rows_events.reset();
 
+    tablename_tableid.clear();
+
     rows_event_it.it = rows_events.end();
     row_events_count_ = 0;
     current_tablemap_id = 0;
