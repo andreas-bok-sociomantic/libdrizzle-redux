@@ -65,10 +65,10 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     memcpy(&columns_present, event->data_ptr, rows_event->bitmap_size);
     event->data_ptr += rows_event->bitmap_size;
 
-    while ( drizzle_binlog_event_available_bytes(event) >= DRIZZLE_BINLOG_CRC32_LEN )
+/*    while ( drizzle_binlog_event_available_bytes(event) >= DRIZZLE_BINLOG_CRC32_LEN )
     {
         drizzle_binlog_parse_row(rows_event, event->data_ptr, columns_present);
-    }
+    }*/
 
     event->binlog_rbr->add_table_row_mapping(rows_event);
     return rows_event;
