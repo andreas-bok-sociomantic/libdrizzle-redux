@@ -61,7 +61,6 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     drizzle_binlog_rows_event_st *rows_event;
     size_t rows_count;
     drizzle_binlog_tablemap_event_st * tablemap_event;
-    drizzle_return_t ret_val;
 
     char actual_str[1024];
     uint64_t expected_number;
@@ -96,7 +95,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     printf("table: name=%s, id=%ld, row_count=%ld\n", actual_str, expected_number, rows_count);
 
     // Get the rows event in the binlog event group
-    while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, &ret_val, table) ) != NULL )
+    while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, table) ) != NULL )
     {
         rows_count = drizzle_binlog_rbr_row_events_count(rbr, table);
         ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %ld",
@@ -121,8 +120,6 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     }
 
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, table);
-
-
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_END, table);
 
 
@@ -168,7 +165,6 @@ int main(int argc, char *argv[])
                drizzle_error(con), drizzle_strerror(ret));
 
     free(binlog_file);
-
     CHECKED_QUERY("DROP TABLE test_binlog_rbr.binlog_rbr_tbl");
 
     tear_down_schema("test_binlog_rbr");

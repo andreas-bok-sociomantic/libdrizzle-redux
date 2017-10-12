@@ -33,23 +33,21 @@ uint64_t drizzle_binlog_rbr_xid(const drizzle_binlog_rbr_st *binlog_rbr);
  * Read a row event from a binlog event group
  *
  * @param      binlog_rbr  A binlog rbr structure
- * @param      ret_ptr     Standard drizzle return value
+ * @param[in]  <unnamed>   Optional table name
  *
  * @return     a row event struct, or NULL if there are no more rows events
  */
 DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
-    ...);
+    drizzle_binlog_rbr_st *binlog_rbr, ...);
 #define drizzle_binlog_rbr_rows_event_next(binlog_rbr, ret_ptr, ...) \
-    drizzle_binlog_rbr_rows_event_next_(binlog_rbr, ret_ptr, ##__VA_ARGS__, NULL)
+    drizzle_binlog_rbr_rows_event_next_(binlog_rbr, ##__VA_ARGS__, NULL)
 
 
 /**
  * @brief      Get the previous row event
  *
  * @param      binlog_rbr  a binlog rbr structure
- * @param      ret_ptr     Standard drizzle return value
  * @param[in]  <unnamed>   table name optional.
  *
  * @return     Pointer to a row event struct, or NULL if there are no more rows
@@ -57,12 +55,20 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
  */
 DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev_(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr,
-    ...);
+    drizzle_binlog_rbr_st *binlog_rbr, ...);
 #define drizzle_binlog_rbr_rows_event_prev(binlog_rbr, ret_ptr, ...) \
-    drizzle_binlog_rbr_rows_event_prev_(binlog_rbr, ret_ptr, ##__VA_ARGS__, NULL)
+    drizzle_binlog_rbr_rows_event_prev_(binlog_rbr, ##__VA_ARGS__, NULL)
 
 
+/**
+ * @brief      Get a rows event by index
+ *
+ * @param      binlog_rbr     The binlog rbr struct
+ * @param[in]  row_event_idx  The row event index
+ *
+ * @return     Pointer to a row event struct, or NULL if there are no more rows
+ *             events
+ */
 DRIZZLE_API
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
     drizzle_binlog_rbr_st *binlog_rbr, uint64_t row_event_idx);

@@ -20,14 +20,23 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
 
     // Get the associated tablemap
     auto table_map_event = event->binlog_rbr->get_tablemap_event(rows_event->table_id);
-
-    rows_event->column_type_def = (drizzle_column_type_t*)
-        malloc(table_map_event->column_count + 1);
-    memcpy(rows_event->column_type_def, event->data_ptr, table_map_event->column_count);
+    mem_alloc_cpy(&rows_event->column_type_def,
+        table_map_event->column_count + 1,
+        &event->data_ptr,
+        table_map_event->column_count);
+/*
+    rows_event->column_type_def = rows_event->column_type_def == NULL ?
+        (drizzle_column_type_t*) malloc(table_map_event->column_count + 1) :
+        (drizzle_column_type_t*) realloc(rows_event->column_type_def, table_map_event->column_count + 1);*/
+    //memcpy(rows_event->column_type_def, event->data_ptr, table_map_event->column_count);
     event->data_ptr+=table_map_event->column_count;
 
-    rows_event->field_metadata = (uint8_t*) malloc(table_map_event->field_metadata_len);
-    memcpy(rows_event->field_metadata, event->data_ptr, table_map_event->field_metadata_len);
+    //rows_event->field_metadata = (uint8_t*) malloc(table_map_event->field_metadata_len);
+    mem_alloc_cpy<uint8_t*>(&rows_event->field_metadata,
+        table_map_event->field_metadata_len,
+        &event->data_ptr,
+        table_map_event->field_metadata_len);
+    //memcpy(rows_event->field_metadata, event->data_ptr, table_map_event->field_metadata_len);
     event->data_ptr += table_map_event->field_metadata_len;
 
     strcpy(rows_event->table_name, table_map_event->table_name);

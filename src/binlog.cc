@@ -152,6 +152,8 @@ drizzle_binlog_st *drizzle_binlog_rbr_init(drizzle_st *con,
 
 void drizzle_binlog_free(drizzle_binlog_st *binlog)
 {
+  //drizzle_binlog_rbr_free(binlog->binlog_rbr);
+  delete binlog->binlog_rbr;
   delete binlog;
 }
 

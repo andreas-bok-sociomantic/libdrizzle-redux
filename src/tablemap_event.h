@@ -150,6 +150,16 @@ struct drizzle_binlog_tablemap_event_st
         field_metadata(NULL),
         field_metadata_len(0),
         null_bitmap(NULL) {}
+
+    ~drizzle_binlog_tablemap_event_st()
+    {
+        if(column_type_def!=NULL)
+            free(column_type_def);
+        if (field_metadata!=NULL)
+            free(field_metadata);
+        if (null_bitmap!=NULL)
+            free(null_bitmap);
+    }
 };
 
 

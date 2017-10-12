@@ -458,7 +458,13 @@ struct drizzle_binlog_st
     con(NULL),
     binlog_rbr(NULL)
   { }
+
+  ~drizzle_binlog_st()
+  {
+    printf("drizzle_binlog_st destructor\n");
+  }
 };
+
 
 /**
  * @ingroup drizzle_column

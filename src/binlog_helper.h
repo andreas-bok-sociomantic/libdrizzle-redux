@@ -107,3 +107,23 @@ bool __get_var_arg(uint n, T *val, ...) {
 
 #define var_arg_char(...) \
     __get_var_arg<char*>(__VA_ARGS__, NULL)
+
+template<typename T, typename U = unsigned char *>
+inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src=NULL, size_t size_copy=0)
+{
+  *dst = dst == NULL ? (T) malloc(size_alloc) : (T) realloc(*dst, size_alloc);
+  if (src != NULL)
+  {
+    memcpy(*dst, *src, size_copy);
+  }
+}
+/*
+inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src=NULL, size_t size_copy=0)
+{
+  *dst = dst == NULL ? (T) malloc(size_alloc) : (T) realloc(*dst, size_alloc);
+  if (src != NULL)
+  {
+    memcpy(*dst, *src, size_copy);
+  }
+}
+*/

@@ -324,7 +324,16 @@ struct drizzle_binlog_rbr_st
      */
     ~drizzle_binlog_rbr_st()
     {
-        reset(true);
+        for (auto kv : tablemap_events)
+        {
+            delete kv.second;
+        }
+
+        for (auto v : rows_events)
+        {
+            delete v;
+        }
+        printf("called drizzle_binlog_rbr_st destructor\n");
     }
 
     /**
