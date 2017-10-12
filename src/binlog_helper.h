@@ -1,28 +1,6 @@
 #pragma once
 
 #include <cstdarg>
-enum protocol_datatype_t
-{
-    NOT_FOUND,
-    BLOB,
-    VARIABLE_STRING,
-    BIT,
-    TEMPORAL,
-    FIXED_STRING,
-    DECIMAL,
-    ENUM,
-    NUMERICAL
-};
-
-/**
- * @brief      Get the version of the RBR replication Rows Event
- *
- * @param[in]  column_type  a column type
- *
- * @return     Return either 1 or 2 or 0 if column type wasn't found
- */
-uint8_t drizzle_binlog_rows_event_version(
-    drizzle_binlog_event_types_t column_type);
 
 /**
  * @brief      Get the distance between two pointers in a char array
@@ -66,18 +44,6 @@ void set_event_header(drizzle_binlog_event_st* dst,
     drizzle_binlog_event_st* src);
 
 /**
- * Check if a bit is set
- *
- * @param ptr Pointer to start of bitfield
- * @param columns Number of columns (bits)
- * @param current_column Zero indexed column number
- * @return True if the bit is set
- */
-bool bit_is_set(const unsigned char *ptr, int current_column);
-
-
-
-/**
  * @brief      Allocate memory and copy from a source to a destination pointer
  *
  * @param      dst         The destination pointer
@@ -116,8 +82,6 @@ inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src=NULL)
 }
 bool fixed_string_is_enum(drizzle_column_type_t type);
 bool column_is_fixed_string(drizzle_column_type_t type);
-
-protocol_datatype_t column_protocol_datatype(drizzle_column_type_t type);
 
 
 uint get_metadata_len(drizzle_column_type_t column_type);

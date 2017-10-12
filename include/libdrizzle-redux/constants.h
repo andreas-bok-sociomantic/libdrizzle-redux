@@ -276,6 +276,10 @@ enum drizzle_column_flags_t
   DRIZZLE_COLUMN_FLAGS_RENAMED=          (1 << 21)
 };
 
+#ifndef __cplusplus
+typedef enum drizzle_column_flags_t drizzle_column_flags_t;
+#endif
+
 typedef enum
 {
   DRIZZLE_SSL_STATE_NONE= 0,
@@ -359,6 +363,27 @@ typedef enum
   DRIZZLE_EVENT_TYPE_PREVIOUS_GTIDS= 35,
   DRIZZLE_EVENT_TYPE_END
 } drizzle_binlog_event_types_t;
+
+
+/**
+ * @brief      column protocol datatype
+ */
+enum drizzle_column_protocol_datatype_t
+{
+    NOT_FOUND,
+    BLOB,
+    VARIABLE_STRING,
+    BIT,
+    TEMPORAL,
+    FIXED_STRING,
+    DECIMAL,
+    ENUM,
+    NUMERICAL
+};
+
+#ifndef __cplusplus
+typedef enum drizzle_column_protocol_datatype_t drizzle_column_protocol_datatype_t;
+#endif
 
 typedef enum
 {
@@ -584,10 +609,6 @@ typedef enum
   DRIZZLE_STMT_EXECUTED,
   DRIZZLE_STMT_FETCHED
 } drizzle_stmt_state_t;
-
-#ifndef __cplusplus
-typedef enum drizzle_column_flags_t drizzle_column_flags_t;
-#endif
 
 
 typedef enum

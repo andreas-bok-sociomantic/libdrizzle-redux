@@ -201,7 +201,7 @@ size_t unpack_enum(uint8_t *ptr, uint8_t *metadata, uint8_t *dest)
 }
 
 
-protocol_datatype_t column_protocol_datatype(drizzle_column_type_t type)
+drizzle_column_protocol_datatype_t column_protocol_datatype(drizzle_column_type_t type)
 {
     switch ( type )
     {
