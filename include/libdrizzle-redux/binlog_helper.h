@@ -12,7 +12,7 @@ extern "C" {
  * @return     true if it is a rows event, false otherwise
  */
 DRIZZLE_API
-bool drizzle_binlog_is_rows_event(drizzle_binlog_event_types_t event_type);
+bool drizzle_binlog_is_rows_event(const drizzle_binlog_event_types_t event_type);
 
 
 #ifdef __cplusplus
