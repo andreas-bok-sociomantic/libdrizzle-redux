@@ -99,14 +99,6 @@ bool __get_var_arg(uint n, T *val, ...) {
   return ret_val;
 }
 
-#define var_arg_const_char(...) \
-    __get_var_arg<const char*>(__VA_ARGS__, NULL)
-
-#define var_arg_uint(...) \
-    __get_var_arg<uint32_t>(__VA_ARGS__, NULL)
-
-#define var_arg_char(...) \
-    __get_var_arg<char*>(__VA_ARGS__, NULL)
 
 /**
  * @brief      Allocate memory and copy from a source to a destination pointer

@@ -65,12 +65,12 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     char actual_str[1024];
     uint64_t expected_number;
     const char *schema="test_binlog_rbr";
-    const char* table = "binlog_rbr_tbl";
+    const char *table = "binlog_rbr_tbl";
 
     // xid
     printf("Binlog RBR xid: %ld\n", drizzle_binlog_rbr_xid(rbr));
 
-    // number of row events in binlog group
+    // get the tablemap for `binlog_rbr_tbl`
     tablemap_event = drizzle_binlog_rbr_tablemap_by_tablename(rbr, table);
 
     if (tablemap_event == NULL )
@@ -90,9 +90,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     ASSERT_EQ_(column_count, 8, "Wrong number of column in table %s, expected 8 got %d",
                table, column_count);
 
-    rows_count = drizzle_binlog_rbr_row_events_count(rbr, table);
     expected_number = drizzle_binlog_tablemap_event_table_id(tablemap_event);
-    printf("table: name=%s, id=%ld, row_count=%ld\n", actual_str, expected_number, rows_count);
 
     // Get the rows event in the binlog event group
     while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, table) ) != NULL )
