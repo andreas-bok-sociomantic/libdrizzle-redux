@@ -49,14 +49,19 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
 
     len_enc = drizzle_binlog_get_encoded_len(event);
     tablemap_event->field_metadata_len = len_enc + 1;
-    tablemap_event->field_metadata =
+    mem_alloc_cpy<uint8_t*>(&tablemap_event->field_metadata,
+        tablemap_event->field_metadata_len,
+        &event->data_ptr, len_enc);
+    /*tablemap_event->field_metadata =
         (uint8_t*) malloc(tablemap_event->field_metadata_len);
-    memcpy(tablemap_event->field_metadata, event->data_ptr, len_enc);
+    memcpy(tablemap_event->field_metadata, event->data_ptr, len_enc);*/
     event->data_ptr+=len_enc;
 
     len_enc = (uint32_t) (tablemap_event->column_count + 7) / 8;
-    tablemap_event->null_bitmap = (uint8_t*)malloc(len_enc);
-    memcpy(tablemap_event->null_bitmap, event->data_ptr, len_enc);
+    /*tablemap_event->null_bitmap = (uint8_t*)malloc(len_enc);
+    memcpy(tablemap_event->null_bitmap, event->data_ptr, len_enc);*/
+    mem_alloc_cpy<uint8_t*>(&tablemap_event->null_bitmap, len_enc,
+        &event->data_ptr, len_enc);
     event->data_ptr+=len_enc;
 
     event->binlog_rbr->add_tablemap_event(tablemap_event);

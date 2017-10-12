@@ -183,13 +183,13 @@ uint64_t drizzle_binlog_rbr_xid(const drizzle_binlog_rbr_st *binlog_rbr)
 
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
+    drizzle_binlog_rbr_st *binlog_rbr, ...)
 {
     drizzle_binlog_rows_event_st *rows_event = NULL;
     const char *table_name = NULL;
 
     va_list args;
-    va_start(args, ret_ptr);
+    va_start(args, binlog_rbr);
     table_name = va_arg(args, const char *);
     va_end(args);
 
@@ -197,11 +197,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     if (table_name != NULL)
     {
         auto schema_table = binlog_rbr->tableid_by_tablename(table_name);
-        rows_event =
-            binlog_rbr->tableid_rows_events.next_row_event(schema_table);
-        *ret_ptr = rows_event ==
-            NULL ? DRIZZLE_RETURN_ROW_END : DRIZZLE_RETURN_OK;
-        return rows_event;
+        return binlog_rbr->tableid_rows_events.next_row_event(schema_table);
     }
 
     if (!binlog_rbr->rows_event_it.active)
@@ -211,31 +207,26 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     }
     else if (binlog_rbr->rows_event_it.it == binlog_rbr->rows_events.end())
     {
-        *ret_ptr = DRIZZLE_RETURN_ROW_END;
         return NULL;
     }
 
     rows_event = *binlog_rbr->rows_event_it.it;
     binlog_rbr->rows_event_it.it++;
-    *ret_ptr = DRIZZLE_RETURN_OK;
     return rows_event;
 } // drizzle_binlog_rbr_rows_event_next
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_prev_(
-    drizzle_binlog_rbr_st *binlog_rbr, drizzle_return_t *ret_ptr, ...)
+    drizzle_binlog_rbr_st *binlog_rbr, ...)
 {
     if (prev(binlog_rbr->rows_event_it.it) <=
         binlog_rbr->rows_events.begin() - 1)
     {
         binlog_rbr->rows_event_it.it = binlog_rbr->rows_events.begin() - 1;
-        *ret_ptr = DRIZZLE_RETURN_ROW_REND;
         return NULL;
     }
 
     binlog_rbr->rows_event_it.it--;
-    drizzle_binlog_rows_event_st *rows_event = *binlog_rbr->rows_event_it.it;
-    *ret_ptr = DRIZZLE_RETURN_OK;
-    return rows_event;
+    return *binlog_rbr->rows_event_it.it;
 }
 
 drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_index(
