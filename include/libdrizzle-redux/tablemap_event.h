@@ -60,10 +60,10 @@ uint64_t drizzle_binlog_tablemap_event_column_count(
  *
  * @return     an array of column types
  */
-DRIZZLE_API
+/*DRIZZLE_API
 drizzle_column_type_t* drizzle_binlog_tablemap_event_column_type_def(
 	drizzle_binlog_tablemap_event_st* event);
-
+*/
 
 /**
  * Get the columntype by index
