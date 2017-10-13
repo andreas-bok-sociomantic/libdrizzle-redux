@@ -20,27 +20,22 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
 
     // Get the associated tablemap
     auto table_map_event = event->binlog_rbr->get_tablemap_event(rows_event->table_id);
-    mem_alloc_cpy(&rows_event->column_type_def,
-        table_map_event->column_count + 1,
-        &event->data_ptr,
-        table_map_event->column_count);
-/*
-    rows_event->column_type_def = rows_event->column_type_def == NULL ?
-        (drizzle_column_type_t*) malloc(table_map_event->column_count + 1) :
-        (drizzle_column_type_t*) realloc(rows_event->column_type_def, table_map_event->column_count + 1);*/
-    //memcpy(rows_event->column_type_def, event->data_ptr, table_map_event->column_count);
-    event->data_ptr+=table_map_event->column_count;
 
-    //rows_event->field_metadata = (uint8_t*) malloc(table_map_event->field_metadata_len);
+    // copy column types
+    mem_alloc_cpy<uint8_t*>(&rows_event->column_type_def,
+        table_map_event->column_count,
+        &table_map_event->column_type_def);
+
+    // copy field metadata
     mem_alloc_cpy<uint8_t*>(&rows_event->field_metadata,
-        table_map_event->field_metadata_len, &event->data_ptr);
-    event->data_ptr += table_map_event->field_metadata_len;
+        table_map_event->field_metadata_len, &table_map_event->field_metadata);
 
+    // copy table name
     strcpy(rows_event->table_name, table_map_event->table_name);
 
+    // replication flags
     uint16_t flags = drizzle_get_byte2(event->data_ptr);
     event->data_ptr+=2;
-
     if ( rows_event->table_id == 0x00ffffff && flags == (1 << 0))
     {
         return NULL;
@@ -49,10 +44,9 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     if (drizzle_binlog_rows_event_version(event->type) == 2)
     {
         auto len = drizzle_get_byte2(event->data_ptr);
-        if ( len > 2 )
-        {
-            event->data_ptr+=2;
-        }
+        event->data_ptr+=2;
+        if (len >2)
+        event->data_ptr += len-2;
     }
 
     // column_count
@@ -65,10 +59,11 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     memcpy(&columns_present, event->data_ptr, rows_event->bitmap_size);
     event->data_ptr += rows_event->bitmap_size;
 
-/*    while ( drizzle_binlog_event_available_bytes(event) >= DRIZZLE_BINLOG_CRC32_LEN )
+    while ( drizzle_binlog_event_available_bytes(event) >= DRIZZLE_BINLOG_CRC32_LEN )
     {
         drizzle_binlog_parse_row(rows_event, event->data_ptr, columns_present);
-    }*/
+        event->data_ptr += drizzle_binlog_event_available_bytes(event);
+    }
 
     event->binlog_rbr->add_table_row_mapping(rows_event);
     return rows_event;
@@ -109,13 +104,14 @@ drizzle_return_t drizzle_binlog_parse_row(
             continue;
         }
 
-        auto column_type = event->column_type_def[i];
+        auto column_type = (drizzle_column_type_t) event->column_type_def[i];
+        printf("drizzle_binlog_parse_row: %s \n", drizzle_column_type_str(column_type));
 
         // parse the column value
         if (bit_is_set(null_bitmap, idx_null_bitmap++))
         {
             // set null value
-            printf("hello\n");
+            printf("NULL VALUE\n");
 
         }
         else if (column_protocol_datatype(column_type) == FIXED_STRING)
