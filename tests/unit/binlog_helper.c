@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
     sizeof(event_types));
 
     // 4 byte array where a bit encodes whether an event type is a rows event
+    // The variable `ptr` points to the second byte.
     //          |               |
     // 00101011 11010100 00110000 01001001
     unsigned char bytes[] = { 0x2B, 0xD4, 0x30, 0x49 };
@@ -81,7 +82,6 @@ int main(int argc, char *argv[])
             "Expected %d %s to be a rows event type",
             i, drizzle_binlog_event_type_str(event_types[i]));
     }
-    //printf("%d", ptr[0]);
 
     return EXIT_SUCCESS;
 }

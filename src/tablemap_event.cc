@@ -41,17 +41,18 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_parse_tablemap_event(
 
     tablemap_event->column_count = drizzle_binlog_get_encoded_len(event);
 
-    /*tablemap_event->column_type_def =
+/*    tablemap_event->column_type_def =
         (drizzle_column_type_t*) malloc(tablemap_event->column_count);
     memcpy(tablemap_event->column_type_def, event->data_ptr,
         tablemap_event->column_count);
-    */
-    mem_alloc_cpy(&tablemap_event->column_type_def,
+*/
+
+    mem_alloc_cpy<uint8_t*>(&tablemap_event->column_type_def,
         tablemap_event->column_count, &event->data_ptr);
     event->data_ptr+=tablemap_event->column_count;
 
     len_enc = drizzle_binlog_get_encoded_len(event);
-    tablemap_event->field_metadata_len = len_enc + 1;
+    tablemap_event->field_metadata_len = len_enc;
     mem_alloc_cpy<uint8_t*>(&tablemap_event->field_metadata,
         tablemap_event->field_metadata_len,
         &event->data_ptr, len_enc);
@@ -97,11 +98,11 @@ uint64_t drizzle_binlog_tablemap_event_column_count(
     return event->column_count;
 }
 
-drizzle_column_type_t *drizzle_binlog_tablemap_event_column_type_def(
+/*drizzle_column_type_t *drizzle_binlog_tablemap_event_column_type_def(
 	drizzle_binlog_tablemap_event_st* event)
 {
     return event->column_type_def;
-}
+}*/
 
 drizzle_column_type_t drizzle_binlog_tablemap_event_column_type(
     drizzle_binlog_tablemap_event_st* event, uint32_t column_index,
@@ -113,7 +114,7 @@ drizzle_column_type_t drizzle_binlog_tablemap_event_column_type(
         return DRIZZLE_COLUMN_TYPE_NONE;
     }
 
-    return event->column_type_def[column_index];
+    return (drizzle_column_type_t) event->column_type_def[column_index];
 }
 
 uint8_t *drizzle_binlog_tablemap_event_field_metadata(
