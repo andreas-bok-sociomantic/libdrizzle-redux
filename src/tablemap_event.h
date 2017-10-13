@@ -112,7 +112,7 @@ struct drizzle_binlog_tablemap_event_st
      * An array of column types, one byte per column. To find the meanings of
      * these values, look at enum_field_types in the mysql_com.h header file.
      */
-    drizzle_column_type_t *column_type_def;
+    uint8_t *column_type_def;
 
     /**
      * The metadata block; see log_event.h for contents and format.
