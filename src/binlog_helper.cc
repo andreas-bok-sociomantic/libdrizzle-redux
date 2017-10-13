@@ -136,12 +136,13 @@ bool drizzle_binlog_is_rows_event(const drizzle_binlog_event_types_t event_type)
 
 
 /**
- * @brief Check if a bit is set
+ * @brief      Check if a bit is set
  *
- * @param ptr Pointer to start of bitfield
- * @param columns Number of columns (bits)
- * @param current_column Zero indexed column number
- * @return True if the bit is set
+ * @param      ptr             Pointer to start of bitfield
+ * @param      current_column  Zero indexed column number
+ * @param      columns  Number of columns (bits)
+ *
+ * @return     True if the bit is set
  */
 bool bit_is_set(const unsigned char *ptr, int current_column)
 {
@@ -156,8 +157,10 @@ bool bit_is_set(const unsigned char *ptr, int current_column)
 
 /**
  * Check if a column is an ENUM or SET
- * @param type Column type
- * @return True if column is either ENUM or SET
+ *
+ * @param      type  Column type
+ *
+ * @return     True if column is either ENUM or SET
  */
 bool fixed_string_is_enum(drizzle_column_type_t type)
 {
@@ -165,11 +168,12 @@ bool fixed_string_is_enum(drizzle_column_type_t type)
 }
 
 /**
- * @brief Check if the column is a string type column
+ * @brief      Check if the column is a string type column
  *
- * @param type Type of the column
- * @return True if the column is a string type column
- * @see mxs_lestr_consume
+ * @param      type  Type of the column
+ *
+ * @return     True if the column is a string type column
+ * @see        mxs_lestr_consume
  */
 bool column_is_fixed_string(drizzle_column_type_t type)
 {
@@ -178,10 +182,13 @@ bool column_is_fixed_string(drizzle_column_type_t type)
 
 
 /**
- * @brief Unpack an ENUM or SET field
- * @param ptr Pointer to packed value
- * @param metadata Pointer to field metadata
- * @return Length of the processed field in bytes
+ * @brief      Unpack an ENUM or SET field
+ *
+ * @param      ptr       Pointer to packed value
+ * @param      metadata  Pointer to field metadata
+ * @param      dest      The destination
+ *
+ * @return     Length of the processed field in bytes
  */
 size_t unpack_enum(uint8_t *ptr, uint8_t *metadata, uint8_t *dest)
 {
