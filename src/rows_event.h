@@ -169,7 +169,7 @@ struct drizzle_binlog_rows_event_st
     /**
      * Array defining the type for each column present in the result
      */
-    drizzle_column_type_t *column_type_def;
+    uint8_t *column_type_def;
 
     /**
      * Array of type-specific metadata for each column
