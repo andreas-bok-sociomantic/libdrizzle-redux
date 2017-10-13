@@ -36,6 +36,7 @@
 
 #include <libdrizzle-redux/libdrizzle.h>
 #include <yatl/lite.h>
+#include <inttypes.h>
 #include "tests/unit/common.h"
 
 drizzle_result_st *result;
@@ -68,7 +69,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     const char *table = "binlog_rbr_tbl";
 
     // xid
-    printf("Binlog RBR xid: %ld\n", drizzle_binlog_rbr_xid(rbr));
+    printf("Binlog RBR xid: %" PRIu64 "\n", drizzle_binlog_rbr_xid(rbr));
 
     // get the tablemap for `binlog_rbr_tbl`
     tablemap_event = drizzle_binlog_rbr_tablemap_by_tablename(rbr, table);
@@ -96,7 +97,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, table) ) != NULL )
     {
         rows_count = drizzle_binlog_rbr_row_events_count(rbr, table);
-        ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %ld",
+        ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %" PRIu64,
         rows_count);
 
         // get id of the row event's associated tablemap event
@@ -107,7 +108,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
         tablemap_event =
             drizzle_binlog_rbr_rows_event_tablemap(rbr, rows_event);
 
-        printf("rbr_callback for table %s with id %ld\n",
+        printf("rbr_callback for table %s with id %" PRIu64 "\n",
             drizzle_binlog_tablemap_event_table_name(tablemap_event), table_id);
     }
 

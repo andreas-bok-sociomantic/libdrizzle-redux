@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     (void) argc;
     (void) argv;
 
-    drizzle_binlog_event_types_t event_types[11];
+    drizzle_binlog_event_types_t event_types[14];
     memcpy(
         event_types,
         (drizzle_binlog_event_types_t[])
@@ -51,16 +51,22 @@ int main(int argc, char *argv[])
             DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION,
             DRIZZLE_EVENT_TYPE_ROWS_QUERY,
             DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS,
+            DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS,
             DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS,
+            DRIZZLE_EVENT_TYPE_XID,
             DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS,
             DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS,
-            DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS,
-            DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS,
+            DRIZZLE_EVENT_TYPE_QUERY,
             DRIZZLE_EVENT_TYPE_OBSOLETE_WRITE_ROWS,
-            DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS,
-            DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS
+            DRIZZLE_EVENT_TYPE_TABLE_MAP,
+            DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS,
+            DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS,
+            DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS
         },
-        sizeof(event_types));
+    sizeof(event_types));
+
+    00110111100000
+
     bool expected[11];
     memset(expected, true, 11);
     expected[0] = false;
