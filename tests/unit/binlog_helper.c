@@ -65,22 +65,23 @@ int main(int argc, char *argv[])
         },
     sizeof(event_types));
 
-    00110111100000
+    // 4 byte array where a bit encodes whether an event type is a rows event
+    //          |               |
+    // 00101011 11010100 00110000 01001001
+    unsigned char bytes[] = { 0x2B, 0xD4, 0x30, 0x49 };
+    unsigned char *ptr = &bytes[1];
 
-    bool expected[11];
-    memset(expected, true, 11);
-    expected[0] = false;
-    expected[1] = false;
-    expected[8] = false;
-    expected[9] = false;
-    expected[10] = false;
-
-    for (uint i = 0; i < 11; i++)
+    // iterate the array of event types of validate the API functions:
+    //   - drizzle_binlog_is_rows_event
+    //   - bit_is_set
+    for (uint i = 0; i < 14; i++)
     {
         ASSERT_EQ_(drizzle_binlog_is_rows_event(event_types[i]),
-            expected[i], "Expected %d %s to be a rows event type",
+            bit_is_set(ptr, i),
+            "Expected %d %s to be a rows event type",
             i, drizzle_binlog_event_type_str(event_types[i]));
     }
+    //printf("%d", ptr[0]);
 
     return EXIT_SUCCESS;
 }
