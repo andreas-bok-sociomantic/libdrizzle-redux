@@ -124,17 +124,6 @@ void set_event_header(drizzle_binlog_event_st* dst,
 }
 
 
-// bool bit_is_set(uint8_t *ptr, int columns, int current_column)
-// {
-//     if (current_column >= 8)
-//     {
-//         ptr += current_column / 8;
-//         current_column = current_column % 8;
-//     }
-
-//     return ((*ptr) & (1 << current_column));
-// }
-
 bool drizzle_binlog_is_rows_event(const drizzle_binlog_event_types_t event_type)
 {
     return (event_type == DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS ||
