@@ -37,33 +37,50 @@
 #include <libdrizzle-redux/libdrizzle.h>
 #include <yatl/lite.h>
 
+static const drizzle_binlog_event_types_t event_types[] =
+{
+    DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION,
+    DRIZZLE_EVENT_TYPE_ROWS_QUERY,
+    DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS,
+    DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS,
+    DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS,
+    DRIZZLE_EVENT_TYPE_XID,
+    DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS,
+    DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS,
+    DRIZZLE_EVENT_TYPE_QUERY,
+    DRIZZLE_EVENT_TYPE_OBSOLETE_WRITE_ROWS,
+    DRIZZLE_EVENT_TYPE_TABLE_MAP,
+    DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS,
+    DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS,
+    DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS
+};
 
 int main(int argc, char *argv[])
 {
     (void) argc;
     (void) argv;
 
-    drizzle_binlog_event_types_t event_types[14];
-    memcpy(
-        event_types,
-        (drizzle_binlog_event_types_t[])
-        {
-            DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION,
-            DRIZZLE_EVENT_TYPE_ROWS_QUERY,
-            DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS,
-            DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS,
-            DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS,
-            DRIZZLE_EVENT_TYPE_XID,
-            DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS,
-            DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS,
-            DRIZZLE_EVENT_TYPE_QUERY,
-            DRIZZLE_EVENT_TYPE_OBSOLETE_WRITE_ROWS,
-            DRIZZLE_EVENT_TYPE_TABLE_MAP,
-            DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS,
-            DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS,
-            DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS
-        },
-    sizeof(event_types));
+    // drizzle_binlog_event_types_t event_types[14];
+    // memcpy(
+    //     event_types,
+    //     (drizzle_binlog_event_types_t[])
+    //     {
+    //         DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION,
+    //         DRIZZLE_EVENT_TYPE_ROWS_QUERY,
+    //         DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_XID,
+    //         DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_QUERY,
+    //         DRIZZLE_EVENT_TYPE_OBSOLETE_WRITE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_TABLE_MAP,
+    //         DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS,
+    //         DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS
+    //     },
+    // sizeof(event_types));
 
     // 4 byte array where a bit encodes whether an event type is a rows event
     // The variable `ptr` points to the second byte.
