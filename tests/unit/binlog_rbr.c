@@ -137,7 +137,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, table) ) != NULL )
     {
         rows_count = drizzle_binlog_rbr_row_events_count(rbr, table);
-        ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %" PRIu64,
+        ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %ld",
         rows_count);
 
         // get id of the row event's associated tablemap event
