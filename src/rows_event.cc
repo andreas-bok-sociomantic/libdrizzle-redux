@@ -112,15 +112,17 @@ drizzle_return_t drizzle_binlog_parse_row(
         {
             // set null value
             printf("NULL VALUE\n");
-
         }
         else if (column_protocol_datatype(column_type) == FIXED_STRING)
         {
             auto meta_column_type =
                 (drizzle_column_type_t) event->field_metadata[metadata_offset];
+
             if (fixed_string_is_enum(meta_column_type))
             {
-
+                uint8_t val[event->field_metadata[metadata_offset + 1]];
+                uint64_t bytes = unpack_enum(ptr, &event->field_metadata[metadata_offset], val);
+                printf("enum: %" PRIu64 " bytes\n", bytes);
                 // parse enum
                 // unsigned char val[metadata_offset+1];
             }
@@ -175,7 +177,10 @@ drizzle_return_t drizzle_binlog_parse_row(
         {}
         else
         {
-
+            uint8_t lval[16];
+            memset(lval, 0, sizeof(lval));
+            ptr += unpack_numeric_field(ptr, column_type, lval);
+            printf("numeric value: %d", lval[0]);
         }
 
         metadata_offset += get_metadata_len(column_type);
