@@ -306,3 +306,39 @@ uint get_metadata_len(drizzle_column_type_t column_type)
             return 0;
     }
 }
+
+size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest)
+{
+    size_t size = 0;
+    switch (type)
+    {
+    case DRIZZLE_COLUMN_TYPE_LONG:
+    case DRIZZLE_COLUMN_TYPE_FLOAT:
+        size = 4;
+        break;
+
+    case DRIZZLE_COLUMN_TYPE_INT24:
+        size = 3;
+        break;
+
+    case DRIZZLE_COLUMN_TYPE_LONGLONG:
+    case DRIZZLE_COLUMN_TYPE_DOUBLE:
+        size = 8;
+        break;
+
+    case DRIZZLE_COLUMN_TYPE_SHORT:
+        size = 2;
+        break;
+
+    case DRIZZLE_COLUMN_TYPE_TINY:
+        size = 1;
+        break;
+
+    default:
+        //MXS_ERROR("Bad column type: %x %s", type, column_type_to_string(type));
+        break;
+    }
+
+    memcpy(dest, src, size);
+    return size;
+}
