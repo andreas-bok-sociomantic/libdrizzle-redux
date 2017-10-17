@@ -150,12 +150,37 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 
         printf("rbr_callback for table %s with id %" PRIu64 "\n",
             drizzle_binlog_tablemap_event_table_name(tablemap_event), table_id);
+
+        // iterate fields
     }
 
+    // iterate rows_event
     for (auto unsigned row_idx = 0; row_idx < rows_count; row_idx++)
     {
         rows_event = drizzle_binlog_rbr_rows_event_index(rbr, row_idx);
         ASSERT_NOT_NULL_(rows_event, "Extracted rows event is NULL");
+        drizzle_binlog_row_st *row;
+        // iterate rows in rows event
+        while ((row = drizzle_binlog_rbr_get_row(rows_event)) != NULL)
+        {
+            unsigned cols = drizzle_binlog_rows_event_column_count(rows_event);
+            // iterate fields in the row
+            for (unsigned col_idx = 0; col_idx < cols; col_idx++)
+            {
+                drizzle_column_type_t column_type;
+                driz_ret = drizzle_binlog_field_type(
+                    row, col_idx, &column_type);
+                if (driz_ret == DRIZZLE_RETURN_OK)
+                {
+                    printf("Field %d: %s\n", col_idx,
+                        drizzle_column_type_str(column_type));
+                }
+                else
+                {
+                    printf("Field %d: undefined \n", col_idx);
+                }
+            }
+        }
     }
 
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, table);

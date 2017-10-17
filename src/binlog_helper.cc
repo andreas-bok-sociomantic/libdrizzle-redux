@@ -342,3 +342,8 @@ size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest)
     memcpy(dest, src, size);
     return size;
 }
+
+bool is_rows_update_event(drizzle_binlog_event_types_t type)
+{
+    return type == DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS || type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS;
+}
