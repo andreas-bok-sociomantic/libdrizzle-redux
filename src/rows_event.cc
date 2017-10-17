@@ -209,7 +209,7 @@ drizzle_return_t drizzle_binlog_parse_row(
 
     }
 
-void drizzle_binlog_column_value_st::set_field_value(
+/*void drizzle_binlog_column_value_st::set_field_value(
     drizzle_column_type_t _column_type, unsigned char*ptr, size_t value_length)
 {
     this->type = _column_type;
@@ -274,6 +274,80 @@ void drizzle_binlog_column_value_st::set_field_value(
             mem_alloc_cpy(&raw_value, value_length+1,
             &ptr, value_length);
             this->field._uchar_ptr = raw_value;
+            break;
+        case DRIZZLE_COLUMN_TYPE_NEWDATE:
+        default:
+            break;
+    }
+}
+
+
+*/
+void drizzle_binlog_column_value_st::set_field_value(
+    drizzle_column_type_t _column_type, unsigned char*ptr, size_t value_length)
+{
+    this->type = _column_type;
+    printf("set_field_value: %s\n", drizzle_column_type_str(this->type));
+    switch ( this->type )
+    {
+        case DRIZZLE_COLUMN_TYPE_TINY_BLOB:
+        case DRIZZLE_COLUMN_TYPE_MEDIUM_BLOB:
+        case DRIZZLE_COLUMN_TYPE_LONG_BLOB:
+        case DRIZZLE_COLUMN_TYPE_BLOB:
+            mem_alloc_cpy(&raw_value, value_length, &ptr);
+            this->field._uchar_ptr = raw_value;
+            break;
+        case DRIZZLE_COLUMN_TYPE_DECIMAL:
+        case DRIZZLE_COLUMN_TYPE_VARCHAR:
+        case DRIZZLE_COLUMN_TYPE_BIT:
+        case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
+        case DRIZZLE_COLUMN_TYPE_GEOMETRY:
+        case DRIZZLE_COLUMN_TYPE_VAR_STRING:
+            break;
+
+        case DRIZZLE_COLUMN_TYPE_YEAR:
+        case DRIZZLE_COLUMN_TYPE_DATE:
+        case DRIZZLE_COLUMN_TYPE_TIME:
+        case DRIZZLE_COLUMN_TYPE_TIME2 :
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP2 :
+        case DRIZZLE_COLUMN_TYPE_DATETIME:
+        case DRIZZLE_COLUMN_TYPE_DATETIME2 :
+            break;
+
+        // DRIZZLE_COLUMN_TYPE_ENUM and DRIZZLE_COLUMN_TYPE_SET are
+        // packed as a DRIZZLE_COLUMN_TYPE_STRING and cannot appear as a
+        // type in the fixed header. Their respective types must be
+        // extracted from the column metadata
+        case DRIZZLE_COLUMN_TYPE_STRING:
+            break;
+
+        case DRIZZLE_COLUMN_TYPE_TINY:
+            mem_alloc_cpy(this->raw_value, 1, ptr, 1);
+            break;
+        case DRIZZLE_COLUMN_TYPE_SHORT:
+            mem_alloc_cpy(this->raw_value, 2, ptr, 2);
+            this->field._int16 = (ushort) drizzle_get_byte2(ptr);
+            break;
+        case DRIZZLE_COLUMN_TYPE_INT24 :
+            mem_alloc_cpy(this->raw_value, 3, ptr, 3);
+            break;
+        case DRIZZLE_COLUMN_TYPE_LONG:
+            mem_alloc_cpy(this->raw_value, 4, ptr, 4);
+            break;
+        case DRIZZLE_COLUMN_TYPE_FLOAT:
+        case DRIZZLE_COLUMN_TYPE_DOUBLE:
+            break;
+        case DRIZZLE_COLUMN_TYPE_LONGLONG:
+            mem_alloc_cpy(this->raw_value, 8, ptr, 8);
+            break;
+
+        case DRIZZLE_COLUMN_TYPE_NULL:
+            break;
+        case DRIZZLE_COLUMN_TYPE_ENUM:
+        case DRIZZLE_COLUMN_TYPE_SET:
+            mem_alloc_cpy(&raw_value, value_length+1,
+            &ptr, value_length);
             break;
         case DRIZZLE_COLUMN_TYPE_NEWDATE:
         default:
