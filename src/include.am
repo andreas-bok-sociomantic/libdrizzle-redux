@@ -67,6 +67,7 @@ src_libdrizzle_redux@LIBDRIZZLE_MAJOR@_la_SOURCES+= src/binlog.cc	\
 	src/pack.cc		\
 	src/poll.cc		\
 	src/result.cc	\
+	src/binlog_row.cc	\
 	src/sha1.cc		\
 	src/state.cc	\
 	src/statement.cc \

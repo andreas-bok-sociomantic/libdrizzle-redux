@@ -9,5 +9,6 @@
 #include <libdrizzle-redux/rows_event.h>
 #include <libdrizzle-redux/tablemap_event.h>
 #include <libdrizzle-redux/binlog_rbr.h>
+#include <libdrizzle-redux/binlog_row.h>
 
 #endif // BINLOG_EVENT_CLIENT_H
