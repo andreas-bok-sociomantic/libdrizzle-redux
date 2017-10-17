@@ -97,6 +97,7 @@ union drizzle_binlog_field_value_st
     char _char;
     unsigned char* _uchar_ptr;
     uint8_t*       _uint8_ptr;
+    unsigned char* _data;
 
     int8_t    _int8;
     uint8_t   _uint8;
@@ -119,6 +120,7 @@ struct drizzle_binlog_column_value_st
     unsigned char *raw_value;
     drizzle_binlog_field_value_st field;
     bool is_null;
+    bool is_unsigned;
 
     drizzle_binlog_column_value_st(drizzle_column_type_t _type=DRIZZLE_COLUMN_TYPE_NONE,
         unsigned char *_raw_value=NULL) :
