@@ -72,6 +72,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_st::create_rows_event()
     rows_events_parsed++;
 
     auto rows_event = rows_events.at(row_events_count_);
+    rows_event->reset();
 
     // Reuse the rows event if the client has not set the rbr callback function
     row_events_count_ = binlog_rbr_fn != NULL ? row_events_count_ + 1 : 1;
@@ -328,4 +329,30 @@ const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr)
         return NULL;
     }
     return binlog_rbr->db;
+}
+
+drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *rows_event)
+{
+    drizzle_binlog_row_st *row = NULL;
+    if (rows_event->current_row == 0)
+    {
+        row = &rows_event->rows.at(rows_event->current_row++);
+    }
+    else if (++rows_event->current_row < rows_event->rows.size())
+    {
+        row = &rows_event->rows.at(rows_event->current_row);
+    }
+    return row;
+}
+
+drizzle_return_t drizzle_binlog_field_type(drizzle_binlog_row_st *row,
+    size_t field_idx, drizzle_column_type_t *type)
+{
+    if (field_idx >= row->values_before.size())
+    {
+        return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    }
+
+    *type = row->values_before.at(field_idx).type;
+    return DRIZZLE_RETURN_OK;
 }

@@ -156,7 +156,6 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binl
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_rbr_change_db(drizzle_binlog_rbr_st *binlog_rbr, const char *db);
 
-
 /**
  * @brief      Get schema used to identify table
  *
@@ -166,6 +165,14 @@ drizzle_return_t drizzle_binlog_rbr_change_db(drizzle_binlog_rbr_st *binlog_rbr,
  */
 DRIZZLE_API
 const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr);
+
+
+DRIZZLE_API
+drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *rows_event);
+
+DRIZZLE_API
+drizzle_return_t drizzle_binlog_field_type(drizzle_binlog_row_st *row,
+    size_t field_idx, drizzle_column_type_t *type);
 
 #ifdef __cplusplus
 }
