@@ -640,6 +640,8 @@ typedef struct drizzle_binlog_query_event_st drizzle_binlog_query_event_st;
 typedef struct drizzle_binlog_rows_event_st drizzle_binlog_rows_event_st;
 typedef struct drizzle_binlog_tablemap_event_st drizzle_binlog_tablemap_event_st;
 typedef struct drizzle_binlog_rbr_st drizzle_binlog_rbr_st;
+typedef struct drizzle_binlog_column_value_st drizzle_binlog_column_value_st;
+typedef struct drizzle_binlog_row_st drizzle_binlog_row_st;
 
 typedef char *drizzle_field_t;
 typedef drizzle_field_t *drizzle_row_t;

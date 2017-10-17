@@ -91,28 +91,58 @@
  * \sa: https://dev.mysql.com/doc/internals/en/rows-event.html
  */
 
+union drizzle_binlog_field_value_st
+{
+    unsigned char _uchar;
+    char _char;
+    unsigned char* _uchar_ptr;
+    uint8_t*       _uint8_ptr;
+
+    int8_t    _int8;
+    uint8_t   _uint8;
+    int16_t   _int16;
+    uint16_t  _uint16;
+
+    int32_t   _int32;
+    uint32_t  _uint32;
+
+    int64_t   _int64;
+    uint64_t  _uint64;
+
+    double _double;
+    float _float;
+};
+
 struct drizzle_binlog_column_value_st
 {
-    uint8_t *metadata;
-    unsigned char *data_ptr;
     drizzle_column_type_t type;
+    unsigned char *raw_value;
+    drizzle_binlog_field_value_st field;
+    bool is_null;
 
-    drizzle_binlog_column_value_st() :
-        metadata(NULL),
-        data_ptr(NULL),
-        type(DRIZZLE_COLUMN_TYPE_NONE)
+    drizzle_binlog_column_value_st(drizzle_column_type_t _type=DRIZZLE_COLUMN_TYPE_NONE,
+        unsigned char *_raw_value=NULL) :
+        type(_type),
+        raw_value(_raw_value),
+        is_null(false)
     {}
+
+    void set_field_value(drizzle_column_type_t _column_type, unsigned char*ptr,
+        size_t value_length=0);
 };
+
+typedef std::vector<drizzle_binlog_column_value_st> column_values;
 
 struct drizzle_binlog_row_st
 {
-    drizzle_binlog_column_value_st *column_values_before;
-    drizzle_binlog_column_value_st *column_values_after;
+    size_t current_field;
+    bool is_update_event;
+    column_values values_before;
+    column_values values_after;
 
-    drizzle_binlog_row_st() :
-        column_values_before(NULL),
-        column_values_after(NULL)
-        {}
+    drizzle_binlog_row_st(bool _is_update_event=false) :
+        current_field(0), is_update_event(_is_update_event)
+    {}
 };
 
 struct drizzle_binlog_rows_event_st
@@ -184,7 +214,8 @@ struct drizzle_binlog_rows_event_st
     /**
      * List of parsed rows
      */
-    drizzle_binlog_row_st *rows;
+    std::vector<drizzle_binlog_row_st> rows;
+    size_t current_row;
 
     /**
      * @brief      Constructor
@@ -195,7 +226,8 @@ struct drizzle_binlog_rows_event_st
         field_metadata_len(0),
         column_type_def(NULL),
         field_metadata(NULL),
-        bitmap_size(0)
+        bitmap_size(0),
+        current_row(0)
     {}
 
     ~drizzle_binlog_rows_event_st()
@@ -205,6 +237,15 @@ struct drizzle_binlog_rows_event_st
             free(column_type_def);
         if (field_metadata != NULL)
             free(field_metadata);
+    }
+
+    void reset()
+    {
+        this->table_id = 0;
+        this->column_count = 0;
+        this->bitmap_size = 0;
+        this->current_row = 0;
+        this->rows.clear();
     }
 };
 
@@ -271,4 +312,4 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
 
 drizzle_return_t drizzle_binlog_parse_row(
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
-    unsigned char *columns_present);
+    unsigned char *columns_present, column_values *row);

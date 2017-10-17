@@ -89,3 +89,5 @@ uint get_metadata_len(drizzle_column_type_t column_type);
 size_t unpack_enum(uint8_t *ptr, uint8_t *metadata, uint8_t *dest);
 
 size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest);
+
+bool is_rows_update_event(drizzle_binlog_event_types_t type);
