@@ -358,6 +358,7 @@ drizzle_column_protocol_datatype_t column_protocol_datatype(
 } // column_protocol_datatype
 
 
+
 uint get_metadata_len(drizzle_column_type_t column_type)
 {
     switch ( column_type )
