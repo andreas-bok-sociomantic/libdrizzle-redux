@@ -129,9 +129,17 @@ inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src, size_t size_copy)
 template<typename T, typename U = unsigned char *>
 inline void mem_alloc_cpy(T *dst, size_t size_alloc, U *src=NULL)
 {
-
   mem_alloc_cpy<T, U>(dst, size_alloc, src, size_alloc);
 }
+
+template<typename T, typename U = unsigned char *>
+inline void mem_alloc_cpy_str(T *dst, size_t size_alloc, U *src)
+{
+  mem_alloc_cpy<T, U>(dst, size_alloc+1, src, size_alloc);
+  (*dst)[size_alloc] = '\0';
+}
+
+
 bool fixed_string_is_enum(drizzle_column_type_t type);
 bool column_is_fixed_string(drizzle_column_type_t type);
 
@@ -153,3 +161,5 @@ size_t unpack_temporal_value(drizzle_column_type_t column_type, unsigned char *p
     unsigned char *metadata, int length, struct tm *tm);
 
 size_t temporal_field_size(uint8_t type, uint8_t decimals);
+
+int lookup_field_bytesize(drizzle_column_type_t field_type);
