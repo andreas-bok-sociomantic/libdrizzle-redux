@@ -1,6 +1,58 @@
 #pragma once
 
 #include <cstdarg>
+#include <math.h>
+
+// define unpacking macros
+
+/** Unpack a "reverse" byte order value */
+#define unpack4(data) (data[3] + (data[2] << 8) + (data[1] << 16) + (data[0] << 24))
+#define unpack3(data) (data[2] + (data[1] << 8) + (data[0] << 16))
+/**
+ * Unpack a 5 byte reverse byte order value
+ * @param data pointer to data
+ * @return Unpacked value
+ */
+static inline uint64_t unpack5(uint8_t* data)
+{
+    uint64_t rval = data[4];
+    rval += ((uint64_t)data[3]) << 8;
+    rval += ((uint64_t)data[2]) << 16;
+    rval += ((uint64_t)data[1]) << 24;
+    rval += ((uint64_t)data[0]) << 32;
+    return rval;
+}
+
+/** Base-10 logarithm values */
+const int64_t log_10_values[] =
+{
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+    10000000,
+    100000000
+};
+
+/**
+ * If the TABLE_COL_TYPE_DATETIME type field is declared as a datetime with
+ * extra precision, the packed length is shorter than 8 bytes.
+ */
+const size_t datetime_sizes[] =
+{
+    5, // DATETIME(0)
+    6, // DATETIME(1)
+    6, // DATETIME(2)
+    7, // DATETIME(3)
+    7, // DATETIME(4)
+    7, // DATETIME(5)
+    8  // DATETIME(6)
+};
+
+#define MAX_DATE_STRING_REP_LENGTH 30
 
 /**
  * @brief      Get the distance between two pointers in a char array
@@ -90,4 +142,14 @@ size_t unpack_enum(uint8_t *ptr, uint8_t *metadata, uint8_t *dest);
 
 size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest);
 
+size_t unpackDecimalField ( unsigned char *ptr, uint precision, uint decimals,
+    double *value );
+
 bool is_rows_update_event(drizzle_binlog_event_types_t type);
+
+uint64_t unpack_bytes(uint8_t *ptr, size_t bytes);
+
+size_t unpack_temporal_value(drizzle_column_type_t column_type, unsigned char *ptr,
+    unsigned char *metadata, int length, struct tm *tm);
+
+size_t temporal_field_size(uint8_t type, uint8_t decimals);
