@@ -385,5 +385,3 @@ void drizzle_binlog_column_value_st::set_field_value(
             break;
     }
 }
-
-
