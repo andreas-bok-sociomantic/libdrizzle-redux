@@ -1,5 +1,7 @@
 #include "config.h"
 #include "src/common.h"
+#include <algorithm>
+#include <ctime>
 
 drizzle_binlog_rows_event_st *drizzle_binlog_get_rows_event(
     drizzle_binlog_event_st *event)
@@ -98,6 +100,7 @@ drizzle_return_t drizzle_binlog_parse_row(
     const unsigned char *null_bitmap = ptr;
     ptr += event->bitmap_size;
     unsigned idx_null_bitmap = 0;
+    int extra_bits = (event->bitmap_size * 8) - event->column_count;
 
     for ( unsigned i = 0; i < event->column_count; i++ )
     {
@@ -150,7 +153,8 @@ drizzle_return_t drizzle_binlog_parse_row(
                  * one or two bytes for string length.
                  */
 
-/*                uint16_t meta = metadata[metadata_offset + 1] + (metadata[metadata_offset] << 8);
+                uint16_t meta = event->field_metadata[metadata_offset + 1] +
+                    (event->field_metadata[metadata_offset] << 8);
                 int bytes = 0;
                 uint16_t extra_length = (((meta >> 4) & 0x300) ^ 0x300);
                 uint16_t field_length = (meta & 0xff) + extra_length;
@@ -163,21 +167,51 @@ drizzle_return_t drizzle_binlog_parse_row(
                 else
                 {
                     bytes = *ptr++;
-                }*/
+                }
+
+                column_value.set_field_value(DRIZZLE_COLUMN_TYPE_STRING,
+                    ptr, bytes);
+                ptr+= bytes;
             }
         }
         else if (column_type == DRIZZLE_COLUMN_TYPE_BIT)
         {
-
+            auto width = event->field_metadata[0] + event->field_metadata[1] * 8;
+            unsigned bits_in_nullmap = std::min(width, extra_bits);
+            extra_bits -= bits_in_nullmap;
+            width -= bits_in_nullmap;
+            size_t bytes = width / 8;
+            column_value.set_field_value(column_type, ptr, bytes);
+            ptr += bytes;
         }
-        else if (column_type== DRIZZLE_COLUMN_TYPE_NEWDECIMAL)
+        else if (column_type == DRIZZLE_COLUMN_TYPE_NEWDECIMAL)
         {
-
+            double val = 0.0;
+            auto precision = event->field_metadata[0];
+            auto decimals = event->field_metadata[1];
+            size_t bytes = unpackDecimalField(ptr, precision, decimals, &val);
+            column_value.set_field_value(column_type, ptr, bytes);
+            ptr+=bytes;
         }
         else if (column_protocol_datatype(column_type) == VARIABLE_STRING)
         {
-            /*size_t sz;
-            int bytes = metadata[metadata_offset] | metadata[metadata_offset + 1] << 8;*/
+            size_t sz;
+            int bytes = event->field_metadata[metadata_offset] |
+                event->field_metadata[metadata_offset + 1] << 8;
+
+            if (bytes > 255)
+            {
+                sz = drizzle_get_byte2(ptr);
+                ptr+=2;
+            }
+            else
+            {
+                sz = *ptr;
+                ptr++;
+            }
+
+            column_value.set_field_value(column_type, ptr, sz);
+            ptr+=sz;
         }
         else if (column_protocol_datatype(column_type) == BLOB)
         {
@@ -189,7 +223,13 @@ drizzle_return_t drizzle_binlog_parse_row(
             ptr += blob_len;
         }
         else if (column_protocol_datatype(column_type) == TEMPORAL)
-        {}
+        {
+
+            auto decimals = event->field_metadata[0];
+            auto field_size = temporal_field_size(column_type, decimals);
+            column_value.set_field_value(column_type, ptr, field_size);
+            ptr += field_size;
+        }
         else
         {
             column_value.set_field_value(column_type, ptr);
@@ -284,7 +324,7 @@ drizzle_return_t drizzle_binlog_parse_row(
 
 */
 void drizzle_binlog_column_value_st::set_field_value(
-    drizzle_column_type_t _column_type, unsigned char*ptr, size_t value_length)
+    drizzle_column_type_t _column_type, unsigned char *ptr, size_t value_length)
 {
     this->type = _column_type;
     printf("set_field_value: %s\n", drizzle_column_type_str(this->type));
@@ -295,14 +335,17 @@ void drizzle_binlog_column_value_st::set_field_value(
         case DRIZZLE_COLUMN_TYPE_LONG_BLOB:
         case DRIZZLE_COLUMN_TYPE_BLOB:
             mem_alloc_cpy(&raw_value, value_length, &ptr);
-            this->field._uchar_ptr = raw_value;
             break;
         case DRIZZLE_COLUMN_TYPE_DECIMAL:
         case DRIZZLE_COLUMN_TYPE_VARCHAR:
         case DRIZZLE_COLUMN_TYPE_BIT:
         case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
+            mem_alloc_cpy(&raw_value, value_length, &ptr);
+            break;
         case DRIZZLE_COLUMN_TYPE_GEOMETRY:
+            break;
         case DRIZZLE_COLUMN_TYPE_VAR_STRING:
+            mem_alloc_cpy(&raw_value, value_length, &ptr);
             break;
 
         case DRIZZLE_COLUMN_TYPE_YEAR:
@@ -313,6 +356,7 @@ void drizzle_binlog_column_value_st::set_field_value(
         case DRIZZLE_COLUMN_TYPE_TIMESTAMP2 :
         case DRIZZLE_COLUMN_TYPE_DATETIME:
         case DRIZZLE_COLUMN_TYPE_DATETIME2 :
+            mem_alloc_cpy(&this->raw_value, value_length, &ptr, value_length);
             break;
 
         // DRIZZLE_COLUMN_TYPE_ENUM and DRIZZLE_COLUMN_TYPE_SET are
@@ -320,26 +364,26 @@ void drizzle_binlog_column_value_st::set_field_value(
         // type in the fixed header. Their respective types must be
         // extracted from the column metadata
         case DRIZZLE_COLUMN_TYPE_STRING:
+            mem_alloc_cpy(&this->raw_value, value_length, &ptr, value_length);
             break;
 
         case DRIZZLE_COLUMN_TYPE_TINY:
-            mem_alloc_cpy(this->raw_value, 1, ptr, 1);
+            mem_alloc_cpy(&this->raw_value, 1, &ptr, 1);
             break;
         case DRIZZLE_COLUMN_TYPE_SHORT:
-            mem_alloc_cpy(this->raw_value, 2, ptr, 2);
-            this->field._int16 = (ushort) drizzle_get_byte2(ptr);
+            mem_alloc_cpy(&this->raw_value, 2, &ptr, 2);
             break;
         case DRIZZLE_COLUMN_TYPE_INT24 :
-            mem_alloc_cpy(this->raw_value, 3, ptr, 3);
+            mem_alloc_cpy(&this->raw_value, 3, &ptr, 3);
             break;
         case DRIZZLE_COLUMN_TYPE_LONG:
-            mem_alloc_cpy(this->raw_value, 4, ptr, 4);
+            mem_alloc_cpy(&this->raw_value, 4, &ptr, 4);
             break;
         case DRIZZLE_COLUMN_TYPE_FLOAT:
         case DRIZZLE_COLUMN_TYPE_DOUBLE:
             break;
         case DRIZZLE_COLUMN_TYPE_LONGLONG:
-            mem_alloc_cpy(this->raw_value, 8, ptr, 8);
+            mem_alloc_cpy(&this->raw_value, 8, &ptr, 8);
             break;
 
         case DRIZZLE_COLUMN_TYPE_NULL:
