@@ -32,8 +32,7 @@
        ((uint32_t) (__b) == 8 ? 0xff : 0xffffffffffffffff ))))
 
 
-static int lookup_field_bytesize(
-    drizzle_column_type_t field_type)
+int lookup_field_bytesize(drizzle_column_type_t field_type)
 {
     switch ( field_type )
     {
