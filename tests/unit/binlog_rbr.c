@@ -193,7 +193,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                     if (datatype == DRIZZLE_FIELD_DATATYPE_LONG)
                     {
                         uint32_t int_val_before, int_val_after;
-                        driz_ret = drizzle_binlog_get_int(row, col_idx,
+                        driz_ret = drizzle_binlog_get_uint(row, col_idx,
                                                           &int_val_before,
                                                           &int_val_after);
 
@@ -209,7 +209,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                     else if (datatype == DRIZZLE_FIELD_DATATYPE_LONGLONG)
                     {
                         uint64_t int_val_before, int_val_after;
-                        driz_ret = drizzle_binlog_get_bigint(row, col_idx,
+                        driz_ret = drizzle_binlog_get_big_uint(row, col_idx,
                                                           &int_val_before,
                                                           &int_val_after);
 
