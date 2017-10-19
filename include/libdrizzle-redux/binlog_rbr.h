@@ -172,7 +172,8 @@ drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *
 
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_field_type(drizzle_binlog_row_st *row,
-    size_t field_idx, drizzle_column_type_t *type);
+    size_t field_idx, drizzle_column_type_t *type,
+    drizzle_field_datatype_t *datatype);
 
 #ifdef __cplusplus
 }

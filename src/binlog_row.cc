@@ -19,7 +19,6 @@ drizzle_return_t drizzle_binlog_get_field_value(
             ret = DRIZZLE_RETURN_NULL_SIZE;
             break;
         case DRIZZLE_COLUMN_TYPE_TINY:
-
             *val = (uint32_t) (*(uint8_t *) column_value->raw_value);
             break;
         case DRIZZLE_COLUMN_TYPE_SHORT:
@@ -31,20 +30,41 @@ drizzle_return_t drizzle_binlog_get_field_value(
             *val = (uint32_t) (*(uint32_t *) column_value->raw_value);
             break;
         case DRIZZLE_COLUMN_TYPE_LONGLONG:
-            *val = (uint32_t) (*(uint64_t *) column_value->raw_value);
-            if (*val > UINT32_MAX)
+            if (sizeof(T) <= sizeof(uint32_t))
             {
+                *val = (uint32_t) (*(uint64_t *) column_value->raw_value);
+                if (*val > UINT32_MAX)
+                {
+                    ret = DRIZZLE_RETURN_TRUNCATED;
+                }
+            }
+            else if (sizeof(T) <= sizeof(uint64_t))
+            {
+                *val = (uint64_t) (*(uint64_t *) column_value->raw_value);
+            }
+            break;
+
+        case DRIZZLE_COLUMN_TYPE_FLOAT:
+        case DRIZZLE_COLUMN_TYPE_DOUBLE:
+            if (std::is_floating_point<typeof(T)>::value)
+            {
+                *val = (*(T *) column_value->raw_value);
+            }
+            else if (std::is_integral<T>::value)
+            {
+                if (sizeof(T) == sizeof(uint32_t))
+                {
+                    *val = (uint32_t) (*(T *) column_value->raw_value);
+                }
+                else if (sizeof(T) == sizeof(uint64_t))
+                {
+                    *val = (uint64_t) (*(T *) column_value->raw_value);
+                }
+
                 ret = DRIZZLE_RETURN_TRUNCATED;
             }
             break;
-        case DRIZZLE_COLUMN_TYPE_FLOAT:
-            ret = DRIZZLE_RETURN_TRUNCATED;
-            *val = (uint32_t) (*(float *) column_value->raw_value);
-            break;
-        case DRIZZLE_COLUMN_TYPE_DOUBLE:
-            ret = DRIZZLE_RETURN_TRUNCATED;
-            *val = (uint32_t) (*(double *) column_value->raw_value);
-            break;
+
         case DRIZZLE_COLUMN_TYPE_TIME:
         case DRIZZLE_COLUMN_TYPE_DATE:
         case DRIZZLE_COLUMN_TYPE_DATETIME:
@@ -92,7 +112,6 @@ drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
-
 
     drizzle_return_t ret_before = DRIZZLE_RETURN_OK;
     drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
@@ -162,7 +181,6 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
     drizzle_binlog_column_value_st *column_value = &row->values_before.at(
             field_number);
 
-
     auto type = column_value->type;
     if ( !(type == DRIZZLE_COLUMN_TYPE_NEWDECIMAL ||
            type == DRIZZLE_COLUMN_TYPE_DECIMAL ||
@@ -186,5 +204,5 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
 
     return ret_before == DRIZZLE_RETURN_OK &&
            ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
-           ret_before;;
+           ret_before;
 }

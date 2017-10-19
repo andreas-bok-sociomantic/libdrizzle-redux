@@ -170,7 +170,6 @@ struct tableid_rows_events_map
 
         auto vec_rows = &mapping.find(rows_event->table_id)->second;
         vec_rows->push_back(rows_event);
-        printf("add_mapping: %ld\n", vec_rows->size());
     }
 
 

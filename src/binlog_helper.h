@@ -153,7 +153,6 @@ size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest);
 size_t unpackDecimalField ( unsigned char *ptr, uint precision, uint decimals,
     double *value );
 
-bool is_rows_update_event(drizzle_binlog_event_types_t type);
 
 uint64_t unpack_bytes(uint8_t *ptr, size_t bytes);
 
@@ -163,3 +162,6 @@ size_t unpack_temporal_value(drizzle_column_type_t column_type, unsigned char *p
 size_t temporal_field_size(uint8_t type, uint8_t decimals);
 
 int lookup_field_bytesize(drizzle_column_type_t field_type);
+
+drizzle_field_datatype_t get_field_datatype(drizzle_column_type_t field_type);
+
