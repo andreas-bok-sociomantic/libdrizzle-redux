@@ -244,6 +244,23 @@ enum drizzle_column_type_t
 typedef enum drizzle_column_type_t drizzle_column_type_t;
 #endif
 
+
+enum drizzle_field_datatype_t
+{
+  DRIZZLE_FIELD_DATATYPE_BLOB,
+  DRIZZLE_FIELD_DATATYPE_STRING,
+  DRIZZLE_FIELD_DATATYPE_TEMPORAL,
+  DRIZZLE_FIELD_DATATYPE_BIT,
+  DRIZZLE_FIELD_DATATYPE_DECIMAL,
+  DRIZZLE_FIELD_DATATYPE_LONG,
+  DRIZZLE_FIELD_DATATYPE_LONGLONG,
+  DRIZZLE_FIELD_DATATYPE_NONE
+};
+
+#ifndef __cplusplus
+typedef enum drizzle_field_datatype_t drizzle_field_datatype_t;
+#endif
+
 /**
  * @ingroup drizzle_column
  * Flags for drizzle_column_st.

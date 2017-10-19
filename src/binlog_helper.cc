@@ -453,10 +453,10 @@ size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest)
     return size;
 } // unpack_numeric_field
 
-bool is_rows_update_event(drizzle_binlog_event_types_t type)
+bool is_rows_update_event(drizzle_binlog_rows_event_st *rows_event)
 {
-    return type == DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS ||
-           type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS;
+    return rows_event->header.type == DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS ||
+           rows_event->header.type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS;
 }
 
 size_t unpackDecimalField(unsigned char *ptr, uint precision, uint decimals,
@@ -762,7 +762,7 @@ size_t temporal_field_size(uint8_t type, uint8_t decimals)
  * @brief Unpack a temporal value
  *
  * MariaDB and MySQL both store temporal values in a special format. This
- *function
+ * function
  * unpacks them from the storage format and into a common, usable format.
  * @param type Column type
  * @param val Extracted packed value
@@ -834,3 +834,58 @@ size_t unpack_temporal_value(drizzle_column_type_t type, uint8_t *ptr,
     return temporal_field_size(type, *metadata);
 } // unpack_temporal_value
 
+
+drizzle_field_datatype_t get_field_datatype(drizzle_column_type_t field_type)
+{
+    switch ( field_type )
+    {
+        case DRIZZLE_COLUMN_TYPE_TINY_BLOB:
+        case DRIZZLE_COLUMN_TYPE_MEDIUM_BLOB:
+        case DRIZZLE_COLUMN_TYPE_LONG_BLOB:
+        case DRIZZLE_COLUMN_TYPE_BLOB:
+            return DRIZZLE_FIELD_DATATYPE_BLOB;
+
+        case DRIZZLE_COLUMN_TYPE_VARCHAR:
+        case DRIZZLE_COLUMN_TYPE_VAR_STRING:
+        case DRIZZLE_COLUMN_TYPE_STRING:
+            return DRIZZLE_FIELD_DATATYPE_STRING;
+
+
+        case DRIZZLE_COLUMN_TYPE_DATE:
+        case DRIZZLE_COLUMN_TYPE_TIME:
+        case DRIZZLE_COLUMN_TYPE_TIME2:
+        case DRIZZLE_COLUMN_TYPE_NEWDATE:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP:
+        case DRIZZLE_COLUMN_TYPE_TIMESTAMP2:
+        case DRIZZLE_COLUMN_TYPE_DATETIME:
+        case DRIZZLE_COLUMN_TYPE_DATETIME2:
+            return DRIZZLE_FIELD_DATATYPE_TEMPORAL;
+
+        case DRIZZLE_COLUMN_TYPE_BIT:
+            return DRIZZLE_FIELD_DATATYPE_BIT;
+
+        case DRIZZLE_COLUMN_TYPE_FLOAT:
+        case DRIZZLE_COLUMN_TYPE_DOUBLE:
+        case DRIZZLE_COLUMN_TYPE_DECIMAL:
+        case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
+            return DRIZZLE_FIELD_DATATYPE_DECIMAL;
+
+        case DRIZZLE_COLUMN_TYPE_TINY:
+        case DRIZZLE_COLUMN_TYPE_YEAR:
+        case DRIZZLE_COLUMN_TYPE_SHORT:
+        case DRIZZLE_COLUMN_TYPE_INT24:
+        case DRIZZLE_COLUMN_TYPE_LONG:
+            return DRIZZLE_FIELD_DATATYPE_LONG;
+
+        case DRIZZLE_COLUMN_TYPE_LONGLONG:
+            return DRIZZLE_FIELD_DATATYPE_LONGLONG;
+
+        case DRIZZLE_COLUMN_TYPE_NULL:
+        case DRIZZLE_COLUMN_TYPE_ENUM:
+        case DRIZZLE_COLUMN_TYPE_SET:
+        case DRIZZLE_COLUMN_TYPE_GEOMETRY:
+        default:
+            return DRIZZLE_FIELD_DATATYPE_NONE;
+    } // switch
+      //
+} // get_field_datatype

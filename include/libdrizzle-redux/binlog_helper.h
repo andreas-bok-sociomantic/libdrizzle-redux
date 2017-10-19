@@ -48,6 +48,10 @@ DRIZZLE_API
 uint8_t drizzle_binlog_rows_event_version(
     drizzle_binlog_event_types_t column_type);
 
+
+DRIZZLE_API
+bool is_rows_update_event(drizzle_binlog_rows_event_st *rows_event);
+
 #ifdef __cplusplus
 }
 #endif
