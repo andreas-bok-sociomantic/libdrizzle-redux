@@ -184,8 +184,9 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
             {
                 drizzle_column_type_t column_type;
                 drizzle_field_datatype_t datatype;
-                driz_ret = drizzle_binlog_field_type(
-                        row, col_idx, &column_type, &datatype);
+                bool is_unsigned = false;
+                driz_ret = drizzle_binlog_field_info(
+                        row, col_idx, &column_type, &datatype, &is_unsigned);
 
 
                 if (driz_ret == DRIZZLE_RETURN_OK)
