@@ -1,8 +1,8 @@
 #pragma once
 
-#ifndef BINLOG_ROW_H
-#define BINLOG_ROW_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /**
@@ -17,5 +17,6 @@ DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
     size_t field_number, uint32_t *before, uint32_t *after);
 
-
+#ifdef __cplusplus
+}
 #endif

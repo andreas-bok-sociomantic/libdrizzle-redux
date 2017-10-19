@@ -41,11 +41,12 @@
 
 drizzle_result_st *result;
 /*
-void test_row();
-void test_row(drizzle_binlog_rbr_st *rbr, drizzle_binlog_rows_event_st *event)
-{
-
-}*/
+ * void test_row();
+ * void test_row(drizzle_binlog_rbr_st *rbr, drizzle_binlog_rows_event_st
+ * *event)
+ * {
+ *
+ * }*/
 
 static const drizzle_column_type_t COLUMN_TYPES[] = {
     DRIZZLE_COLUMN_TYPE_LONG,
@@ -58,9 +59,9 @@ static const drizzle_column_type_t COLUMN_TYPES[] = {
     DRIZZLE_COLUMN_TYPE_DOUBLE
 };
 
-static const uint8_t FIELD_METADATA[3] = {0x4, 0x8};
+static const uint8_t FIELD_METADATA[3] = { 0x4, 0x8 };
 
-static const uint8_t NULL_BITMAP[1] = {0xd4};
+static const uint8_t NULL_BITMAP[1] = { 0xd4 };
 
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
@@ -76,12 +77,12 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
     (void) context;
     drizzle_binlog_rows_event_st *rows_event;
     size_t rows_count;
-    drizzle_binlog_tablemap_event_st * tablemap_event;
+    drizzle_binlog_tablemap_event_st *tablemap_event;
     drizzle_return_t driz_ret;
 
     char actual_str[1024];
     uint64_t expected_number;
-    const char *schema="test_binlog_rbr";
+    const char *schema = "test_binlog_rbr";
     const char *table = "binlog_rbr_tbl";
 
     // xid
@@ -92,53 +93,66 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 
     // Only test test_binlog_rbr.binlog_rbr_tbl
     if (tablemap_event == NULL)
+    {
         return;
-    sprintf(actual_str, "%s", drizzle_binlog_tablemap_event_schema_name(tablemap_event));
+    }
+    sprintf(actual_str, "%s",
+            drizzle_binlog_tablemap_event_schema_name(tablemap_event));
     if (strcmp(actual_str, schema) != 0)
     {
         printf("skipping\n");
         return;
     }
 
-    sprintf(&actual_str[0], "%s", drizzle_binlog_tablemap_event_table_name(tablemap_event));
+    sprintf(&actual_str[0], "%s",
+            drizzle_binlog_tablemap_event_table_name(tablemap_event));
     ASSERT_STREQ_(table, actual_str, "Wrong table name. Expected %s got %s",
-        table, actual_str);
+                  table, actual_str);
 
-    unsigned column_count = drizzle_binlog_tablemap_event_column_count(tablemap_event);
-    ASSERT_EQ_(column_count, 8, "Wrong number of column in table %s, expected 8 got %d",
+    unsigned column_count = drizzle_binlog_tablemap_event_column_count(
+            tablemap_event);
+    ASSERT_EQ_(column_count, 8,
+               "Wrong number of column in table %s, expected 8 got %d",
                table, column_count);
 
     // Check the column types in the table
     for (uint i = 0; i < column_count; i++)
     {
 
-        drizzle_column_type_t column_type = drizzle_binlog_tablemap_event_column_type(tablemap_event, i, &driz_ret);
+        drizzle_column_type_t column_type =
+            drizzle_binlog_tablemap_event_column_type(tablemap_event, i,
+                                                      &driz_ret);
         ASSERT_EQ_(column_type, COLUMN_TYPES[i],
-            "Wrong column type. Expected %s got %s",
-            drizzle_column_type_str(COLUMN_TYPES[i]),
-            drizzle_column_type_str(column_type));
+                   "Wrong column type. Expected %s got %s",
+                   drizzle_column_type_str(COLUMN_TYPES[i]),
+                   drizzle_column_type_str(column_type));
     }
 
     // Check field metadata
-    uint8_t *field_metadata=drizzle_binlog_tablemap_event_field_metadata(tablemap_event);
-    uint field_metadata_len=drizzle_binlog_tablemap_event_field_metadata_len(tablemap_event);
+    uint8_t *field_metadata = drizzle_binlog_tablemap_event_field_metadata(
+            tablemap_event);
+    uint field_metadata_len = drizzle_binlog_tablemap_event_field_metadata_len(
+            tablemap_event);
     for (uint i = 0; i < field_metadata_len; i++ )
     {
         ASSERT_EQ(field_metadata[i], FIELD_METADATA[i]);
     }
 
     // Check null bitmap
-    uint8_t *null_bitmap = drizzle_binlog_tablemap_event_null_bitmap(tablemap_event);
+    uint8_t *null_bitmap = drizzle_binlog_tablemap_event_null_bitmap(
+            tablemap_event);
     ASSERT_EQ(null_bitmap[0], NULL_BITMAP[0]);
 
     expected_number = drizzle_binlog_tablemap_event_table_id(tablemap_event);
 
     // Get the rows event in the binlog event group
-    while ( (rows_event = drizzle_binlog_rbr_rows_event_next(rbr, table) ) != NULL )
+    while ( (rows_event =
+                 drizzle_binlog_rbr_rows_event_next(rbr, table) ) != NULL )
     {
         rows_count = drizzle_binlog_rbr_row_events_count(rbr, table);
-        ASSERT_EQ_(rows_count, 1, "Wrong number of rows in binlog group. Expected 1 got %ld",
-        rows_count);
+        ASSERT_EQ_(rows_count, 1,
+                   "Wrong number of rows in binlog group. Expected 1 got %ld",
+                   rows_count);
 
         // get id of the row event's associated tablemap event
         uint64_t table_id = drizzle_binlog_rows_event_table_id(rows_event);
@@ -149,7 +163,8 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
             drizzle_binlog_rbr_rows_event_tablemap(rbr, rows_event);
 
         printf("rbr_callback for table %s with id %" PRIu64 "\n",
-            drizzle_binlog_tablemap_event_table_name(tablemap_event), table_id);
+               drizzle_binlog_tablemap_event_table_name(
+                   tablemap_event), table_id);
 
         // iterate fields
     }
@@ -168,12 +183,28 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
             for (unsigned col_idx = 0; col_idx < cols; col_idx++)
             {
                 drizzle_column_type_t column_type;
+                drizzle_field_datatype_t datatype;
                 driz_ret = drizzle_binlog_field_type(
-                    row, col_idx, &column_type);
+                        row, col_idx, &column_type, &datatype);
+
+                uint32_t int_val_before, int_val_after;
                 if (driz_ret == DRIZZLE_RETURN_OK)
                 {
-                    printf("Field %d: %s\n", col_idx,
-                        drizzle_column_type_str(column_type));
+                    if (datatype == DRIZZLE_FIELD_DATATYPE_LONG)
+                    {
+                        driz_ret = drizzle_binlog_get_int(row, col_idx,
+                                                          &int_val_before,
+                                                          &int_val_after);
+
+                        printf("Field #%d %s : %d", col_idx,
+                               drizzle_column_type_str(column_type),
+                               int_val_before);
+                        if (is_rows_update_event(rows_event))
+                        {
+                            printf(" -> %d", int_val_after);
+                        }
+                        printf("\n");
+                    }
                 }
                 else
                 {
@@ -185,7 +216,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_BEGIN, table);
     drizzle_binlog_rbr_row_events_seek(rbr, DRIZZLE_LIST_END, table);
-}
+} /* binlog_rbr */
 
 
 int main(int argc, char *argv[])
@@ -207,7 +238,7 @@ int main(int argc, char *argv[])
 
     CHECKED_QUERY("INSERT INTO test_binlog_rbr.binlog_rbr_tbl "
                   "(b,c,d,e,f,g,h) VALUES "
-                  "(1,1,1,1,1,1,1)");
+                  "(1,2,4,8,16,32,64)");
 
     char *binlog_file;
     uint32_t end_position;
