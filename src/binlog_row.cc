@@ -128,6 +128,39 @@ drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
            ret_before;
 } // drizzle_binlog_get_int
 
+drizzle_return_t drizzle_binlog_get_bigint(drizzle_binlog_row_st *row,
+                                        size_t field_number, uint64_t *before,
+                                        uint64_t *after)
+{
+    if (row == NULL || field_number >= row->values_before.size() ||
+        before == NULL || after == NULL )
+    {
+        return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    }
+
+    drizzle_binlog_column_value_st *column_value = &row->values_before.at(
+            field_number);
+
+    if ( column_value->type != DRIZZLE_COLUMN_TYPE_LONGLONG)
+    {
+        return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    }
+
+    drizzle_return_t ret_before = DRIZZLE_RETURN_OK;
+    drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
+    ret_before = drizzle_binlog_get_field_value(column_value, before);
+
+    if (row->is_update_event)
+    {
+        column_value = &row->values_after.at(field_number);
+        ret_after = drizzle_binlog_get_field_value(column_value, after);
+    }
+
+    return ret_before == DRIZZLE_RETURN_OK &&
+           ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
+           ret_before;
+}
+
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            size_t field_number,
                                            const unsigned char *before,
@@ -142,10 +175,7 @@ drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
     drizzle_binlog_column_value_st *column_value = &row->values_before.at(
             field_number);
 
-    auto type = column_value->type;
-    if ( !(type == DRIZZLE_COLUMN_TYPE_STRING ||
-           type == DRIZZLE_COLUMN_TYPE_VARCHAR ||
-           type == DRIZZLE_COLUMN_TYPE_VAR_STRING) )
+    if ( get_field_datatype(column_value->type) != DRIZZLE_FIELD_DATATYPE_STRING )
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
@@ -177,15 +207,10 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
 
-
     drizzle_binlog_column_value_st *column_value = &row->values_before.at(
             field_number);
 
-    auto type = column_value->type;
-    if ( !(type == DRIZZLE_COLUMN_TYPE_NEWDECIMAL ||
-           type == DRIZZLE_COLUMN_TYPE_DECIMAL ||
-           type == DRIZZLE_COLUMN_TYPE_FLOAT ||
-           type == DRIZZLE_COLUMN_TYPE_DOUBLE) )
+    if (get_field_datatype(column_value->type) != DRIZZLE_FIELD_DATATYPE_DECIMAL)
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }

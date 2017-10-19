@@ -187,11 +187,12 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                 driz_ret = drizzle_binlog_field_type(
                         row, col_idx, &column_type, &datatype);
 
-                uint32_t int_val_before, int_val_after;
+
                 if (driz_ret == DRIZZLE_RETURN_OK)
                 {
                     if (datatype == DRIZZLE_FIELD_DATATYPE_LONG)
                     {
+                        uint32_t int_val_before, int_val_after;
                         driz_ret = drizzle_binlog_get_int(row, col_idx,
                                                           &int_val_before,
                                                           &int_val_after);
@@ -202,6 +203,22 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                         if (is_rows_update_event(rows_event))
                         {
                             printf(" -> %d", int_val_after);
+                        }
+                        printf("\n");
+                    }
+                    else if (datatype == DRIZZLE_FIELD_DATATYPE_LONGLONG)
+                    {
+                        uint64_t int_val_before, int_val_after;
+                        driz_ret = drizzle_binlog_get_bigint(row, col_idx,
+                                                          &int_val_before,
+                                                          &int_val_after);
+
+                        printf("Field #%d %s : %" PRIu64, col_idx,
+                               drizzle_column_type_str(column_type),
+                               int_val_before);
+                        if (is_rows_update_event(rows_event))
+                        {
+                            printf(" -> %" PRIu64, int_val_after);
                         }
                         printf("\n");
                     }
