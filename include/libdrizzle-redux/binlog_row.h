@@ -19,7 +19,12 @@ drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
                                         uint32_t *after);
 
 DRIZZLE_API
-drizzle_return_t drizzle_binlog_get_bigint(drizzle_binlog_row_st *row,
+drizzle_return_t drizzle_binlog_get_big_int(drizzle_binlog_row_st *row,
+                                           size_t field_number,
+                                           uint64_t *before,
+                                           uint64_t *after);
+
+drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
                                            size_t field_number,
                                            uint64_t *before,
                                            uint64_t *after);
