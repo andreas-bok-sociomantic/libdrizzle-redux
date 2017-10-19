@@ -91,34 +91,11 @@
  * \sa: https://dev.mysql.com/doc/internals/en/rows-event.html
  */
 
-union drizzle_binlog_field_value_st
-{
-    unsigned char _uchar;
-    char _char;
-    unsigned char* _uchar_ptr;
-    uint8_t*       _uint8_ptr;
-    unsigned char* _data;
-
-    int8_t    _int8;
-    uint8_t   _uint8;
-    int16_t   _int16;
-    uint16_t  _uint16;
-
-    int32_t   _int32;
-    uint32_t  _uint32;
-
-    int64_t   _int64;
-    uint64_t  _uint64;
-
-    double _double;
-    float _float;
-};
 
 struct drizzle_binlog_column_value_st
 {
     drizzle_column_type_t type;
     unsigned char *raw_value;
-    drizzle_binlog_field_value_st field;
     bool is_null;
     bool is_unsigned;
 
@@ -137,13 +114,11 @@ typedef std::vector<drizzle_binlog_column_value_st> column_values;
 
 struct drizzle_binlog_row_st
 {
-    size_t current_field;
     bool is_update_event;
     column_values values_before;
     column_values values_after;
 
-    drizzle_binlog_row_st(bool _is_update_event=false) :
-        current_field(0), is_update_event(_is_update_event)
+    drizzle_binlog_row_st(bool _is_update_event=false) : is_update_event(_is_update_event)
     {}
 };
 
