@@ -1,16 +1,39 @@
 #include "config.h"
 #include "src/common.h"
 
-template <typename T_UNSIGNED, typename T_SIGNED, typename TYPE_DEST>
-void signedness_cast(TYPE_DEST *dest, const unsigned char *src, bool is_unsigned)
+template<typename T>
+drizzle_binlog_column_value_st *get_column_value_st(
+    drizzle_binlog_row_st *row,
+    size_t field_number,
+    const T *before,
+    const T *after,
+    drizzle_return_t *ret_ptr)
 {
-    if (is_unsigned)
+
+    if (row == NULL || field_number >= row->values_before.size() ||
+        before == NULL || after == NULL )
     {
-        *dest = (TYPE_DEST) (*(T_UNSIGNED*) src) ;
+        *ret_ptr = DRIZZLE_RETURN_INVALID_ARGUMENT;
+        return NULL;
     }
     else
     {
-        *dest = (TYPE_DEST) (*(T_SIGNED*) src) ;
+        *ret_ptr = DRIZZLE_RETURN_OK;
+        return &row->values_before.at(field_number);
+    }
+} // get_column_value_st
+
+template <typename T_UNSIGNED, typename T_SIGNED, typename TYPE_DEST>
+void signedness_cast(TYPE_DEST *dest, const unsigned char *src,
+                     bool is_unsigned)
+{
+    if (is_unsigned)
+    {
+        *dest = (TYPE_DEST) (*(T_UNSIGNED *) src);
+    }
+    else
+    {
+        *dest = (TYPE_DEST) (*(T_SIGNED *) src);
     }
 }
 
@@ -36,30 +59,22 @@ drizzle_return_t drizzle_binlog_get_field_value(
             break;
         case DRIZZLE_COLUMN_TYPE_TINY:
             /*signedness_cast<uint8_t, int8_t>(val, column_value->raw_value,
-                column_value->is_unsigned);*/
+             *  column_value->is_unsigned);*/
             signedness_cast<uint8_t, int8_t>(val, src_value, is_unsigned);
-            //*val = (uint32_t) (*(uint8_t *) column_value->raw_value);
+            // *val = (uint32_t) (*(uint8_t *) column_value->raw_value);
             break;
         case DRIZZLE_COLUMN_TYPE_SHORT:
         case DRIZZLE_COLUMN_TYPE_YEAR:
-            *val = (uint32_t) (*(uint16_t *) column_value->raw_value);
+            signedness_cast<uint16_t, int16_t>(val, src_value, is_unsigned);
             break;
         case DRIZZLE_COLUMN_TYPE_INT24:
         case DRIZZLE_COLUMN_TYPE_LONG:
-            if (column_value->is_unsigned)
-            {
-                *val = (uint32_t) (*(uint32_t *) column_value->raw_value);
-            }
-            else
-            {
-                *val = (int32_t) (*(int32_t *) column_value->raw_value);
-            }
-
+            signedness_cast<uint32_t, int32_t>(val, src_value, is_unsigned);
             break;
         case DRIZZLE_COLUMN_TYPE_LONGLONG:
             if (sizeof(T) <= sizeof(uint32_t))
             {
-                *val = (uint32_t) (*(uint64_t *) column_value->raw_value);
+                signedness_cast<uint64_t, int64_t>(val, src_value, is_unsigned);
                 if (*val > UINT32_MAX)
                 {
                     ret = DRIZZLE_RETURN_TRUNCATED;
@@ -67,7 +82,11 @@ drizzle_return_t drizzle_binlog_get_field_value(
             }
             else if (sizeof(T) <= sizeof(uint64_t))
             {
-                *val = (uint64_t) (*(uint64_t *) column_value->raw_value);
+                signedness_cast<uint64_t, int64_t>(val, src_value, is_unsigned);
+            }
+            else
+            {
+                // do something here
             }
             break;
 
@@ -120,44 +139,15 @@ drizzle_return_t drizzle_binlog_get_field_value(
 
     return ret;
 } // drizzle_binlog_get_field_value
-  //
-  //
-/*template<typename T>
-drizzle_return_t drizzle_binlog_get_integer(drizzle_binlog_row_st *row,
-                                        size_t field_number, T *before,
-                                        T *after);
+
+
+template<typename T, typename U>
+drizzle_return_t assign_field_value(drizzle_binlog_row_st *row,
+                                    drizzle_binlog_column_value_st *column_value,
+                                    size_t field_number, T *before, T *after,
+                                    U type1, U type2)
 {
-    // validation of arguments
-    if (row == NULL || field_number >= row->values_before.size() ||
-        before == NULL || after == NULL )
-    {
-        return DRIZZLE_RETURN_INVALID_ARGUMENT;
-    }
-
-    if ( column_protocol_datatype(column_value->type) != NUMERICAL)
-    {
-        return DRIZZLE_RETURN_INVALID_ARGUMENT;
-    }
-
-    drizzle_binlog_column_value_st *column_value = &row->values_before.at(
-            field_number);
-}
-*/
-
-drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
-                                        size_t field_number, uint32_t *before,
-                                        uint32_t *after)
-{
-    if (row == NULL || field_number >= row->values_before.size() ||
-        before == NULL || after == NULL )
-    {
-        return DRIZZLE_RETURN_INVALID_ARGUMENT;
-    }
-
-    drizzle_binlog_column_value_st *column_value = &row->values_before.at(
-            field_number);
-
-    if ( column_protocol_datatype(column_value->type) != NUMERICAL)
+    if ( type1 != type2 )
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
@@ -175,12 +165,32 @@ drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
     return ret_before == DRIZZLE_RETURN_OK &&
            ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
            ret_before;
+}
+
+drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
+                                         size_t field_number, uint32_t *before,
+                                         uint32_t *after)
+{
+    drizzle_return_t ret;
+    drizzle_binlog_column_value_st *column_value =
+        get_column_value_st(row, field_number, before, after, &ret);
+
+    if (ret != DRIZZLE_RETURN_OK)
+    {
+        return ret;
+    }
+
+    return assign_field_value(row, column_value, field_number, before, after,
+                              column_protocol_datatype(
+                                  column_value->type), NUMERICAL);
+
 } // drizzle_binlog_get_int
 
 
 drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
-                                        size_t field_number, uint64_t *before,
-                                        uint64_t *after)
+                                             size_t field_number,
+                                             uint64_t *before,
+                                             uint64_t *after)
 {
     if (row == NULL || field_number >= row->values_before.size() ||
         before == NULL || after == NULL )
@@ -209,7 +219,7 @@ drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
     return ret_before == DRIZZLE_RETURN_OK &&
            ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
            ret_before;
-}
+} // drizzle_binlog_get_big_uint
 
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            size_t field_number,
@@ -225,7 +235,8 @@ drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
     drizzle_binlog_column_value_st *column_value = &row->values_before.at(
             field_number);
 
-    if ( get_field_datatype(column_value->type) != DRIZZLE_FIELD_DATATYPE_STRING )
+    if ( get_field_datatype(column_value->type) !=
+         DRIZZLE_FIELD_DATATYPE_STRING )
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
@@ -260,7 +271,8 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
     drizzle_binlog_column_value_st *column_value = &row->values_before.at(
             field_number);
 
-    if (get_field_datatype(column_value->type) != DRIZZLE_FIELD_DATATYPE_DECIMAL)
+    if (get_field_datatype(column_value->type) !=
+        DRIZZLE_FIELD_DATATYPE_DECIMAL)
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
@@ -280,4 +292,4 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
     return ret_before == DRIZZLE_RETURN_OK &&
            ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
            ret_before;
-}
+} // drizzle_binlog_get_double
