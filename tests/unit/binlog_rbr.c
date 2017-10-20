@@ -223,6 +223,21 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                         }
                         printf("\n");
                     }
+                    else if (datatype == DRIZZLE_FIELD_DATATYPE_DECIMAL)
+                    {
+                        double double_before, double_after;
+                        driz_ret = drizzle_binlog_get_double(row, col_idx,
+                            &double_before, &double_after);
+
+                        printf("Field #%d %s : %g", col_idx,
+                               drizzle_column_type_str(column_type),
+                               double_before);
+                        if (is_rows_update_event(rows_event))
+                        {
+                            printf(" -> %g", double_after);
+                        }
+                        printf("\n");
+                    }
                 }
                 else
                 {
@@ -256,7 +271,7 @@ int main(int argc, char *argv[])
 
     CHECKED_QUERY("INSERT INTO test_binlog_rbr.binlog_rbr_tbl "
                   "(b,c,d,e,f,g,h) VALUES "
-                  "(1,2,4,8,16,32,64)");
+                  "(1,2,4,8,16,32.25,64.25)");
 
     char *binlog_file;
     uint32_t end_position;
