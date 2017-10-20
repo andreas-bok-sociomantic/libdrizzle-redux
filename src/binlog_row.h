@@ -26,16 +26,46 @@ drizzle_binlog_column_value_st *get_column_value_st(drizzle_binlog_row_st *row,
                                                     const T *after,
                                                     drizzle_return_t ret_ptr);
 
+/**
+ * @brief      Assigns the value of
+ *
+ * @param      column_value  The column value struct
+ * @param      dest          The destination
+ *
+ * @tparam     T             The type
+ *
+ * @return     DRIZZLE_RETURN_OK if the field could be assigned,
+ *             DRIZZLE_RETURN_INVALID_ARGUMENT or information about the
+ *             assignment error
+ */
 template<typename T>
-drizzle_return_t drizzle_binlog_get_field_value(
+drizzle_return_t assign_field_value(
     drizzle_binlog_column_value_st *column_value,
     T *dest);
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      row           Pointer to drizzle binlog row struct
+ * @param      column_value  Pointer to column value struct
+ * @param[in]  field_number  The field number
+ * @param      before        The variable to save before value into
+ * @param      after         The variable to save after value into
+ * @param[in]  type1         The original column type
+ * @param[in]  type2         The expected column type
+ *
+ * @tparam     T             The datatype of the field to assign
+ * @tparam     U             The enum type to do check the column type
+ *
+ * @return     DRIZZLE_RETURN_OK if the field could be assigned,
+ *             DRIZZLE_RETURN_INVALID_ARGUMENT or information about the
+ *             assignment error
+ */
 template<typename T, typename U>
-drizzle_return_t assign_field_value(drizzle_binlog_row_st *row,
-                                    drizzle_binlog_column_value_st *column_value,
-                                    size_t field_number, T *before, T *after,
-                                    U type1, U type2);
+drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
+                                                drizzle_binlog_column_value_st *column_value,
+                                                size_t field_number, T *before, T *after,
+                                                U type1, U type2);
 
 // check if the value is signed/unsigned
 // make a double cast through the actual type and the longest type
