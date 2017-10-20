@@ -213,8 +213,8 @@ drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            const unsigned char **before,
                                            const unsigned char **after)
 {
-    if (row == NULL || field_number >= row->values_before.size()
-    )
+    if (row == NULL || field_number >= row->values_before.size() ||
+        before == NULL || after == NULL)
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
