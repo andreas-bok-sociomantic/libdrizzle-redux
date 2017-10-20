@@ -36,6 +36,16 @@ drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
                                            uint64_t *after);
 
 DRIZZLE_API
+/**
+ * @brief      Get a string field value
+ *
+ * @param      row           The row struct
+ * @param[in]  field_number  The field number
+ * @param      before        The before value
+ * @param      after         The after value
+ *
+ * @return     DRIZZLE_RETURN_OK or DRIZZLE_RETURN_INVALID_ARGUMENT
+ */
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            size_t field_number,
                                            const unsigned char **before,
