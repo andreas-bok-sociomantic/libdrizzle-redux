@@ -210,11 +210,11 @@ drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
 
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            size_t field_number,
-                                           const unsigned char *before,
-                                           const unsigned char *after)
+                                           const unsigned char **before,
+                                           const unsigned char **after)
 {
-    if (row == NULL || field_number >= row->values_before.size() ||
-        before == NULL || after == NULL )
+    if (row == NULL || field_number >= row->values_before.size()
+    )
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
@@ -230,13 +230,13 @@ drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
 
     drizzle_return_t ret_before = DRIZZLE_RETURN_OK;
     drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
-    before = column_value->raw_value;
+    *before = column_value->raw_value;
     // ret_before = assign_field_value(column_value, before);
 
     if (row->is_update_event)
     {
         column_value = &row->values_after.at(field_number);
-        after = column_value->raw_value;
+        *after = column_value->raw_value;
         // ret_after = assign_field_value(column_value, after);
     }
 
