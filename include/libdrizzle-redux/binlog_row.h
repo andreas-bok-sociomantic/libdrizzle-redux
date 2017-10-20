@@ -38,8 +38,8 @@ drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            size_t field_number,
-                                           const unsigned char *before,
-                                           const unsigned char *after);
+                                           const unsigned char **before,
+                                           const unsigned char **after);
 
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
