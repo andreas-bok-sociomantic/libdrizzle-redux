@@ -143,16 +143,16 @@ inline void mem_alloc_cpy_str(T *dst, size_t size_alloc, U *src)
 bool fixed_string_is_enum(drizzle_column_type_t type);
 bool column_is_fixed_string(drizzle_column_type_t type);
 
-
 uint get_metadata_len(drizzle_column_type_t column_type);
 
 size_t unpack_enum(uint8_t *ptr, uint8_t *metadata, uint8_t *dest);
 
 size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest);
 
-size_t unpackDecimalField ( unsigned char *ptr, uint precision, uint decimals,
-    double *value );
+size_t unpack_decimal_field_length(uint precision, uint decimals);
 
+size_t unpackDecimalField ( unsigned char *ptr, uint precision, uint decimals,
+    double *value);
 
 uint64_t unpack_bytes(uint8_t *ptr, size_t bytes);
 

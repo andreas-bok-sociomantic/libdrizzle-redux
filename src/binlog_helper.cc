@@ -459,6 +459,22 @@ bool is_rows_update_event(drizzle_binlog_rows_event_st *rows_event)
            rows_event->header.type == DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS;
 }
 
+size_t unpack_decimal_field_length(uint precision, uint decimals)
+{
+    const int dec_dig = 9;
+    const int dig_bytes[] = { 0, 1, 1, 2, 2, 3, 3, 4, 4, 4 };
+
+    uint ipart = precision - decimals;
+    uint ipart1 = ipart / dec_dig;
+    uint fpart1 = decimals / dec_dig;
+    uint ipart2 = ipart - ipart1 * dec_dig;
+    uint fpart2 = decimals - fpart1 * dec_dig;
+    uint ibytes = ipart1 * 4 + dig_bytes[ipart2];
+    uint fbytes = fpart1 * 4 + dig_bytes[fpart2];
+
+    return ibytes + fbytes;
+}
+
 size_t unpackDecimalField(unsigned char *ptr, uint precision, uint decimals,
                           double *value)
 {
