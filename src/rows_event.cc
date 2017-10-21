@@ -176,7 +176,8 @@ drizzle_return_t drizzle_binlog_parse_row(
         }
         else if (column_type == DRIZZLE_COLUMN_TYPE_BIT)
         {
-            auto width = event->field_metadata[0] + event->field_metadata[1] * 8;
+            auto width = event->field_metadata[metadata_offset] +
+                event->field_metadata[metadata_offset] * 8;
             unsigned bits_in_nullmap = std::min(width, extra_bits);
             extra_bits -= bits_in_nullmap;
             width -= bits_in_nullmap;
@@ -186,12 +187,21 @@ drizzle_return_t drizzle_binlog_parse_row(
         }
         else if (column_type == DRIZZLE_COLUMN_TYPE_NEWDECIMAL)
         {
-            double val = 0.0;
-            auto precision = event->field_metadata[0];
-            auto decimals = event->field_metadata[1];
-            size_t bytes = unpackDecimalField(ptr, precision, decimals, &val);
+            memcpy(column_value.metadata, &event->field_metadata[metadata_offset],
+                2);
+            auto precision = event->field_metadata[metadata_offset];
+            auto decimals = event->field_metadata[metadata_offset];
+            size_t bytes = unpack_decimal_field_length(precision, decimals);
             column_value.set_field_value(column_type, ptr, bytes);
             ptr+=bytes;
+            // double val = 0.0;
+
+
+            // auto precision = event->field_metadata[metadata_offset];
+            // auto decimals = event->field_metadata[metadata_offset];
+            // size_t bytes = unpackDecimalField(ptr, precision, decimals, &val);
+            // column_value.set_field_value(column_type, ptr, bytes);
+            // ptr+=bytes;
         }
         else if (column_protocol_datatype(column_type) == VARIABLE_STRING)
         {
@@ -224,8 +234,7 @@ drizzle_return_t drizzle_binlog_parse_row(
         }
         else if (column_protocol_datatype(column_type) == TEMPORAL)
         {
-
-            auto decimals = event->field_metadata[0];
+            auto decimals = event->field_metadata[metadata_offset];
             auto field_size = temporal_field_size(column_type, decimals);
             column_value.set_field_value(column_type, ptr, field_size);
             ptr += field_size;
