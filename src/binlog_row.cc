@@ -92,19 +92,27 @@ drizzle_return_t assign_field_value(
 
         case DRIZZLE_COLUMN_TYPE_FLOAT:
         case DRIZZLE_COLUMN_TYPE_DOUBLE:
+            double value = 0.0;
+            auto precision = column_value->metadata[0];
+            auto decimals = column_value->metadata[1];
+            unpackDecimalField(column_value->raw_value,
+                precision, decimals, &value);
             if (std::is_floating_point<typeof(T)>::value)
             {
-                *val = (*(T *) column_value->raw_value);
+                //*val = (*(T *) column_value->raw_value);
+                *val = value;
             }
             else if (std::is_integral<T>::value)
             {
                 if (sizeof(T) == sizeof(uint32_t))
                 {
-                    *val = (uint32_t) (*(T *) column_value->raw_value);
+                    //*val = (uint32_t) (*(T *) column_value->raw_value);
+                    *val = (uint32_t) (*(T *) &value);
                 }
                 else if (sizeof(T) == sizeof(uint64_t))
                 {
-                    *val = (uint64_t) (*(T *) column_value->raw_value);
+                    //*val = (uint64_t) (*(T *) column_value->raw_value);
+                    *val = (uint64_t) (*(T *) &value);
                 }
 
                 ret = DRIZZLE_RETURN_TRUNCATED;
@@ -268,12 +276,13 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
     drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
 
     *before = (double) drizzle_get_byte8(column_value->raw_value);
+    //*before = (double) drizzle_get_byte8(column_value->raw_value);
 
     if (row->is_update_event)
     {
         column_value = &row->values_after.at(field_number);
-        *after = (double) drizzle_get_byte8(column_value->raw_value);
-        // ret_after = assign_field_value(column_value, after);
+        //*after = (double) drizzle_get_byte8(column_value->raw_value);
+        ret_after = assign_field_value(column_value, after);
     }
 
     return ret_before == DRIZZLE_RETURN_OK &&
