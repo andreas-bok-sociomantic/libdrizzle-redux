@@ -252,21 +252,6 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                         }
                         printf("\n");
                     }
-                    // else if (datatype == DRIZZLE_FIELD_DATATYPE_BLOB)
-                    // {
-                    //     const unsigned char *blob_before;
-                    //     const unsigned char *blob_after;
-                    //     driz_ret = drizzle_binlog_get_string(row, col_idx,
-                    //         &blob_before, &blob_after);
-                    //     printf("Field #%d %s : %s", col_idx,
-                    //            drizzle_column_type_str(column_type),
-                    //            blob_before);
-                    //     if (is_rows_update_event(rows_event))
-                    //     {
-                    //         printf(" -> %s", blob_after);
-                    //     }
-                    //     printf("\n");
-                    // }
                 }
                 else
                 {
