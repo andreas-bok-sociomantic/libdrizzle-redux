@@ -300,5 +300,4 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
                                           before, after,
                                           get_field_datatype(column_value->type),
                                           DRIZZLE_FIELD_DATATYPE_DECIMAL);
-
 } // drizzle_binlog_get_double
