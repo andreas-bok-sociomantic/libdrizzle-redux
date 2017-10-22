@@ -35,7 +35,7 @@ drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
                                            uint64_t *before,
                                            uint64_t *after);
 
-DRIZZLE_API
+
 /**
  * @brief      Get a string field value
  *
@@ -46,6 +46,7 @@ DRIZZLE_API
  *
  * @return     DRIZZLE_RETURN_OK or DRIZZLE_RETURN_INVALID_ARGUMENT
  */
+DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
                                            size_t field_number,
                                            const unsigned char **before,
@@ -56,6 +57,11 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
                                            size_t field_number, double *before,
                                            double *after);
 
+
+DRIZZLE_API
+drizzle_return_t drizzle_binlog_get_timestamp(drizzle_binlog_row_st *row,
+                                           size_t field_number, time_t *before,
+                                           time_t *after);
 
 #ifdef __cplusplus
 }
