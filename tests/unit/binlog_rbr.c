@@ -40,13 +40,6 @@
 #include "tests/unit/common.h"
 
 drizzle_result_st *result;
-/*
- * void test_row();
- * void test_row(drizzle_binlog_rbr_st *rbr, drizzle_binlog_rows_event_st
- * *event)
- * {
- *
- * }*/
 
 static const drizzle_column_type_t COLUMN_TYPES[] = {
     DRIZZLE_COLUMN_TYPE_LONG,
@@ -57,12 +50,17 @@ static const drizzle_column_type_t COLUMN_TYPES[] = {
     DRIZZLE_COLUMN_TYPE_LONGLONG,
     DRIZZLE_COLUMN_TYPE_FLOAT,
     DRIZZLE_COLUMN_TYPE_DOUBLE,
-    DRIZZLE_COLUMN_TYPE_VARCHAR
+    DRIZZLE_COLUMN_TYPE_VARCHAR,
+    DRIZZLE_COLUMN_TYPE_NEWDECIMAL,
+    DRIZZLE_COLUMN_TYPE_STRING,
+    DRIZZLE_COLUMN_TYPE_BLOB
 };
 
 static const uint8_t FIELD_METADATA[3] = { 0x4, 0x8 };
 
 static const uint8_t NULL_BITMAP[1] = { 0xd4 };
+
+#define EXPECTED_COLUMN_COUNT 12
 
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
@@ -112,9 +110,9 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
 
     unsigned column_count = drizzle_binlog_tablemap_event_column_count(
             tablemap_event);
-    ASSERT_EQ_(column_count, 9,
-               "Wrong number of column in table %s, expected 9 got %d",
-               table, column_count);
+    ASSERT_EQ_(column_count, EXPECTED_COLUMN_COUNT,
+               "Wrong number of column in table %s, expected %d got %d",
+               table, EXPECTED_COLUMN_COUNT, column_count);
 
     // Check the column types in the table
     for (uint i = 0; i < column_count; i++)
@@ -254,6 +252,21 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                         }
                         printf("\n");
                     }
+                    // else if (datatype == DRIZZLE_FIELD_DATATYPE_BLOB)
+                    // {
+                    //     const unsigned char *blob_before;
+                    //     const unsigned char *blob_after;
+                    //     driz_ret = drizzle_binlog_get_string(row, col_idx,
+                    //         &blob_before, &blob_after);
+                    //     printf("Field #%d %s : %s", col_idx,
+                    //            drizzle_column_type_str(column_type),
+                    //            blob_before);
+                    //     if (is_rows_update_event(rows_event))
+                    //     {
+                    //         printf(" -> %s", blob_after);
+                    //     }
+                    //     printf("\n");
+                    // }
                 }
                 else
                 {
@@ -283,11 +296,15 @@ int main(int argc, char *argv[])
                   "(a INT PRIMARY KEY AUTO_INCREMENT, "
                   "b TINYINT NOT NULL, c SMALLINT, d MEDIUMINT NOT NULL, e INT, "
                   "f BIGINT NOT NULL, g FLOAT, "
-                  "h DOUBLE(16,13),i varchar(20) NOT NULL)");
+                  "h DOUBLE(16,13),i VARCHAR(20) NOT NULL, j DECIMAL(5,2), "
+                  "k CHAR(10), l MEDIUMBLOB"
+                  ")");
 
     CHECKED_QUERY("INSERT INTO test_binlog_rbr.binlog_rbr_tbl "
-                  "(b,c,d,e,f,g,h,i) VALUES "
-                  "(1,2,4,8,16,32.25,64.25, 'this is a varchar')");
+                  "(b,c,d,e,f,g,h,i,j,k, l) VALUES "
+                  "(1,2,4,8,16,32.25,64.25, 'this is a varchar', 128.51, "
+                  "'a char', 'a mediumtext'"
+                  ")");
 
     char *binlog_file;
     uint32_t end_position;
