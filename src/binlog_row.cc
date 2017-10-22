@@ -91,33 +91,32 @@ drizzle_return_t assign_field_value(
             break;
 
         case DRIZZLE_COLUMN_TYPE_FLOAT:
+            {
+                // todo add support for truncation
+                *val = (double) (*(float*) column_value->raw_value);
+                break;
+            }
         case DRIZZLE_COLUMN_TYPE_DOUBLE:
-            double value = 0.0;
-            auto precision = column_value->metadata[0];
-            auto decimals = column_value->metadata[1];
-            unpackDecimalField(column_value->raw_value,
-                precision, decimals, &value);
+            {
             if (std::is_floating_point<typeof(T)>::value)
             {
-                //*val = (*(T *) column_value->raw_value);
-                *val = value;
+                *val = (*(T *) column_value->raw_value);
             }
             else if (std::is_integral<T>::value)
             {
                 if (sizeof(T) == sizeof(uint32_t))
                 {
-                    //*val = (uint32_t) (*(T *) column_value->raw_value);
-                    *val = (uint32_t) (*(T *) &value);
+                    *val = (uint32_t) (*(T *) column_value->raw_value);
                 }
                 else if (sizeof(T) == sizeof(uint64_t))
                 {
-                    //*val = (uint64_t) (*(T *) column_value->raw_value);
-                    *val = (uint64_t) (*(T *) &value);
+                    *val = (uint64_t) (*(T *) column_value->raw_value);
                 }
 
                 ret = DRIZZLE_RETURN_TRUNCATED;
             }
             break;
+            }
 
         case DRIZZLE_COLUMN_TYPE_TIME:
         case DRIZZLE_COLUMN_TYPE_DATE:
@@ -131,7 +130,37 @@ drizzle_return_t assign_field_value(
         case DRIZZLE_COLUMN_TYPE_STRING:
         case DRIZZLE_COLUMN_TYPE_VAR_STRING:
         case DRIZZLE_COLUMN_TYPE_DECIMAL:
+            ret = DRIZZLE_RETURN_INVALID_CONVERSION;
+            break;
         case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
+            {
+            double d_value = 0.0;
+            auto precision = column_value->metadata[0];
+            auto decimals = column_value->metadata[1];
+            unpackDecimalField(column_value->raw_value, precision, decimals, &d_value);
+            if (std::is_floating_point<typeof(T)>::value)
+            {
+                //*val = (*(T *) column_value->raw_value);
+                *val = d_value;
+            }
+            else if (std::is_integral<T>::value)
+            {
+                if (sizeof(T) == sizeof(uint32_t))
+                {
+                    //*val = (uint32_t) (*(T *) column_value->raw_value);
+                    //*val = (uint32_t) (*(T *) d_value);
+                    //*val = (uint32_t) (*(T *) d_value);
+                }
+                else if (sizeof(T) == sizeof(uint64_t))
+                {
+                    //*val = (uint64_t) (*(T *) column_value->raw_value);
+                    //*val = (uint64_t) (*(T *) &d_value);
+                }
+
+                ret = DRIZZLE_RETURN_TRUNCATED;
+            }
+            break;
+            }
         case DRIZZLE_COLUMN_TYPE_NEWDATE:
         case DRIZZLE_COLUMN_TYPE_VARCHAR:
         case DRIZZLE_COLUMN_TYPE_ENUM:
@@ -257,35 +286,48 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
                                            size_t field_number, double *before,
                                            double *after)
 {
-    if (row == NULL || field_number >= row->values_before.size() ||
-        before == NULL || after == NULL )
+    drizzle_return_t ret;
+    drizzle_binlog_column_value_st *column_value =
+        get_column_value_st(row, field_number, before, after, &ret);
+
+    if (ret != DRIZZLE_RETURN_OK)
     {
-        return DRIZZLE_RETURN_INVALID_ARGUMENT;
+        return ret;
     }
 
-    drizzle_binlog_column_value_st *column_value = &row->values_before.at(
-            field_number);
+    return drizzle_binlog_get_field_value(row, column_value, field_number,
+                                          before, after,
+                                          get_field_datatype(column_value->type),
+                                          DRIZZLE_FIELD_DATATYPE_DECIMAL);
+    // if (row == NULL || field_number >= row->values_before.size() ||
+    //     before == NULL || after == NULL )
+    // {
+    //     return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    // }
 
-    if (get_field_datatype(column_value->type) !=
-        DRIZZLE_FIELD_DATATYPE_DECIMAL)
-    {
-        return DRIZZLE_RETURN_INVALID_ARGUMENT;
-    }
+    // drizzle_binlog_column_value_st *column_value = &row->values_before.at(
+    //         field_number);
 
-    drizzle_return_t ret_before = DRIZZLE_RETURN_OK;
-    drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
+    // if (get_field_datatype(column_value->type) !=
+    //     DRIZZLE_FIELD_DATATYPE_DECIMAL)
+    // {
+    //     return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    // }
 
-    *before = (double) drizzle_get_byte8(column_value->raw_value);
-    //*before = (double) drizzle_get_byte8(column_value->raw_value);
+    // drizzle_return_t ret_before = DRIZZLE_RETURN_OK;
+    // drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
 
-    if (row->is_update_event)
-    {
-        column_value = &row->values_after.at(field_number);
-        //*after = (double) drizzle_get_byte8(column_value->raw_value);
-        ret_after = assign_field_value(column_value, after);
-    }
+    // *before = (double) drizzle_get_byte8(column_value->raw_value);
+    // //*before = (double) drizzle_get_byte8(column_value->raw_value);
 
-    return ret_before == DRIZZLE_RETURN_OK &&
-           ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
-           ret_before;
+    // if (row->is_update_event)
+    // {
+    //     column_value = &row->values_after.at(field_number);
+    //     //*after = (double) drizzle_get_byte8(column_value->raw_value);
+    //     ret_after = assign_field_value(column_value, after);
+    // }
+
+    // return ret_before == DRIZZLE_RETURN_OK &&
+    //        ret_after == DRIZZLE_RETURN_OK ? DRIZZLE_RETURN_OK :
+    //        ret_before;
 } // drizzle_binlog_get_double
