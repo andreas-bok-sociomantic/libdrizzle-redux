@@ -41,7 +41,7 @@ drizzle_binlog_column_value_st *get_column_value_st(drizzle_binlog_row_st *row,
 template<typename T>
 drizzle_return_t assign_field_value(
     drizzle_binlog_column_value_st *column_value,
-    T *dest);
+    T *dest, bool is_unsigned);
 
 /**
  * @brief      { function_description }
@@ -65,7 +65,7 @@ template<typename T, typename U>
 drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
                                                 drizzle_binlog_column_value_st *column_value,
                                                 size_t field_number, T *before, T *after,
-                                                U type1, U type2);
+                                                U type1, U type2, bool is_unsigned=true);
 
 // check if the value is signed/unsigned
 // make a double cast through the actual type and the longest type
@@ -90,3 +90,8 @@ void signedness_cast(TYPE_DEST *dest, const unsigned char *src,
                      bool is_unsigned);
 
 
+/*template<typename T>
+drizzle_return_t drizzle_binlog_get_integer(drizzle_binlog_row_st *row,
+                                        size_t field_number, T *before,
+                                        T *after, bool is_unsigned);
+*/

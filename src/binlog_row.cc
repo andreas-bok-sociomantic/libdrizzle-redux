@@ -41,7 +41,7 @@ void signedness_cast(TYPE_DEST *dest, const unsigned char *src,
 template<typename T>
 drizzle_return_t assign_field_value(
     drizzle_binlog_column_value_st *column_value,
-    T *val)
+    T *val, bool is_unsigned)
 {
     if (column_value == NULL || val == NULL )
     {
@@ -50,7 +50,6 @@ drizzle_return_t assign_field_value(
 
     drizzle_return_t ret = DRIZZLE_RETURN_OK;
     const unsigned char *src_value = column_value->raw_value;
-    bool is_unsigned = column_value->is_unsigned;
 
     switch (column_value->type)
     {
@@ -193,7 +192,7 @@ template<typename T, typename U>
 drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
                                                 drizzle_binlog_column_value_st *column_value,
                                                 size_t field_number, T *before, T *after,
-                                                U type1, U type2)
+                                                U type1, U type2, bool is_unsigned)
 {
     if ( type1 != type2 )
     {
@@ -202,12 +201,12 @@ drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
 
     drizzle_return_t ret_before = DRIZZLE_RETURN_OK;
     drizzle_return_t ret_after = DRIZZLE_RETURN_OK;
-    ret_before = assign_field_value(column_value, before);
+    ret_before = assign_field_value(column_value, before, is_unsigned);
 
     if (row->is_update_event)
     {
         column_value = &row->values_after.at(field_number);
-        ret_after = assign_field_value(column_value, after);
+        ret_after = assign_field_value(column_value, after, is_unsigned);
     }
 
     return ret_before == DRIZZLE_RETURN_OK &&
@@ -215,6 +214,14 @@ drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
            ret_before;
 }
 
+
+/*drizzle_return_t drizzle_binlog_get_integer(drizzle_binlog_row_st *row,
+                                        size_t field_number, T *before,
+                                        T *after, bool is_unsigned)
+{
+
+}
+*/
 drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
                                         size_t field_number, int32_t *before,
                                         int32_t *after)
@@ -231,9 +238,12 @@ drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
     return drizzle_binlog_get_field_value(row, column_value, field_number,
                                           before, after,
                                           column_protocol_datatype(
-                                              column_value->type), NUMERICAL);
+                                              column_value->type), NUMERICAL,
+                                          false);
 
 } // drizzle_binlog_get_int
+  //
+
 
 
 drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
@@ -252,7 +262,8 @@ drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
     return drizzle_binlog_get_field_value(row, column_value, field_number,
                                           before, after,
                                           column_protocol_datatype(
-                                              column_value->type), NUMERICAL);
+                                              column_value->type), NUMERICAL,
+                                          true);
 
 } // drizzle_binlog_get_int
 
@@ -274,7 +285,7 @@ drizzle_return_t drizzle_binlog_get_big_int(drizzle_binlog_row_st *row,
     return drizzle_binlog_get_field_value(row, column_value, field_number,
                                           before, after,
                                           column_value->type,
-                                          DRIZZLE_COLUMN_TYPE_LONGLONG);
+                                          DRIZZLE_COLUMN_TYPE_LONGLONG, false);
 } // drizzle_binlog_get_big_uint
 
 
@@ -295,7 +306,7 @@ drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
     return drizzle_binlog_get_field_value(row, column_value, field_number,
                                           before, after,
                                           column_value->type,
-                                          DRIZZLE_COLUMN_TYPE_LONGLONG);
+                                          DRIZZLE_COLUMN_TYPE_LONGLONG, true);
 } // drizzle_binlog_get_big_uint
 
 drizzle_return_t drizzle_binlog_get_string(drizzle_binlog_row_st *row,
@@ -352,5 +363,5 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
                                           before, after,
                                           get_field_datatype(
                                               column_value->type),
-                                          DRIZZLE_FIELD_DATATYPE_DECIMAL);
+                                          DRIZZLE_FIELD_DATATYPE_DECIMAL, false);
 } // drizzle_binlog_get_double

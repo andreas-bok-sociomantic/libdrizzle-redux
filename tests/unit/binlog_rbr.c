@@ -183,10 +183,8 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
             {
                 drizzle_column_type_t column_type;
                 drizzle_field_datatype_t datatype;
-                bool is_unsigned = false;
                 driz_ret = drizzle_binlog_field_info(
-                        row, col_idx, &column_type, &datatype, &is_unsigned);
-
+                        row, col_idx, &column_type, &datatype);
 
                 if (driz_ret == DRIZZLE_RETURN_OK)
                 {
@@ -208,17 +206,17 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                     }
                     else if (datatype == DRIZZLE_FIELD_DATATYPE_LONGLONG)
                     {
-                        uint64_t int_val_before, int_val_after;
-                        driz_ret = drizzle_binlog_get_big_uint(row, col_idx,
+                        int64_t int_val_before, int_val_after;
+                        driz_ret = drizzle_binlog_get_big_int(row, col_idx,
                                                           &int_val_before,
                                                           &int_val_after);
 
-                        printf("Field #%d %s : %" PRIu64, col_idx,
+                        printf("Field #%d %s : %" PRId64, col_idx,
                                drizzle_column_type_str(column_type),
                                int_val_before);
                         if (is_rows_update_event(rows_event))
                         {
-                            printf(" -> %" PRIu64, int_val_after);
+                            printf(" -> %" PRId64, int_val_after);
                         }
                         printf("\n");
                     }
@@ -287,7 +285,7 @@ int main(int argc, char *argv[])
 
     CHECKED_QUERY("INSERT INTO test_binlog_rbr.binlog_rbr_tbl "
                   "(b,c,d,e,f,g,h,i,j,k, l) VALUES "
-                  "(1,2,4,8,16,32.25,64.25, 'this is a varchar', 128.51, "
+                  "(1,2,4,8,-16,32.25,64.25, 'this is a varchar', 128.51, "
                   "'a char', 'a mediumtext'"
                   ")");
 

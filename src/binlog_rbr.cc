@@ -347,7 +347,7 @@ drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *
 
 drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
     size_t field_idx, drizzle_column_type_t *type,
-    drizzle_field_datatype_t *datatype, bool *is_unsigned)
+    drizzle_field_datatype_t *datatype)
 {
     if (field_idx >= row->values_before.size())
     {
@@ -357,6 +357,5 @@ drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
     drizzle_binlog_column_value_st *column_value = &row->values_before.at(field_idx);
     *type = column_value->type;
     *datatype =  get_field_datatype(column_value->type);
-    *is_unsigned = column_value->is_unsigned;
     return DRIZZLE_RETURN_OK;
 }

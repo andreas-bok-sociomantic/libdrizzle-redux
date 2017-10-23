@@ -15,25 +15,25 @@ extern "C" {
  */
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
-                                        size_t field_number, uint32_t *before,
-                                        uint32_t *after);
+                                        size_t field_number, int32_t *before,
+                                        int32_t *after);
 
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
-                                        size_t field_number, uint32_t *before,
-                                        uint32_t *after);
+                                         size_t field_number, uint32_t *before,
+                                         uint32_t *after);
 
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_big_int(drizzle_binlog_row_st *row,
-                                           size_t field_number,
-                                           uint64_t *before,
-                                           uint64_t *after);
+                                            size_t field_number,
+                                            int64_t *before,
+                                            int64_t *after);
 
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
-                                           size_t field_number,
-                                           uint64_t *before,
-                                           uint64_t *after);
+                                             size_t field_number,
+                                             uint64_t *before,
+                                             uint64_t *after);
 
 
 /**
@@ -60,8 +60,9 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
 
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_timestamp(drizzle_binlog_row_st *row,
-                                           size_t field_number, time_t *before,
-                                           time_t *after);
+                                              size_t field_number,
+                                              time_t *before,
+                                              time_t *after);
 
 #ifdef __cplusplus
 }
