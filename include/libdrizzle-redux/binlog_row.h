@@ -98,6 +98,10 @@ drizzle_return_t drizzle_binlog_get_timestamp(drizzle_binlog_row_st *row,
                                               time_t *before,
                                               time_t *after);
 
+DRIZZLE_API
+drizzle_return_t drizzle_binlog_get_time(drizzle_binlog_row_st *row,
+                                         size_t field_number,
+                                         struct tm *before, struct tm *after);
 #ifdef __cplusplus
 }
 #endif

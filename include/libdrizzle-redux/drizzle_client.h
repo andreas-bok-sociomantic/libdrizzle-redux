@@ -50,6 +50,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <time.h>
 
 /* Visibility must come first */
 #include <libdrizzle-redux/visibility.h>

@@ -192,7 +192,8 @@ template<typename T, typename U>
 drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
                                                 drizzle_binlog_column_value_st *column_value,
                                                 size_t field_number, T *before, T *after,
-                                                U type1, U type2, bool is_unsigned)
+                                                U type1, U type2,
+                                                bool is_unsigned)
 {
     if ( type1 != type2 )
     {
@@ -216,12 +217,12 @@ drizzle_return_t drizzle_binlog_get_field_value(drizzle_binlog_row_st *row,
 
 
 /*drizzle_return_t drizzle_binlog_get_integer(drizzle_binlog_row_st *row,
-                                        size_t field_number, T *before,
-                                        T *after, bool is_unsigned)
-{
-
-}
-*/
+ *                                      size_t field_number, T *before,
+ *                                      T *after, bool is_unsigned)
+ * {
+ *
+ * }
+ */
 drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
                                         size_t field_number, int32_t *before,
                                         int32_t *after)
@@ -363,5 +364,28 @@ drizzle_return_t drizzle_binlog_get_double(drizzle_binlog_row_st *row,
                                           before, after,
                                           get_field_datatype(
                                               column_value->type),
-                                          DRIZZLE_FIELD_DATATYPE_DECIMAL, false);
+                                          DRIZZLE_FIELD_DATATYPE_DECIMAL,
+                                          false);
 } // drizzle_binlog_get_double
+
+drizzle_return_t drizzle_binlog_get_time(drizzle_binlog_row_st *row,
+                                         size_t field_number,
+                                         struct tm *before, struct tm *after)
+{
+    drizzle_return_t ret;
+    drizzle_binlog_column_value_st *column_value =
+        get_column_value_st(row, field_number, before, after, &ret);
+
+    if (ret != DRIZZLE_RETURN_OK)
+    {
+        return ret;
+    }
+
+    if ( get_field_datatype(column_value->type) != DRIZZLE_FIELD_DATATYPE_TEMPORAL )
+    {
+        return DRIZZLE_RETURN_INVALID_ARGUMENT;
+    }
+
+
+    return DRIZZLE_RETURN_OK;
+}
