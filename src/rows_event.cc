@@ -244,7 +244,6 @@ drizzle_return_t drizzle_binlog_parse_row(
             memcpy(&blob_len, ptr, blob_byte_length);
             ptr += blob_byte_length;
             column_value.set_field_value(column_type, ptr, blob_len);
-            printf("blob %s\n", column_value.raw_value);
             ptr += blob_len;
         }
         else if (column_protocol_datatype(column_type) == TEMPORAL)
@@ -322,9 +321,6 @@ void drizzle_binlog_column_value_st::set_field_value(
 
         case DRIZZLE_COLUMN_TYPE_FLOAT:
         {
-            float f = 0.0;
-            f = (*(float *) ptr);
-            printf("float: %f\n", f);
             mem_alloc_cpy(&this->raw_value, value_length, &ptr);
             break;
         }

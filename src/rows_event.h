@@ -97,7 +97,6 @@ struct drizzle_binlog_column_value_st
     drizzle_column_type_t type;
     unsigned char *raw_value;
     bool is_null;
-    bool is_unsigned;
     unsigned char metadata[2];
 
     drizzle_binlog_column_value_st(drizzle_column_type_t _type=DRIZZLE_COLUMN_TYPE_NONE,
