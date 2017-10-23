@@ -251,6 +251,8 @@ drizzle_return_t drizzle_binlog_parse_row(
             auto decimals = event->field_metadata[metadata_offset];
             auto field_size = temporal_field_size(column_type, decimals);
             column_value.set_field_value(column_type, ptr, field_size);
+            // copy the metadata to the column value
+            column_value.metadata[0] = event->field_metadata[metadata_offset];
             ptr += field_size;
         }
         else
