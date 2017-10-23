@@ -6,10 +6,12 @@ extern "C" {
 
 
 /**
- * @brief      Get an int field value
+ * @brief      Get a signed 32-bit integer value
  *
- * @param      column  The column struct
- * @param      value   Pointer to a value
+ * @param      row           The row
+ * @param[in]  field_number  The field number
+ * @param      before        The before value
+ * @param      after         The after value
  *
  * @return     return value
  */
@@ -18,17 +20,49 @@ drizzle_return_t drizzle_binlog_get_int(drizzle_binlog_row_st *row,
                                         size_t field_number, int32_t *before,
                                         int32_t *after);
 
+
+/**
+ * @brief      Get an unsigned 32-bit integer value
+ *
+ * @param      row           The row
+ * @param[in]  field_number  The field number
+ * @param      before        The before
+ * @param      after         The after
+ *
+ * @return     { description_of_the_return_value }
+ */
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_uint(drizzle_binlog_row_st *row,
                                          size_t field_number, uint32_t *before,
                                          uint32_t *after);
 
+
+/**
+ * @brief      Get a signed 64 bit integer value
+ *
+ * @param      row           The row
+ * @param[in]  field_number  The field number
+ * @param      before        The before
+ * @param      after         The after
+ *
+ * @return     { description_of_the_return_value }
+ */
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_big_int(drizzle_binlog_row_st *row,
                                             size_t field_number,
                                             int64_t *before,
                                             int64_t *after);
 
+/**
+ * @brief      Get an unsigned 64 bit integer value
+ *
+ * @param      row           The row
+ * @param[in]  field_number  The field number
+ * @param      before        The before
+ * @param      after         The after
+ *
+ * @return     { description_of_the_return_value }
+ */
 DRIZZLE_API
 drizzle_return_t drizzle_binlog_get_big_uint(drizzle_binlog_row_st *row,
                                              size_t field_number,
