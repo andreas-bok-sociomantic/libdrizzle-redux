@@ -89,4 +89,3 @@ template <typename T_UNSIGNED, typename T_SIGNED, typename TYPE_DEST>
 void signedness_cast(TYPE_DEST *dest, const unsigned char *src,
                      bool is_unsigned);
 
-

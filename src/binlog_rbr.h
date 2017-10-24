@@ -39,11 +39,156 @@
 #include <iterator>
 #include <cstdarg>
 
+// Gets extra information from INFORMATION_SCHEMA.COLUMNS about tables which are
+// NOT internal to MySQL
+//
+// The columns in INFORMATION_SCHEMA.COLUMNS include:
+//
+// +--------------------------+---------------------+--------+-------+-----------+---------+
+// | Field                    | Type                | Null   | Key   | Default
+//   | Extra   |
+// |--------------------------+---------------------+--------+-------+-----------+---------|
+// | TABLE_CATALOG            | varchar(512)        | NO     |       |
+//           |         |
+// | TABLE_SCHEMA             | varchar(64)         | NO     |       |
+//           |         |
+// | TABLE_NAME               | varchar(64)         | NO     |       |
+//           |         |
+// | COLUMN_NAME              | varchar(64)         | NO     |       |
+//           |         |
+// | ORDINAL_POSITION         | bigint(21) unsigned | NO     |       | 0
+//         |         |
+// | COLUMN_DEFAULT           | longtext            | YES    |       | <null>
+//    |         |
+// | IS_NULLABLE              | varchar(3)          | NO     |       |
+//           |         |
+// | DATA_TYPE                | varchar(64)         | NO     |       |
+//           |         |
+// | CHARACTER_MAXIMUM_LENGTH | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | CHARACTER_OCTET_LENGTH   | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | NUMERIC_PRECISION        | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | NUMERIC_SCALE            | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | DATETIME_PRECISION       | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | CHARACTER_SET_NAME       | varchar(32)         | YES    |       | <null>
+//    |         |
+// | COLLATION_NAME           | varchar(32)         | YES    |       | <null>
+//    |         |
+// | COLUMN_TYPE              | longtext            | NO     |       | <null>
+//    |         |
+// | COLUMN_KEY               | varchar(3)          | NO     |       |
+//           |         |
+// | EXTRA                    | varchar(30)         | NO     |       |
+//           |         |
+// | PRIVILEGES               | varchar(80)         | NO     |       |
+//           |         |
+// | COLUMN_COMMENT           | varchar(1024)       | NO     |       |
+//           |         |
+// | GENERATION_EXPRESSION    | longtext            | NO     |       | <null>
+//    |         |
+// +--------------------------+---------------------+--------+-------+-----------+---------+
 
+struct information_schema_column_st
+{
+    char schema[DRIZZLE_MAX_DB_SIZE];
+    char table[DRIZZLE_MAX_TABLE_SIZE];
+    char column[DRIZZLE_MAX_COLUMN_NAME_SIZE];
+    size_t index;
+    bool is_unsigned;
+    bool is_nullable;
+
+    information_schema_column_st(const char *schema_name = '\0',
+                                 const char *table_name = '\0',
+                                 const char *column_name = '\0',
+                                 size_t column_index = 0,
+                                 bool _is_unsigned = false,
+                                 bool _is_nullable = false) :
+        index(column_index), is_unsigned(_is_unsigned),
+        is_nullable(_is_nullable)
+    {
+        sprintf(schema, "%s", schema_name);
+        sprintf(table, "%s", table_name);
+        sprintf(column, "%s", column_name);
+
+    }
+};
+
+struct db_information_schema_columns_st
+{
+
+
+    char fmt_buffer[1024];
+
+    typedef std::pair<const char *,
+                      information_schema_column_st> pair_schema_table_column;
+    typedef std::unordered_map<const char *,
+                               information_schema_column_st>
+        map_schema_table_columns;
+
+
+    map_schema_table_columns schema_table_columns;
+
+    // information_schema_column_st get(const char *schema_name, const char
+    // *table_name, size_t 0)
+    // {
+    //     sprintf(&fmt_buffer[0], "%s.%s", schema, table);
+    // }
+
+    void add(const char *schema_name, const char *table_name,
+            const char *column_name,
+             size_t column_index,
+             bool _is_unsigned, bool _is_nullable)
+    {
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+        if (schema_table_columns.find(fmt_buffer) == schema_table_columns.end())
+        {
+            information_schema_column_st st(schema_name, table_name,
+                                            column_name,
+                                            column_index,
+                                            _is_unsigned, _is_nullable);
+            schema_table_columns.insert(std::make_pair(fmt_buffer, st));
+        }
+    }
+
+//     SELECT C.table_name,
+//        C.column_name,
+//        ABS(C.ordinal_position-1) ordinal_position,
+//        IF (C.column_type REGEXP 'unsigned',
+//                                 TRUE,
+//                                 FALSE) is_unsigned
+// FROM COLUMNS C
+// WHERE find_in_set(C.table_schema,
+// 'information_schema,sys,mysql,performance_schema') < 1
+// GROUP BY C.table_schema,
+//          C.table_name,
+//          C.column_name,
+//          ordinal_position,
+//          is_unsigned
+// ORDER BY C.table_schema,
+//          C.table_name,
+//          C.column_name,
+//          ordinal_position;
+
+};
+
+/**
+ * @brief      Create a struct containing extra information from
+ * INFORMATION_SCHEMA.COLUMNS about tables which are NOT internal to MySQL
+ *
+ * @param      con   drizzle_con struct
+ *
+ * @return     A allocated struct or NULL upon error
+ */
+db_information_schema_columns_st *drizzle_information_schema_create(
+    drizzle_st *con);
 
 struct tableid_rows_events_map
 {
-    typedef std::vector<drizzle_binlog_rows_event_st* > vec_ptr_row_events;
+    typedef std::vector<drizzle_binlog_rows_event_st * > vec_ptr_row_events;
     typedef std::unordered_map<uint64_t, vec_ptr_row_events>
         map_tableid_vec_row_events_ptr;
 
@@ -105,7 +250,7 @@ struct tableid_rows_events_map
      * @return     True if the table was found, False otherwise
      */
     bool set_rows_events_it(uint64_t _table_id, drizzle_list_position_t
-        pos=DRIZZLE_LIST_BEGIN)
+                            pos = DRIZZLE_LIST_BEGIN)
     {
         if (!has_table(_table_id))
         {
@@ -133,7 +278,7 @@ struct tableid_rows_events_map
      * @return     A pointer to a event struct, False if no more
      *             events are available
      */
-    drizzle_binlog_rows_event_st* next_row_event(uint64_t _table_id)
+    drizzle_binlog_rows_event_st *next_row_event(uint64_t _table_id)
     {
         if (!set_rows_events_it(_table_id))
         {
@@ -177,7 +322,7 @@ struct tableid_rows_events_map
     {
 
         return has_table(_table_id) ?
-            mapping.find(_table_id)->second.size() : 0;
+               mapping.find(_table_id)->second.size() : 0;
     }
 
     /**
@@ -190,7 +335,7 @@ struct tableid_rows_events_map
         this->table_changed = false;
         this->table_id = 0;
         this->mapping_it = mapping.begin();
-        for(;mapping_it != mapping.end(); mapping_it++)
+        for (; mapping_it != mapping.end(); mapping_it++)
         {
             this->mapping_it->second.clear();
         }
@@ -201,11 +346,11 @@ struct tableid_rows_events_map
 
 struct drizzle_binlog_rbr_st
 {
-    typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
+    typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st *>
         map_tablemap_events;
     typedef std::unordered_map<std::string, uint64_t>
         map_tablename_tableid;
-    typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
+    typedef std::vector<drizzle_binlog_rows_event_st *> vec_row_events;
 
     /**
      * @brief      Iterator for traversing a vector of rows
@@ -213,17 +358,18 @@ struct drizzle_binlog_rbr_st
     struct rows_events_iterator
     {
 
-        //** flag indicating if the iterator is active   */
+        // ** flag indicating if the iterator is active   */
         bool active;
 
-        //** iterate to traverse a vector of rows events */
+        // ** iterate to traverse a vector of rows events */
         vec_row_events::iterator it;
 
         /**
          * @brief      Constructor
          */
         rows_events_iterator() : active(false)
-            {}
+        {
+        }
 
         /**
          * @brief      Reset the state of the object
@@ -264,47 +410,47 @@ struct drizzle_binlog_rbr_st
     /** pointer to binlog struct */
     drizzle_binlog_st *binlog;
 
-    //** callback function */
+    // ** callback function */
     drizzle_binlog_rbr_fn *binlog_rbr_fn;
 
-    //** xid event struct */
+    // ** xid event struct */
     drizzle_binlog_xid_event_st xid_event;
 
-    //** query event struct  */
+    // ** query event struct  */
     drizzle_binlog_query_event_st query_event;
 
-    //** mapping from table id to table map event struct */
+    // ** mapping from table id to table map event struct */
     map_tablemap_events tablemap_events;
 
-    //** mapping from table name to table map event struct */
+    // ** mapping from table name to table map event struct */
     map_tablename_tableid tablename_tableid;
 
-    //** mapping between a table name to the table's rows event structs     */
+    // ** mapping between a table name to the table's rows event structs     */
     tableid_rows_events_map tableid_rows_events;
 
-    //** vector of parsed row event structs */
+    // ** vector of parsed row event structs */
     vec_row_events rows_events;
 
-    //** iterator for accessing the vector of row events structs */
+    // ** iterator for accessing the vector of row events structs */
     rows_events_iterator rows_event_it;
 
-    //* total number of row event in the current binlog event group.
+    // * total number of row event in the current binlog event group.
     //  If row events are not buffered this is always 1  */
     size_t row_events_count_;
 
-    //** number of parsed row events. */
+    // ** number of parsed row events. */
     size_t rows_events_parsed;
 
-    //** the id of the table from which to get row events */
+    // ** the id of the table from which to get row events */
     uint64_t current_tablemap_id;
 
-    //** buffer used for formatting */
+    // ** buffer used for formatting */
     char fmt_buffer[1024];
 
-    //** string used to create the unique schema.table identifier */
+    // ** string used to create the unique schema.table identifier */
     std::string _schema_table;
 
-    //** default database as specified with drizzle_create */
+    // ** default database as specified with drizzle_create */
     char db[DRIZZLE_MAX_DB_SIZE];
 
     /**
@@ -341,7 +487,7 @@ struct drizzle_binlog_rbr_st
      *
      * @param[in]  free_rows  bool flag
      */
-    void reset(bool free_rows=false);
+    void reset(bool free_rows = false);
 
     /**
      * Gets a tablemap event.
@@ -352,7 +498,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     Pointer to a tablemap event struct
      */
-    drizzle_binlog_tablemap_event_st *get_tablemap_event(uint64_t table_id=0);
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(uint64_t table_id = 0);
 
     /**
      * @brief      Gets a tablemap event by name
@@ -365,7 +511,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     The tablemap event.
      */
-    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char* table_name);
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char *table_name);
 
     /**
      * @brief      Creates a tablemap event.
@@ -397,7 +543,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     The row events count.
      */
-    size_t get_row_events_count(const char* table_name);
+    size_t get_row_events_count(const char *table_name);
 
     /**
      * @brief      Get a rows event.
@@ -430,7 +576,7 @@ struct drizzle_binlog_rbr_st
      *
      * @param      binlog_event  a drizzle binlog event struct
      */
-    void add_binlog_event(drizzle_binlog_event_st* binlog_event);
+    void add_binlog_event(drizzle_binlog_event_st *binlog_event);
 
     /**
      * @brief      Returns a string of a table name with its schema in the

@@ -1,6 +1,6 @@
 #include "config.h"
 #include "src/common.h"
-//#include <cstdarg>
+// #include <cstdarg>
 #include <stdarg.h>
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
@@ -17,9 +17,10 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
 }
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(
-    const char* table_name)
+    const char *table_name)
 {
     auto table_id = tableid_by_tablename(table_name);
+
     return table_id != 0 ? get_tablemap_event(table_id) : NULL;
 }
 
@@ -37,13 +38,14 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::create_tablemap_event(
     return tablemap_events.find(table_id)->second;
 }
 
-void drizzle_binlog_rbr_st::add_tablemap_event(drizzle_binlog_tablemap_event_st *event)
+void drizzle_binlog_rbr_st::add_tablemap_event(
+    drizzle_binlog_tablemap_event_st *event)
 {
     std::string schema_table(schema_table_name(event->table_name));
     if (tableid_by_tablename(schema_table.c_str()) == 0)
     {
         tablename_tableid.insert(std::make_pair(schema_table,
-            event->table_id));
+                                                event->table_id));
     }
     else
     {
@@ -145,23 +147,25 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
     current_tablemap_id = 0;
     rows_events_parsed = 0;
     rows_event_it.reset();
-}
+} // drizzle_binlog_rbr_st::reset
 
 size_t drizzle_binlog_rbr_st::get_row_events_count(const char *table_name)
 {
     auto table_id = tableid_by_tablename(table_name);
+
     return tableid_rows_events.row_events_count(table_id);
 }
 
 
 size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
-                                           ...)
+                                            ...)
 {
     size_t rows_count = 0;
     const char *table_name = NULL;
     va_list args;
+
     va_start(args, binlog_rbr);
-    table_name = va_arg(args, const char*);
+    table_name = va_arg(args, const char *);
     va_end(args);
 
     if (table_name == NULL)
@@ -190,6 +194,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
     const char *table_name = NULL;
 
     va_list args;
+
     va_start(args, binlog_rbr);
     table_name = va_arg(args, const char *);
     va_end(args);
@@ -272,16 +277,22 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
     drizzle_binlog_rbr_st *binlog_rbr, const char *table_name)
 {
-    if (table_name == NULL) return NULL;
+    if (table_name == NULL)
+    {
+        return NULL;
+    }
 
     return binlog_rbr->get_tablemap_event(table_name);
 }
 
-drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binlog_rbr,
-    drizzle_list_position_t pos, ...)
+drizzle_return_t drizzle_binlog_rbr_row_events_seek_(
+    drizzle_binlog_rbr_st *binlog_rbr,
+    drizzle_list_position_t pos,
+    ...)
 {
     const char *table_name = NULL;
     va_list args;
+
     va_start(args, pos);
     table_name = va_arg(args, const char *);
     va_end(args);
@@ -295,7 +306,7 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binl
         else
         {
             sprintf(binlog_rbr->binlog->con->last_error,
-                "table: %s does not exist ", table_name);
+                    "table: %s does not exist ", table_name);
             return DRIZZLE_RETURN_INVALID_ARGUMENT;
         }
     }
@@ -307,22 +318,22 @@ drizzle_return_t drizzle_binlog_rbr_row_events_seek_(drizzle_binlog_rbr_st *binl
     }
 
     return DRIZZLE_RETURN_OK;
-}
+} // drizzle_binlog_rbr_row_events_seek_
 
 
 drizzle_return_t drizzle_binlog_rbr_change_db(drizzle_binlog_rbr_st *binlog_rbr,
-    const char *db)
+                                              const char *db)
 {
     if (db == NULL || binlog_rbr == NULL)
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
     strncpy(binlog_rbr->db, db, DRIZZLE_MAX_DB_SIZE);
-    binlog_rbr->db[DRIZZLE_MAX_DB_SIZE - 1]= 0;
+    binlog_rbr->db[DRIZZLE_MAX_DB_SIZE - 1] = 0;
     return DRIZZLE_RETURN_OK;
 }
 
-const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr)
+const char *drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr)
 {
     if (binlog_rbr == NULL)
     {
@@ -331,9 +342,11 @@ const char* drizzle_binlog_rbr_db(const drizzle_binlog_rbr_st *binlog_rbr)
     return binlog_rbr->db;
 }
 
-drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *rows_event)
+drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(
+    drizzle_binlog_rows_event_st *rows_event)
 {
     drizzle_binlog_row_st *row = NULL;
+
     if (rows_event->current_row == 0)
     {
         row = &rows_event->rows.at(rows_event->current_row++);
@@ -346,17 +359,105 @@ drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *
 }
 
 drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
-    size_t field_idx, drizzle_column_type_t *type,
-    drizzle_field_datatype_t *datatype, bool *is_unsigned)
+                                           size_t field_idx,
+                                           drizzle_column_type_t *type,
+                                           drizzle_field_datatype_t *datatype,
+                                           bool *is_unsigned)
 {
     if (field_idx >= row->values_before.size())
     {
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
 
-    drizzle_binlog_column_value_st *column_value = &row->values_before.at(field_idx);
+    drizzle_binlog_column_value_st *column_value = &row->values_before.at(
+            field_idx);
     *type = column_value->type;
     *datatype =  get_field_datatype(column_value->type);
     *is_unsigned = column_value->is_unsigned;
     return DRIZZLE_RETURN_OK;
 }
+
+
+/**
+ * SQL to query information_schema.columns
+ */
+#define INFORMATION_SCHEMA_QUERY \
+    "SELECT " \
+    "C.table_schema, " \
+    "C.table_name, "\
+    "C.column_name, "\
+    "ABS(C.ordinal_position - 1) ordinal_position, "\
+    "IF(C.column_type REGEXP 'unsigned', "\
+    "   TRUE, "\
+    "   FALSE) is_unsigned,  "\
+    "IF(C.is_nullable REGEXP 'YES', "\
+    "   TRUE, "\
+    "   FALSE) is_nullable "\
+    "FROM COLUMNS C "\
+    "WHERE find_in_set(C.table_schema, "\
+    "                  'information_schema,sys,mysql,performance_schema') < 1 "\
+    "GROUP BY C.table_schema, "\
+    "C.table_name, "\
+    "C.column_name, "\
+    "ordinal_position, "\
+    "is_unsigned "\
+    "ORDER BY C.table_schema, "\
+    "C.table_name, "\
+    "C.column_name, "\
+    "ordinal_position"
+
+db_information_schema_columns_st *drizzle_information_schema_create(
+    drizzle_st *con)
+{
+    if (con == NULL)
+    {
+        return NULL;
+    }
+
+    auto *information_schema =
+        new (std::nothrow) db_information_schema_columns_st();
+    if (information_schema == NULL)
+    {
+        return NULL;
+    }
+    drizzle_return_t ret;
+
+    char orig_schema[DRIZZLE_MAX_DB_SIZE];
+    sprintf(orig_schema, "%s", drizzle_db(con));
+
+    ret = drizzle_select_db(con, "information_schema");
+    if (drizzle_failed(ret))
+    {
+        drizzle_set_error(con, __FILE_LINE_FUNC__,
+                          "Could not select db `INFORMATION_SCHEMA`");
+        return NULL;
+    }
+
+    drizzle_result_st *result = drizzle_query(con, INFORMATION_SCHEMA_QUERY, 0,
+                                              &ret);
+
+    if (ret != DRIZZLE_RETURN_OK)
+    {
+        drizzle_set_error(con, __FILE_LINE_FUNC__,
+                          "Could not query db `INFORMATION_SCHEMA.COLUMNS`\n");
+        return NULL;
+    }
+
+    if (drizzle_failed(drizzle_result_buffer(result)))
+    {
+        drizzle_set_error(con, __FILE_LINE_FUNC__, "Could not buffer result");
+        return NULL;
+    }
+
+    drizzle_row_t row;
+    while ((row = drizzle_row_next(result)))
+    {
+        information_schema->add(
+            row[0], row[1], row[2],
+            (size_t) atoi(row[3]), atoi(row[4]),
+            atoi(row[5]));
+    }
+
+    drizzle_select_db(con, orig_schema);
+    return information_schema;
+} // drizzle_information_schema_create
