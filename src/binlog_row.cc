@@ -146,8 +146,7 @@ drizzle_return_t assign_field_value(
             double d_value = 0.0;
             auto precision = column_value->metadata[0];
             auto decimals = column_value->metadata[1];
-            unpackDecimalField(column_value->raw_value, precision, decimals,
-                               &d_value);
+            unpack_decimal_field(column_value->raw_value, precision, decimals, &d_value);
             if (std::is_floating_point<typeof(T)>::value)
             {
                 // *val = (*(T *) column_value->raw_value);
