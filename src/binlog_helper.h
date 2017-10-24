@@ -151,7 +151,7 @@ size_t unpack_numeric_field(uint8_t *src, uint8_t type, uint8_t *dest);
 
 size_t unpack_decimal_field_length(uint precision, uint decimals);
 
-size_t unpackDecimalField ( unsigned char *ptr, uint precision, uint decimals,
+size_t unpack_decimal_field ( unsigned char *ptr, uint precision, uint decimals,
     double *value);
 
 uint64_t unpack_bytes(uint8_t *ptr, size_t bytes);
