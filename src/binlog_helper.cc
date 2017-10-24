@@ -475,7 +475,7 @@ size_t unpack_decimal_field_length(uint precision, uint decimals)
     return ibytes + fbytes;
 }
 
-size_t unpackDecimalField(unsigned char *ptr, uint precision, uint decimals,
+size_t unpack_decimal_field(unsigned char *ptr, uint precision, uint decimals,
                           double *value)
 {
     const int dec_dig = 9;
@@ -522,7 +522,7 @@ size_t unpackDecimalField(unsigned char *ptr, uint precision, uint decimals,
     *value = (double) val_i + ((double) val_f / (pow(10.0, decimals)));
 
     return ibytes + fbytes;
-} // unpackDecimalField
+} // unpack_decimal_field
 
 /**
  * @brief Unpack a YEAR type

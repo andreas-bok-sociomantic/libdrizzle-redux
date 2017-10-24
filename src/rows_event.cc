@@ -212,7 +212,7 @@ drizzle_return_t drizzle_binlog_parse_row(
 
             // auto precision = event->field_metadata[metadata_offset];
             // auto decimals = event->field_metadata[metadata_offset];
-            // size_t bytes = unpackDecimalField(ptr, precision, decimals,
+            // size_t bytes = unpack_decimal_field(ptr, precision, decimals,
             // &val);
             // column_value.set_field_value(column_type, ptr, bytes);
             // ptr+=bytes;
