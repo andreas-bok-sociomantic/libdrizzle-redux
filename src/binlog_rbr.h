@@ -94,24 +94,18 @@
 
 struct information_schema_column_st
 {
-    char schema[DRIZZLE_MAX_DB_SIZE];
-    char table[DRIZZLE_MAX_TABLE_SIZE];
     char column[DRIZZLE_MAX_COLUMN_NAME_SIZE];
     size_t index;
     bool is_unsigned;
     bool is_nullable;
 
-    information_schema_column_st(const char *schema_name = '\0',
-                                 const char *table_name = '\0',
-                                 const char *column_name = '\0',
+    information_schema_column_st(const char *column_name = '\0',
                                  size_t column_index = 0,
                                  bool _is_unsigned = false,
                                  bool _is_nullable = false) :
         index(column_index), is_unsigned(_is_unsigned),
         is_nullable(_is_nullable)
     {
-        sprintf(schema, "%s", schema_name);
-        sprintf(table, "%s", table_name);
         sprintf(column, "%s", column_name);
 
     }
@@ -119,24 +113,34 @@ struct information_schema_column_st
 
 struct db_information_schema_columns_st
 {
-
-
     char fmt_buffer[1024];
 
-    typedef std::pair<const char *,
-                      information_schema_column_st> pair_schema_table_column;
-    typedef std::unordered_map<const char *,
-                               information_schema_column_st>
-        map_schema_table_columns;
-
-
+    typedef std::vector<information_schema_column_st> vec_schema_columns;
+    typedef std::unordered_map<const char *, vec_schema_columns> map_schema_table_columns;
     map_schema_table_columns schema_table_columns;
+    map_schema_table_columns::iterator it;
 
-    // information_schema_column_st get(const char *schema_name, const char
-    // *table_name, size_t 0)
-    // {
-    //     sprintf(&fmt_buffer[0], "%s.%s", schema, table);
-    // }
+    vector<information_schema_column_st>* get(const char *schema_name, const char
+    *table_name)
+    {
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+        it = schema_table_columns.find(fmt_buffer);
+        if (it == schema_table_columns.end() || index >= it->second.size())
+            return NULL;
+
+        return it->second;
+    }
+
+    information_schema_column_st* get(const char *schema_name, const char
+    *table_name, size_t index)
+    {
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+        it = schema_table_columns.find(fmt_buffer);
+        if (it == schema_table_columns.end() || index >= it->second.size())
+            return NULL;
+
+        return &it->second.at(index);
+    }
 
     void add(const char *schema_name, const char *table_name,
             const char *column_name,
@@ -146,12 +150,23 @@ struct db_information_schema_columns_st
         sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
         if (schema_table_columns.find(fmt_buffer) == schema_table_columns.end())
         {
-            information_schema_column_st st(schema_name, table_name,
-                                            column_name,
+            vec_schema_columns vec;
+            schema_table_columns.insert(std::make_pair(fmt_buffer, vec));
+        }
+
+        information_schema_column_st st(column_name,
                                             column_index,
                                             _is_unsigned, _is_nullable);
-            schema_table_columns.insert(std::make_pair(fmt_buffer, st));
-        }
+        schema_table_columns.find(fmt_buffer)->second.push_back(st);
+
+        printf("Added information schem column: "
+            "%s.%s.%s index=%ld, unsigned=%d, nullable=%d\n",
+            schema_name,
+            table_name,
+            column_name,
+            column_index,
+            _is_unsigned,
+            _is_nullable);
     }
 
 //     SELECT C.table_name,
@@ -413,6 +428,9 @@ struct drizzle_binlog_rbr_st
     // ** callback function */
     drizzle_binlog_rbr_fn *binlog_rbr_fn;
 
+    // ** pointer to information schema column struct */
+    db_information_schema_columns_st *schema_columns;
+
     // ** xid event struct */
     drizzle_binlog_xid_event_st xid_event;
 
@@ -478,6 +496,9 @@ struct drizzle_binlog_rbr_st
         {
             delete v;
         }
+
+        if (schema_columns != NULL)
+            delete schema_columns;
         printf("called drizzle_binlog_rbr_st destructor\n");
     }
 

@@ -1,6 +1,5 @@
 #include "config.h"
 #include "src/common.h"
-// #include <cstdarg>
 #include <stdarg.h>
 
 drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_st::get_tablemap_event(

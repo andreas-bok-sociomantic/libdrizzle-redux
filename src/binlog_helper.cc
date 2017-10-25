@@ -905,3 +905,11 @@ drizzle_field_datatype_t get_field_datatype(drizzle_column_type_t field_type)
     } // switch
       //
 } // get_field_datatype
+
+const char *schema_name_from_tableid(drizzle_binlog_rbr_st *rbr, size_t table_id)
+{
+    if (rbr->tablemap_events->find(table_id))
+        return rbr->tablemap_events->find(table_id)->second.schema_name;
+    else
+        return NULL;
+}

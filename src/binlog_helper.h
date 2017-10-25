@@ -165,3 +165,4 @@ int lookup_field_bytesize(drizzle_column_type_t field_type);
 
 drizzle_field_datatype_t get_field_datatype(drizzle_column_type_t field_type);
 
+const char *schema_name_from_tableid(drizzle_binlog_rbr_st *rbr, size_t table_id);
