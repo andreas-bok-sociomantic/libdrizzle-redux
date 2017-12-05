@@ -39,7 +39,167 @@
 #include <iterator>
 #include <cstdarg>
 
+// Gets extra information from INFORMATION_SCHEMA.COLUMNS about tables which are
+// NOT internal to MySQL
+//
+// The columns in INFORMATION_SCHEMA.COLUMNS include:
+//
+// +--------------------------+---------------------+--------+-------+-----------+---------+
+// | Field                    | Type                | Null   | Key   | Default
+//   | Extra   |
+// |--------------------------+---------------------+--------+-------+-----------+---------|
+// | TABLE_CATALOG            | varchar(512)        | NO     |       |
+//           |         |
+// | TABLE_SCHEMA             | varchar(64)         | NO     |       |
+//           |         |
+// | TABLE_NAME               | varchar(64)         | NO     |       |
+//           |         |
+// | COLUMN_NAME              | varchar(64)         | NO     |       |
+//           |         |
+// | ORDINAL_POSITION         | bigint(21) unsigned | NO     |       | 0
+//         |         |
+// | COLUMN_DEFAULT           | longtext            | YES    |       | <null>
+//    |         |
+// | IS_NULLABLE              | varchar(3)          | NO     |       |
+//           |         |
+// | DATA_TYPE                | varchar(64)         | NO     |       |
+//           |         |
+// | CHARACTER_MAXIMUM_LENGTH | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | CHARACTER_OCTET_LENGTH   | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | NUMERIC_PRECISION        | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | NUMERIC_SCALE            | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | DATETIME_PRECISION       | bigint(21) unsigned | YES    |       | <null>
+//    |         |
+// | CHARACTER_SET_NAME       | varchar(32)         | YES    |       | <null>
+//    |         |
+// | COLLATION_NAME           | varchar(32)         | YES    |       | <null>
+//    |         |
+// | COLUMN_TYPE              | longtext            | NO     |       | <null>
+//    |         |
+// | COLUMN_KEY               | varchar(3)          | NO     |       |
+//           |         |
+// | EXTRA                    | varchar(30)         | NO     |       |
+//           |         |
+// | PRIVILEGES               | varchar(80)         | NO     |       |
+//           |         |
+// | COLUMN_COMMENT           | varchar(1024)       | NO     |       |
+//           |         |
+// | GENERATION_EXPRESSION    | longtext            | NO     |       | <null>
+//    |         |
+// +--------------------------+---------------------+--------+-------+-----------+---------+
 
+struct information_schema_column_st
+{
+    char column[DRIZZLE_MAX_COLUMN_NAME_SIZE];
+    size_t index;
+    bool is_unsigned;
+    bool is_nullable;
+
+    information_schema_column_st(const char *column_name = '\0',
+                                 size_t column_index = 0,
+                                 bool _is_unsigned = false,
+                                 bool _is_nullable = false) :
+        index(column_index), is_unsigned(_is_unsigned),
+        is_nullable(_is_nullable)
+    {
+        sprintf(column, "%s", column_name);
+
+    }
+};
+
+struct db_information_schema_columns_st
+{
+    char fmt_buffer[1024];
+
+    typedef std::vector<information_schema_column_st> vec_schema_columns;
+    typedef std::unordered_map<const char *, vec_schema_columns> map_schema_table_columns;
+    map_schema_table_columns schema_table_columns;
+    map_schema_table_columns::iterator it;
+
+    vector<information_schema_column_st>* get(const char *schema_name, const char
+    *table_name)
+    {
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+        it = schema_table_columns.find(fmt_buffer);
+        if (it == schema_table_columns.end() || index >= it->second.size())
+            return NULL;
+
+        return it->second;
+    }
+
+    information_schema_column_st* get(const char *schema_name, const char
+    *table_name, size_t index)
+    {
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+        it = schema_table_columns.find(fmt_buffer);
+        if (it == schema_table_columns.end() || index >= it->second.size())
+            return NULL;
+
+        return &it->second.at(index);
+    }
+
+    void add(const char *schema_name, const char *table_name,
+            const char *column_name,
+             size_t column_index,
+             bool _is_unsigned, bool _is_nullable)
+    {
+        sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
+        if (schema_table_columns.find(fmt_buffer) == schema_table_columns.end())
+        {
+            vec_schema_columns vec;
+            schema_table_columns.insert(std::make_pair(fmt_buffer, vec));
+        }
+
+        information_schema_column_st st(column_name,
+                                            column_index,
+                                            _is_unsigned, _is_nullable);
+        schema_table_columns.find(fmt_buffer)->second.push_back(st);
+
+        printf("Added information schem column: "
+            "%s.%s.%s index=%ld, unsigned=%d, nullable=%d\n",
+            schema_name,
+            table_name,
+            column_name,
+            column_index,
+            _is_unsigned,
+            _is_nullable);
+    }
+
+//     SELECT C.table_name,
+//        C.column_name,
+//        ABS(C.ordinal_position-1) ordinal_position,
+//        IF (C.column_type REGEXP 'unsigned',
+//                                 TRUE,
+//                                 FALSE) is_unsigned
+// FROM COLUMNS C
+// WHERE find_in_set(C.table_schema,
+// 'information_schema,sys,mysql,performance_schema') < 1
+// GROUP BY C.table_schema,
+//          C.table_name,
+//          C.column_name,
+//          ordinal_position,
+//          is_unsigned
+// ORDER BY C.table_schema,
+//          C.table_name,
+//          C.column_name,
+//          ordinal_position;
+
+};
+
+/**
+ * @brief      Create a struct containing extra information from
+ * INFORMATION_SCHEMA.COLUMNS about tables which are NOT internal to MySQL
+ *
+ * @param      con   drizzle_con struct
+ *
+ * @return     A allocated struct or NULL upon error
+ */
+db_information_schema_columns_st *drizzle_information_schema_create(
+    drizzle_st *con);
 
 struct tableid_rows_events_map
 {
@@ -268,7 +428,10 @@ struct drizzle_binlog_rbr_st
     // ** callback function */
     drizzle_binlog_rbr_fn *binlog_rbr_fn;
 
-    //** xid event struct */
+    // ** pointer to information schema column struct */
+    db_information_schema_columns_st *schema_columns;
+
+    // ** xid event struct */
     drizzle_binlog_xid_event_st xid_event;
 
     // ** query event struct  */
@@ -333,6 +496,9 @@ struct drizzle_binlog_rbr_st
         {
             delete v;
         }
+
+        if (schema_columns != NULL)
+            delete schema_columns;
         printf("called drizzle_binlog_rbr_st destructor\n");
     }
 

@@ -373,3 +373,88 @@ drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
     *datatype =  get_field_datatype(column_value->type);
     return DRIZZLE_RETURN_OK;
 }
+
+
+/**
+ * SQL to query information_schema.columns
+ */
+#define INFORMATION_SCHEMA_QUERY \
+    "SELECT " \
+    "C.table_schema, " \
+    "C.table_name, "\
+    "C.column_name, "\
+    "ABS(C.ordinal_position - 1) ordinal_position, "\
+    "IF(C.column_type REGEXP 'unsigned', "\
+    "   TRUE, "\
+    "   FALSE) is_unsigned,  "\
+    "IF(C.is_nullable REGEXP 'YES', "\
+    "   TRUE, "\
+    "   FALSE) is_nullable "\
+    "FROM COLUMNS C "\
+    "WHERE find_in_set(C.table_schema, "\
+    "                  'information_schema,sys,mysql,performance_schema') < 1 "\
+    "GROUP BY C.table_schema, "\
+    "C.table_name, "\
+    "C.column_name, "\
+    "ordinal_position, "\
+    "is_unsigned "\
+    "ORDER BY C.table_schema, "\
+    "C.table_name, "\
+    "C.column_name, "\
+    "ordinal_position"
+
+db_information_schema_columns_st *drizzle_information_schema_create(
+    drizzle_st *con)
+{
+    if (con == NULL)
+    {
+        return NULL;
+    }
+
+    auto *information_schema =
+        new (std::nothrow) db_information_schema_columns_st();
+    if (information_schema == NULL)
+    {
+        return NULL;
+    }
+    drizzle_return_t ret;
+
+    char orig_schema[DRIZZLE_MAX_DB_SIZE];
+    sprintf(orig_schema, "%s", drizzle_db(con));
+
+    ret = drizzle_select_db(con, "information_schema");
+    if (drizzle_failed(ret))
+    {
+        drizzle_set_error(con, __FILE_LINE_FUNC__,
+                          "Could not select db `INFORMATION_SCHEMA`");
+        return NULL;
+    }
+
+    drizzle_result_st *result = drizzle_query(con, INFORMATION_SCHEMA_QUERY, 0,
+                                              &ret);
+
+    if (ret != DRIZZLE_RETURN_OK)
+    {
+        drizzle_set_error(con, __FILE_LINE_FUNC__,
+                          "Could not query db `INFORMATION_SCHEMA.COLUMNS`\n");
+        return NULL;
+    }
+
+    if (drizzle_failed(drizzle_result_buffer(result)))
+    {
+        drizzle_set_error(con, __FILE_LINE_FUNC__, "Could not buffer result");
+        return NULL;
+    }
+
+    drizzle_row_t row;
+    while ((row = drizzle_row_next(result)))
+    {
+        information_schema->add(
+            row[0], row[1], row[2],
+            (size_t) atoi(row[3]), atoi(row[4]),
+            atoi(row[5]));
+    }
+
+    drizzle_select_db(con, orig_schema);
+    return information_schema;
+} // drizzle_information_schema_create

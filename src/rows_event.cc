@@ -109,9 +109,12 @@ drizzle_return_t drizzle_binlog_parse_row(
     unsigned idx_null_bitmap = 0;
     int extra_bits = (event->bitmap_size * 8) - event->column_count;
 
+    std::vector<information_schema_column_st> *schema_columns;
+    auto schema_name = schema_name_from_tableid(event->rbr, event->table_id);
+    schema_columns = event->binlog_rbr->schema_columns->get(schema_name, event->table_name);
+    information_schema_column_st *information_column;
     for ( unsigned i = 0; i < event->column_count; i++ )
     {
-
         // skip if column is not present
         if (!bit_is_set(columns_present, i))
         {
@@ -124,6 +127,7 @@ drizzle_return_t drizzle_binlog_parse_row(
 
         drizzle_binlog_column_value_st column_value;
         column_value.type = column_type;
+        column_value.is_unsigned = schema_columns->at(i).is_unsigned;
 
         // parse the column value
         if (bit_is_set(null_bitmap, idx_null_bitmap++))

@@ -145,8 +145,10 @@ drizzle_binlog_st *drizzle_binlog_rbr_init(drizzle_st *con,
 
   binlog->binlog_rbr->binlog_rbr_fn = binlog_rbr_fn;
   sprintf(binlog->binlog_rbr->db, "%s", binlog->con->db);
-  //printf("db after assign: %s\n",  binlog->binlog_rbr->db);
-  //strcpy(binlog->binlog_rbr->db, binlog->con->db);
+
+  db_information_schema_columns_st *schema_columns =
+    drizzle_information_schema_create(con);
+  binlog->binlog_rbr->schema_columns = schema_columns;
 
   return binlog;
 }
