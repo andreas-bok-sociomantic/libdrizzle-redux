@@ -43,7 +43,7 @@
 
 struct tableid_rows_events_map
 {
-    typedef std::vector<drizzle_binlog_rows_event_st* > vec_ptr_row_events;
+    typedef std::vector<drizzle_binlog_rows_event_st *> vec_ptr_row_events;
     typedef std::unordered_map<uint64_t, vec_ptr_row_events>
         map_tableid_vec_row_events_ptr;
 
@@ -105,7 +105,7 @@ struct tableid_rows_events_map
      * @return     True if the table was found, False otherwise
      */
     bool set_rows_events_it(uint64_t _table_id, drizzle_list_position_t
-        pos=DRIZZLE_LIST_BEGIN)
+                            pos = DRIZZLE_LIST_BEGIN)
     {
         if (!has_table(_table_id))
         {
@@ -133,7 +133,7 @@ struct tableid_rows_events_map
      * @return     A pointer to a event struct, False if no more
      *             events are available
      */
-    drizzle_binlog_rows_event_st* next_row_event(uint64_t _table_id)
+    drizzle_binlog_rows_event_st *next_row_event(uint64_t _table_id)
     {
         if (!set_rows_events_it(_table_id))
         {
@@ -177,7 +177,7 @@ struct tableid_rows_events_map
     {
 
         return has_table(_table_id) ?
-            mapping.find(_table_id)->second.size() : 0;
+               mapping.find(_table_id)->second.size() : 0;
     }
 
     /**
@@ -190,7 +190,7 @@ struct tableid_rows_events_map
         this->table_changed = false;
         this->table_id = 0;
         this->mapping_it = mapping.begin();
-        for(;mapping_it != mapping.end(); mapping_it++)
+        for (; mapping_it != mapping.end(); mapping_it++)
         {
             this->mapping_it->second.clear();
         }
@@ -201,11 +201,11 @@ struct tableid_rows_events_map
 
 struct drizzle_binlog_rbr_st
 {
-    typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st*>
+    typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st *>
         map_tablemap_events;
     typedef std::unordered_map<std::string, uint64_t>
         map_tablename_tableid;
-    typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
+    typedef std::vector<drizzle_binlog_rows_event_st *> vec_row_events;
 
     /**
      * @brief      Iterator for traversing a vector of rows
@@ -213,17 +213,18 @@ struct drizzle_binlog_rbr_st
     struct rows_events_iterator
     {
 
-        //** flag indicating if the iterator is active   */
+        // ** flag indicating if the iterator is active   */
         bool active;
 
-        //** iterate to traverse a vector of rows events */
+        // ** iterate to traverse a vector of rows events */
         vec_row_events::iterator it;
 
         /**
          * @brief      Constructor
          */
         rows_events_iterator() : active(false)
-            {}
+        {
+        }
 
         /**
          * @brief      Reset the state of the object
@@ -264,47 +265,47 @@ struct drizzle_binlog_rbr_st
     /** pointer to binlog struct */
     drizzle_binlog_st *binlog;
 
-    //** callback function */
+    // ** callback function */
     drizzle_binlog_rbr_fn *binlog_rbr_fn;
 
     //** xid event struct */
     drizzle_binlog_xid_event_st xid_event;
 
-    //** query event struct  */
+    // ** query event struct  */
     drizzle_binlog_query_event_st query_event;
 
-    //** mapping from table id to table map event struct */
+    // ** mapping from table id to table map event struct */
     map_tablemap_events tablemap_events;
 
-    //** mapping from table name to table map event struct */
+    // ** mapping from table name to table map event struct */
     map_tablename_tableid tablename_tableid;
 
-    //** mapping between a table name to the table's rows event structs     */
+    // ** mapping between a table name to the table's rows event structs     */
     tableid_rows_events_map tableid_rows_events;
 
-    //** vector of parsed row event structs */
+    // ** vector of parsed row event structs */
     vec_row_events rows_events;
 
-    //** iterator for accessing the vector of row events structs */
+    // ** iterator for accessing the vector of row events structs */
     rows_events_iterator rows_event_it;
 
-    //* total number of row event in the current binlog event group.
+    // * total number of row event in the current binlog event group.
     //  If row events are not buffered this is always 1  */
     size_t row_events_count_;
 
-    //** number of parsed row events. */
+    // ** number of parsed row events. */
     size_t rows_events_parsed;
 
-    //** the id of the table from which to get row events */
+    // ** the id of the table from which to get row events */
     uint64_t current_tablemap_id;
 
-    //** buffer used for formatting */
+    // ** buffer used for formatting */
     char fmt_buffer[1024];
 
-    //** string used to create the unique schema.table identifier */
+    // ** string used to create the unique schema.table identifier */
     std::string _schema_table;
 
-    //** default database as specified with drizzle_create */
+    // ** default database as specified with drizzle_create */
     char db[DRIZZLE_MAX_DB_SIZE];
 
     /**
@@ -341,7 +342,7 @@ struct drizzle_binlog_rbr_st
      *
      * @param[in]  free_rows  bool flag
      */
-    void reset(bool free_rows=false);
+    void reset(bool free_rows = false);
 
     /**
      * Gets a tablemap event.
@@ -352,7 +353,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     Pointer to a tablemap event struct
      */
-    drizzle_binlog_tablemap_event_st *get_tablemap_event(uint64_t table_id=0);
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(uint64_t table_id = 0);
 
     /**
      * @brief      Gets a tablemap event by name
@@ -365,7 +366,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     The tablemap event.
      */
-    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char* table_name);
+    drizzle_binlog_tablemap_event_st *get_tablemap_event(const char *table_name);
 
     /**
      * @brief      Creates a tablemap event.
@@ -397,7 +398,7 @@ struct drizzle_binlog_rbr_st
      *
      * @return     The row events count.
      */
-    size_t get_row_events_count(const char* table_name);
+    size_t get_row_events_count(const char *table_name);
 
     /**
      * @brief      Get a rows event.
@@ -430,7 +431,7 @@ struct drizzle_binlog_rbr_st
      *
      * @param      binlog_event  a drizzle binlog event struct
      */
-    void add_binlog_event(drizzle_binlog_event_st* binlog_event);
+    void add_binlog_event(drizzle_binlog_event_st *binlog_event);
 
     /**
      * @brief      Returns a string of a table name with its schema in the
