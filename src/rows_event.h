@@ -108,6 +108,17 @@ struct drizzle_binlog_column_value_st
 
     void set_field_value(drizzle_column_type_t _column_type, unsigned char*ptr,
         size_t value_length=0);
+
+    ~drizzle_binlog_column_value_st()
+    {
+//        printf("RAW_VALUE NULL=%d\n", this->raw_value == NULL);
+
+/*        if (this->raw_value !=NULL &&
+            get_field_datatype(this->type) != DRIZZLE_FIELD_DATATYPE_LONG)
+        {
+           free(this->raw_value);
+        }*/
+    }
 };
 
 typedef std::vector<drizzle_binlog_column_value_st> column_values;
