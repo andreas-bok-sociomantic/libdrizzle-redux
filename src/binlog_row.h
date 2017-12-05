@@ -89,7 +89,6 @@ template <typename T_UNSIGNED, typename T_SIGNED, typename TYPE_DEST>
 void signedness_cast(TYPE_DEST *dest, const unsigned char *src,
                      bool is_unsigned);
 
-
 /*template<typename T>
 drizzle_return_t drizzle_binlog_get_integer(drizzle_binlog_row_st *row,
                                         size_t field_number, T *before,
