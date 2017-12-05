@@ -497,8 +497,8 @@ struct drizzle_binlog_rbr_st
             delete v;
         }
 
-        if (schema_columns != NULL)
-            delete schema_columns;
+/*        if (schema_columns != NULL)
+            delete schema_columns;*/
         printf("called drizzle_binlog_rbr_st destructor\n");
     }
 
