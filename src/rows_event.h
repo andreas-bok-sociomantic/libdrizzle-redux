@@ -36,7 +36,7 @@
 
 #include <vector>
 
-
+struct information_schema_column_st;
 /**
  * @brief      Rows_event event
  *
@@ -286,7 +286,7 @@ struct drizzle_binlog_row_events_st
 drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     drizzle_binlog_event_st *event);
 
-
 drizzle_return_t drizzle_binlog_parse_row(
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
     unsigned char *columns_present, column_values *row);
+//    std::vector<information_schema_column_st> *schema_columns);
