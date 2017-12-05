@@ -120,15 +120,15 @@ struct db_information_schema_columns_st
     map_schema_table_columns schema_table_columns;
     map_schema_table_columns::iterator it;
 
-    vector<information_schema_column_st>* get(const char *schema_name, const char
-    *table_name)
+    std::vector<information_schema_column_st>* get(const char *schema_name,
+        const char *table_name)
     {
         sprintf(&fmt_buffer[0], "%s.%s", schema_name, table_name);
         it = schema_table_columns.find(fmt_buffer);
-        if (it == schema_table_columns.end() || index >= it->second.size())
+        if (it == schema_table_columns.end())
             return NULL;
 
-        return it->second;
+        return &it->second;
     }
 
     information_schema_column_st* get(const char *schema_name, const char
