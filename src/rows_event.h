@@ -223,7 +223,9 @@ struct drizzle_binlog_rows_event_st
         field_metadata(NULL),
         bitmap_size(0),
         current_row(0)
-    {}
+    {
+        this->table_name[0] = '\0';
+    }
 
     ~drizzle_binlog_rows_event_st()
     {
