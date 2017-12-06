@@ -155,6 +155,9 @@ struct drizzle_binlog_tablemap_event_st
             this->schema_name[0] = '\0';
         }
 
+    /**
+     * @brief      Destroys the object.
+     */
     ~drizzle_binlog_tablemap_event_st()
     {
         if(column_type_def!=NULL)
