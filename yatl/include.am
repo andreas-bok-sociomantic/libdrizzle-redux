@@ -17,8 +17,7 @@ export LIBTOOL_COMMAND
 export VALGRIND_COMMAND
 export HELGRIND_COMMAND
 export DRD_COMMAND
-export GDB_COMMAND 
-  
+export GDB_COMMAND
 valgrind:
 	@echo make check TESTS_ENVIRONMENT="\"$(VALGRIND_EXEC_COMMAND)\""
 
