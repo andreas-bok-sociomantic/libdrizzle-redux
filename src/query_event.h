@@ -116,7 +116,9 @@ struct drizzle_binlog_query_event_st
         status_vars_length(0),
         status_vars(NULL),
         query(NULL)
-    {}
+    {
+        this->schema[0] = '\0';
+    }
 
     ~drizzle_binlog_query_event_st()
     {

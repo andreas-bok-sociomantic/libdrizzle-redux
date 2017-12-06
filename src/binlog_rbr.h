@@ -107,7 +107,6 @@ struct information_schema_column_st
         is_nullable(_is_nullable)
     {
         sprintf(column, "%s", column_name);
-
     }
 };
 
@@ -485,6 +484,10 @@ struct drizzle_binlog_rbr_st
         row_events_count_(0),
         current_tablemap_id(0)
     {
+        this->fmt_buffer[0] = '\0';
+        this->_schema_table = "";
+        this->db[0] = '\0';
+
     }
 
     /**
