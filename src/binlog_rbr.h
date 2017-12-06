@@ -449,6 +449,10 @@ struct drizzle_binlog_rbr_st
     // ** vector of parsed row event structs */
     vec_row_events rows_events;
 
+    vec_column_values column_values;
+
+    size_t column_values_size;
+
     // ** iterator for accessing the vector of row events structs */
     rows_events_iterator rows_event_it;
 
@@ -477,6 +481,7 @@ struct drizzle_binlog_rbr_st
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
+        column_values_size(0),
         row_events_count_(0),
         current_tablemap_id(0)
     {
@@ -495,6 +500,12 @@ struct drizzle_binlog_rbr_st
         for (auto v : rows_events)
         {
             delete v;
+        }
+
+
+        for (auto column_value : column_values)
+        {
+            delete column_value;
         }
 
 /*        if (schema_columns != NULL)
@@ -576,6 +587,9 @@ struct drizzle_binlog_rbr_st
      * @return     Pointer to a rows event
      */
     drizzle_binlog_rows_event_st *create_rows_event();
+
+
+    drizzle_binlog_column_value_st *create_column_value();
 
 
     /**

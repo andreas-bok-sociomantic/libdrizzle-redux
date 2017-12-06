@@ -41,7 +41,7 @@ void drizzle_binlog_rbr_st::add_tablemap_event(
     drizzle_binlog_tablemap_event_st *event)
 {
     std::string schema_table(schema_table_name(event->table_name));
-    if (tableid_by_tablename(schema_table.c_str()) == 0)
+    if (tablename_tableid.find(schema_table.c_str()) == tablename_tableid.end())
     {
         tablename_tableid.insert(std::make_pair(schema_table,
                                                 event->table_id));
@@ -146,6 +146,7 @@ void drizzle_binlog_rbr_st::reset(bool free_all)
     current_tablemap_id = 0;
     rows_events_parsed = 0;
     rows_event_it.reset();
+    column_values_size =0;
 } // drizzle_binlog_rbr_st::reset
 
 size_t drizzle_binlog_rbr_st::get_row_events_count(const char *table_name)
@@ -367,7 +368,7 @@ drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
         return DRIZZLE_RETURN_INVALID_ARGUMENT;
     }
 
-    drizzle_binlog_column_value_st *column_value = &row->values_before.at(
+    drizzle_binlog_column_value_st *column_value = row->values_before.at(
             field_idx);
     *type = column_value->type;
     *datatype =  get_field_datatype(column_value->type);
@@ -458,3 +459,16 @@ db_information_schema_columns_st *drizzle_information_schema_create(
     drizzle_select_db(con, orig_schema);
     return information_schema;
 } // drizzle_information_schema_create
+
+
+drizzle_binlog_column_value_st *drizzle_binlog_rbr_st::create_column_value()
+{
+    drizzle_binlog_column_value_st *column_value;
+    if (this->column_values_size >= this->column_values.size())
+    {
+        column_value = new (std::nothrow) drizzle_binlog_column_value_st;
+        this->column_values.push_back(column_value);
+    }
+
+    return this->column_values.at(this->column_values_size++);
+}

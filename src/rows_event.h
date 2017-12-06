@@ -113,24 +113,31 @@ struct drizzle_binlog_column_value_st
     {
 //        printf("RAW_VALUE NULL=%d\n", this->raw_value == NULL);
 
-/*        if (this->raw_value !=NULL &&
-            get_field_datatype(this->type) != DRIZZLE_FIELD_DATATYPE_LONG)
+        if (this->raw_value !=NULL)
         {
            free(this->raw_value);
-        }*/
+        }
     }
 };
 
-typedef std::vector<drizzle_binlog_column_value_st> column_values;
+typedef std::vector<drizzle_binlog_column_value_st*> vec_column_values;
 
 struct drizzle_binlog_row_st
 {
     bool is_update_event;
-    column_values values_before;
-    column_values values_after;
+    vec_column_values values_before;
+    vec_column_values values_after;
 
-    drizzle_binlog_row_st(bool _is_update_event=false) : is_update_event(_is_update_event)
-    {}
+    drizzle_binlog_row_st(bool _is_update_event=false) :
+    is_update_event(_is_update_event)
+    {
+    }
+
+    ~drizzle_binlog_row_st()
+    {
+        this->values_before.clear();
+        this->values_after.clear();
+    }
 };
 
 struct drizzle_binlog_rows_event_st
@@ -245,10 +252,14 @@ struct drizzle_binlog_row_events_st
     vec_row_events rows_events;
     bool active;
     vec_row_events::iterator it_;
-    size_t count_;
     drizzle_binlog_row_events_st() :
         active(false)
     {}
+
+    ~drizzle_binlog_row_events_st()
+    {
+        this->rows_events.clear();
+    }
 
     void reset()
     {
@@ -274,16 +285,6 @@ struct drizzle_binlog_row_events_st
     {
         return index < rows_events.size() ? rows_events.at(index) : NULL;
     }
-
-    void operator++()
-    {
-        it_++;
-    }
-
-    void operator--(int)
-    {
-        it_--;
-    }
 };
 
 
@@ -299,5 +300,6 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
 
 drizzle_return_t drizzle_binlog_parse_row(
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
-    unsigned char *columns_present, column_values *row);
+    unsigned char *columns_present, vec_column_values *row,
+    drizzle_binlog_column_value_st *column_value);
 //    std::vector<information_schema_column_st> *schema_columns);
