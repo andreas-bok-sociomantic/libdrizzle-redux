@@ -171,6 +171,16 @@ DRIZZLE_API
 drizzle_binlog_row_st *drizzle_binlog_rbr_get_row(drizzle_binlog_rows_event_st *rows_event);
 
 DRIZZLE_API
+/**
+ * @brief      Get info about a field
+ *
+ * @param      row        A drizzle binlog struct
+ * @param[in]  field_idx  The field index
+ * @param      type       The type
+ * @param      datatype   The datatype of the field
+ *
+ * @return     A Drizzle return type. DRIZZLE_RETURN_OK upon success.
+ */
 drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
     size_t field_idx, drizzle_column_type_t *type,
     drizzle_field_datatype_t *datatype);

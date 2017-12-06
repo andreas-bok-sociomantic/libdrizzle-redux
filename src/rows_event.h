@@ -36,7 +36,105 @@
 
 #include <vector>
 
+
 struct information_schema_column_st;
+
+/**
+ * @brief      Hold the raw value and information about a column
+ */
+struct drizzle_binlog_column_value_st
+{
+    //** the drizzle column of the value */
+    drizzle_column_type_t type;
+
+    //** byte array holding the raw value */
+    unsigned char *raw_value;
+
+    //** flag to indicate if the value is NULL   */
+    bool is_null;
+
+    //** metadata for the value */
+    unsigned char metadata[2];
+
+    /**
+     * @brief      Constructor
+     *
+     * @param[in]  _type       The column type of the value
+     * @param      _raw_value  The value as raw bytes
+     */
+    drizzle_binlog_column_value_st(drizzle_column_type_t _type=DRIZZLE_COLUMN_TYPE_NONE,
+        unsigned char *_raw_value=NULL) :
+        type(_type),
+        raw_value(_raw_value),
+        is_null(false)
+    {}
+
+
+    /**
+     * @brief      Destroys the object.
+     */
+    ~drizzle_binlog_column_value_st()
+    {
+        if (this->raw_value !=NULL)
+        {
+           free(this->raw_value);
+        }
+    }
+
+    /**
+     * @brief      Sets the field's value.
+     *
+     *             The function allocates memory
+     *
+     * @param[in]  _column_type  The column type
+     * @param      ptr           Pointer to the raw input data
+     * @param[in]  value_length  The length of the value in bytes
+     */
+    void set_field_value(drizzle_column_type_t _column_type, unsigned char*ptr,
+        size_t value_length=0);
+};
+
+typedef std::vector<drizzle_binlog_column_value_st*> vec_column_values;
+
+
+/**
+ * @brief      Hold the values for a single row
+ *
+ *             For DELETE and INSERT events only the values_before is populated
+ *             while for UPDATE events the values_after contains the state after
+ *             the update
+ */
+struct drizzle_binlog_row_st
+{
+    //** flag indicating whether the event is an UPDATE event */
+    bool is_update_event;
+
+    //** contains the state of the row before the change */
+    vec_column_values values_before;
+
+    //** contains the state of the row after the change */
+    vec_column_values values_after;
+
+    /**
+     * @brief      Contructor
+     *
+     * @param[in]  _is_update_event  Indicates if update event
+     */
+    drizzle_binlog_row_st(bool _is_update_event=false) :
+        is_update_event(_is_update_event)
+    {
+    }
+
+    /**
+     * @brief      Destroys the object.
+     */
+    ~drizzle_binlog_row_st()
+    {
+        this->values_before.clear();
+        this->values_after.clear();
+    }
+};
+
 /**
  * @brief      Rows_event event
  *
@@ -90,54 +188,6 @@ struct information_schema_column_st;
  *
  * \sa: https://dev.mysql.com/doc/internals/en/rows-event.html
  */
-
-
-struct drizzle_binlog_column_value_st
-{
-    drizzle_column_type_t type;
-    unsigned char *raw_value;
-    bool is_null;
-    unsigned char metadata[2];
-
-    drizzle_binlog_column_value_st(drizzle_column_type_t _type=DRIZZLE_COLUMN_TYPE_NONE,
-        unsigned char *_raw_value=NULL) :
-        type(_type),
-        raw_value(_raw_value),
-        is_null(false)
-    {}
-
-    void set_field_value(drizzle_column_type_t _column_type, unsigned char*ptr,
-        size_t value_length=0);
-
-    ~drizzle_binlog_column_value_st()
-    {
-        if (this->raw_value !=NULL)
-        {
-           free(this->raw_value);
-        }
-    }
-};
-
-typedef std::vector<drizzle_binlog_column_value_st*> vec_column_values;
-
-struct drizzle_binlog_row_st
-{
-    bool is_update_event;
-    vec_column_values values_before;
-    vec_column_values values_after;
-
-    drizzle_binlog_row_st(bool _is_update_event=false) :
-    is_update_event(_is_update_event)
-    {
-    }
-
-    ~drizzle_binlog_row_st()
-    {
-        this->values_before.clear();
-        this->values_after.clear();
-    }
-};
-
 struct drizzle_binlog_rows_event_st
 {
     /**
@@ -208,6 +258,10 @@ struct drizzle_binlog_rows_event_st
      * List of parsed rows
      */
     std::vector<drizzle_binlog_row_st> rows;
+
+    /**
+     * Index of the row which is currently processed
+     */
     size_t current_row;
 
     /**
@@ -225,6 +279,9 @@ struct drizzle_binlog_rows_event_st
         this->table_name[0] = '\0';
     }
 
+    /**
+     * @brief      Destroys the object.
+     */
     ~drizzle_binlog_rows_event_st()
     {
         printf("called drizzle_binlog_rows_event_st destructor\n");
@@ -234,6 +291,9 @@ struct drizzle_binlog_rows_event_st
             free(field_metadata);
     }
 
+    /**
+     * @brief      Reset the object's state
+     */
     void reset()
     {
         this->table_id = 0;
@@ -245,6 +305,9 @@ struct drizzle_binlog_rows_event_st
 };
 
 
+/**
+ * @brief      { struct_description }
+ */
 struct drizzle_binlog_row_events_st
 {
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
@@ -298,8 +361,18 @@ struct drizzle_binlog_row_events_st
 drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     drizzle_binlog_event_st *event);
 
+/**
+ * @brief      Parse the field values in a row
+ *
+ * @param      event            Pointer to a binlog rows event struct
+ * @param      ptr              Pointer
+ * @param      columns_present  Array of columns present in the row
+ * @param      row              The row into which the column should be added
+ * @param      column_value     A column value struct
+ *
+ * @return     { description_of_the_return_value }
+ */
 drizzle_return_t drizzle_binlog_parse_row(
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
     unsigned char *columns_present, vec_column_values *row,
     drizzle_binlog_column_value_st *column_value);
-//    std::vector<information_schema_column_st> *schema_columns);

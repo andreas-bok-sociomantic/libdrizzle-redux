@@ -9,7 +9,7 @@ extern "C" {
 /**
  * Get the header of a binlog event
  *
- * @param      event  a xid event structure
+ * @param      event an xid event structure
  *
  * @return     pointer to the event's header
  */
@@ -39,9 +39,9 @@ uint32_t drizzle_binlog_query_event_slave_proxy_id(
     drizzle_binlog_query_event_st* query_event);
 
 /**
- * @brief      { item_description }
+ * @brief      Get execution time in seconds of the SQL query
  *
- * @return     Time in seconds
+ * @return     Execution time in seconds
  */
 DRIZZLE_API
 uint32_t drizzle_binlog_query_event_execution_time(
@@ -80,7 +80,7 @@ uint8_t* drizzle_binlog_query_event_status_vars(
 /**
  * @brief      The name of the schema which casused the binlog event
  *
- * @return     { description_of_the_return_value }
+ * @return     schema name
  */
 DRIZZLE_API
 unsigned char* drizzle_binlog_query_event_schema(

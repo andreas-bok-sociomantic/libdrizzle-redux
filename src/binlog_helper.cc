@@ -240,7 +240,6 @@ bool drizzle_binlog_is_rows_event(const drizzle_binlog_event_types_t event_type)
             event_type == DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS );
 }
 
-
 /**
  * @brief      Check if a bit is set
  *
@@ -261,47 +260,22 @@ bool bit_is_set(const unsigned char *ptr, int current_column)
     return ((*ptr) & (1 << current_column));
 }
 
-/**
- * Check if a column is an ENUM or SET
- *
- * @param      type  Column type
- *
- * @return     True if column is either ENUM or SET
- */
 bool fixed_string_is_enum(drizzle_column_type_t type)
 {
     return type == DRIZZLE_COLUMN_TYPE_ENUM || type == DRIZZLE_COLUMN_TYPE_SET;
 }
 
-/**
- * @brief      Check if the column is a string type column
- *
- * @param      type  Type of the column
- *
- * @return     True if the column is a string type column
- * @see        mxs_lestr_consume
- */
+
 bool column_is_fixed_string(drizzle_column_type_t type)
 {
     return type == DRIZZLE_COLUMN_TYPE_VAR_STRING;
 }
 
-
-/**
- * @brief      Unpack an ENUM or SET field
- *
- * @param      ptr       Pointer to packed value
- * @param      metadata  Pointer to field metadata
- * @param      dest      The destination
- *
- * @return     Length of the processed field in bytes
- */
 size_t unpack_enum(uint8_t *ptr, uint8_t *metadata, uint8_t *dest)
 {
     memcpy(dest, ptr, metadata[1]);
     return metadata[1];
 }
-
 
 drizzle_column_protocol_datatype_t column_protocol_datatype(
     drizzle_column_type_t type)
@@ -774,16 +748,7 @@ size_t temporal_field_size(uint8_t type, uint8_t decimals)
 } // temporal_field_size
 
 
-/**
- * @brief Unpack a temporal value
- *
- * MariaDB and MySQL both store temporal values in a special format. This
- * function
- * unpacks them from the storage format and into a common, usable format.
- * @param type Column type
- * @param val Extracted packed value
- * @param tm Pointer where the unpacked temporal value is stored
- */
+
 size_t unpack_temporal_value(drizzle_column_type_t type, uint8_t *ptr,
                              uint8_t *metadata, int length, struct tm *tm)
 {

@@ -50,6 +50,14 @@ uint8_t drizzle_binlog_rows_event_version(
 
 
 DRIZZLE_API
+/**
+ * @brief      Determines if rows event struct is an update event, ie. a SQL
+ *             UPDATE ... statement incurred the binlog event to be written
+ *
+ * @param      rows_event  The rows event
+ *
+ * @return     True if the event is a update rows, False otherwise.
+ */
 bool is_rows_update_event(drizzle_binlog_rows_event_st *rows_event);
 
 #ifdef __cplusplus
