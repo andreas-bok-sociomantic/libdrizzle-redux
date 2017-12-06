@@ -308,7 +308,7 @@ struct drizzle_binlog_rows_event_st
 /**
  * @brief      { struct_description }
  */
-struct drizzle_binlog_row_events_st
+/*struct drizzle_binlog_row_events_st
 {
     typedef std::vector<drizzle_binlog_rows_event_st*> vec_row_events;
 
@@ -348,7 +348,7 @@ struct drizzle_binlog_row_events_st
     {
         return index < rows_events.size() ? rows_events.at(index) : NULL;
     }
-};
+};*/
 
 
 /**
