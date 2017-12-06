@@ -401,8 +401,7 @@ drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
     "is_unsigned "\
     "ORDER BY C.table_schema, "\
     "C.table_name, "\
-    "C.column_name, "\
-    "ordinal_position"
+    "C.ordinal_position"
 
 db_information_schema_columns_st *drizzle_information_schema_create(
     drizzle_st *con)
@@ -431,6 +430,7 @@ db_information_schema_columns_st *drizzle_information_schema_create(
         return NULL;
     }
 
+    printf("%s\n", INFORMATION_SCHEMA_QUERY);
     drizzle_result_st *result = drizzle_query(con, INFORMATION_SCHEMA_QUERY, 0,
                                               &ret);
 

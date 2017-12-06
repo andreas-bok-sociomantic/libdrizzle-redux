@@ -167,26 +167,6 @@ struct db_information_schema_columns_st
             _is_unsigned,
             _is_nullable);
     }
-
-//     SELECT C.table_name,
-//        C.column_name,
-//        ABS(C.ordinal_position-1) ordinal_position,
-//        IF (C.column_type REGEXP 'unsigned',
-//                                 TRUE,
-//                                 FALSE) is_unsigned
-// FROM COLUMNS C
-// WHERE find_in_set(C.table_schema,
-// 'information_schema,sys,mysql,performance_schema') < 1
-// GROUP BY C.table_schema,
-//          C.table_name,
-//          C.column_name,
-//          ordinal_position,
-//          is_unsigned
-// ORDER BY C.table_schema,
-//          C.table_name,
-//          C.column_name,
-//          ordinal_position;
-
 };
 
 /**
