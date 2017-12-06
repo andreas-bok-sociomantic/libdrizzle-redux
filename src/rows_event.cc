@@ -71,12 +71,15 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     auto schema_columns = event->binlog_rbr->schema_columns->get(schema_name,
         rows_event->table_name);*/
 
+    drizzle_binlog_column_value_st *column_value;
     while ( drizzle_binlog_event_available_bytes(event) >=
             DRIZZLE_BINLOG_CRC32_LEN )
     {
+        column_value = event->binlog_rbr->create_column_value();
+
         drizzle_binlog_row_st row(is_rows_update_event(rows_event));
         drizzle_binlog_parse_row(rows_event, event->data_ptr, columns_present,
-                                 &row.values_before);
+                                 &row.values_before, column_value);
         rows_event->rows.push_back(row);
         event->data_ptr += drizzle_binlog_event_available_bytes(event);
     }
@@ -105,7 +108,8 @@ const char *drizzle_binlog_rows_event_table_name(
 
 drizzle_return_t drizzle_binlog_parse_row(
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
-    unsigned char *columns_present, column_values *row)
+    unsigned char *columns_present, vec_column_values *row,
+    drizzle_binlog_column_value_st *column_value)
     /*,
     std::vector<information_schema_column_st> *schema_columns)*/
 {
@@ -132,8 +136,7 @@ drizzle_return_t drizzle_binlog_parse_row(
         printf("drizzle_binlog_parse_row: %s \n",
                drizzle_column_type_str(column_type));
 
-        drizzle_binlog_column_value_st column_value;
-        column_value.type = column_type;
+        column_value->type = column_type;
         //column_value.is_unsigned = schema_columns->at(i).is_unsigned;
 
         // parse the column value
@@ -141,7 +144,7 @@ drizzle_return_t drizzle_binlog_parse_row(
         {
             // set null value
             printf("NULL VALUE\n");
-            column_value.is_null = true;
+            column_value->is_null = true;
         }
         else if (column_protocol_datatype(column_type) == FIXED_STRING)
         {
@@ -152,7 +155,7 @@ drizzle_return_t drizzle_binlog_parse_row(
 
             if (fixed_string_is_enum(meta_column_type))
             {
-                column_value.set_field_value(meta_column_type, ptr,
+                column_value->set_field_value(meta_column_type, ptr,
                                              field_byte_length);
                 ptr += field_byte_length;
 
@@ -190,7 +193,7 @@ drizzle_return_t drizzle_binlog_parse_row(
                     bytes = *ptr++;
                 }
 
-                column_value.set_field_value(DRIZZLE_COLUMN_TYPE_STRING,
+                column_value->set_field_value(DRIZZLE_COLUMN_TYPE_STRING,
                                              ptr, bytes);
                 ptr += bytes;
             }
@@ -203,18 +206,18 @@ drizzle_return_t drizzle_binlog_parse_row(
             extra_bits -= bits_in_nullmap;
             width -= bits_in_nullmap;
             size_t bytes = width / 8;
-            column_value.set_field_value(column_type, ptr, bytes);
+            column_value->set_field_value(column_type, ptr, bytes);
             ptr += bytes;
         }
         else if (column_type == DRIZZLE_COLUMN_TYPE_NEWDECIMAL)
         {
-            memcpy(column_value.metadata,
+            memcpy(column_value->metadata,
                    &event->field_metadata[metadata_offset],
                    2);
             auto precision = event->field_metadata[metadata_offset];
             auto decimals = event->field_metadata[metadata_offset + 1];
             size_t bytes = unpack_decimal_field_length(precision, decimals);
-            column_value.set_field_value(column_type, ptr, bytes);
+            column_value->set_field_value(column_type, ptr, bytes);
             printf("DECIMAL: p=%d, d=%d, bytes=%ld\n", precision,
                    decimals, bytes);
             ptr += bytes;
@@ -245,7 +248,7 @@ drizzle_return_t drizzle_binlog_parse_row(
                 ptr++;
             }
 
-            column_value.set_field_value(column_type, ptr, sz);
+            column_value->set_field_value(column_type, ptr, sz);
             ptr += sz;
         }
         else if (column_protocol_datatype(column_type) == BLOB)
@@ -254,22 +257,22 @@ drizzle_return_t drizzle_binlog_parse_row(
             uint64_t blob_len = 0;
             memcpy(&blob_len, ptr, blob_byte_length);
             ptr += blob_byte_length;
-            column_value.set_field_value(column_type, ptr, blob_len);
+            column_value->set_field_value(column_type, ptr, blob_len);
             ptr += blob_len;
         }
         else if (column_protocol_datatype(column_type) == TEMPORAL)
         {
             auto decimals = event->field_metadata[metadata_offset];
             auto field_size = temporal_field_size(column_type, decimals);
-            column_value.set_field_value(column_type, ptr, field_size);
+            column_value->set_field_value(column_type, ptr, field_size);
             // copy the metadata to the column value
-            column_value.metadata[0] = event->field_metadata[metadata_offset];
+            column_value->metadata[0] = event->field_metadata[metadata_offset];
             ptr += field_size;
         }
         else
         {
             auto bytes = lookup_field_bytesize(column_type);
-            column_value.set_field_value(column_type, ptr, bytes);
+            column_value->set_field_value(column_type, ptr, bytes);
             ptr += bytes;
         }
 
@@ -344,7 +347,10 @@ void drizzle_binlog_column_value_st::set_field_value(
         case DRIZZLE_COLUMN_TYPE_DOUBLE:
         case DRIZZLE_COLUMN_TYPE_LONGLONG:
         case DRIZZLE_COLUMN_TYPE_NEWDATE:
-            this->raw_value = (unsigned char *) malloc(16);
+/*
+            if (this->raw_value != NULL) free(this->raw_value);*/
+            mem_alloc_cpy(&this->raw_value, 16);
+            //this->raw_value = (unsigned char *) malloc(16);
             memset(this->raw_value, 0, 16);
             unpack_numeric_field(ptr, this->type, this->raw_value);
             break;

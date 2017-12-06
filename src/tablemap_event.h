@@ -149,7 +149,11 @@ struct drizzle_binlog_tablemap_event_st
         column_type_def(NULL),
         field_metadata(NULL),
         field_metadata_len(0),
-        null_bitmap(NULL) {}
+        null_bitmap(NULL) {
+            memset(this->flags,0, 2);
+            this->table_name[0] = '\0';
+            this->schema_name[0] = '\0';
+        }
 
     ~drizzle_binlog_tablemap_event_st()
     {
