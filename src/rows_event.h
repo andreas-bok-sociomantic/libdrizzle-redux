@@ -111,8 +111,6 @@ struct drizzle_binlog_column_value_st
 
     ~drizzle_binlog_column_value_st()
     {
-//        printf("RAW_VALUE NULL=%d\n", this->raw_value == NULL);
-
         if (this->raw_value !=NULL)
         {
            free(this->raw_value);
