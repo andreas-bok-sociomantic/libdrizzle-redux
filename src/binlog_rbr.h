@@ -480,9 +480,11 @@ struct drizzle_binlog_rbr_st
     drizzle_binlog_rbr_st() :
         binlog(NULL),
         binlog_rbr_fn(NULL),
+        schema_columns(NULL),
         column_values_size(0),
         row_events_count_(0),
         current_tablemap_id(0)
+
     {
         this->fmt_buffer[0] = '\0';
         this->_schema_table = "";
@@ -500,10 +502,13 @@ struct drizzle_binlog_rbr_st
             delete kv.second;
         }
 
+        tablemap_events.clear();
+
         for (auto v : rows_events)
         {
             delete v;
         }
+        rows_events.clear();
 
 
         for (auto column_value : column_values)
@@ -511,8 +516,13 @@ struct drizzle_binlog_rbr_st
             delete column_value;
         }
 
-/*        if (schema_columns != NULL)
-            delete schema_columns;*/
+        column_values.clear();
+
+        if (this->schema_columns != NULL)
+        {
+            delete this->schema_columns;
+        }
+
         printf("called drizzle_binlog_rbr_st destructor\n");
     }
 
