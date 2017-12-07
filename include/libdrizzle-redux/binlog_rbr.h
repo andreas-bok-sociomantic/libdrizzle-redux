@@ -22,7 +22,7 @@ size_t drizzle_binlog_rbr_row_events_count_(drizzle_binlog_rbr_st *binlog_rbr,
 /**
  * @brief      Get the transaction id for the binlog event group
  *
- * @param[in]  a drizzle_binlog_rbr structure
+ * @param      binlog_rbr  a binlog rbr structure
  *
  * @return     id of the transaction
  */
@@ -33,7 +33,7 @@ uint64_t drizzle_binlog_rbr_xid(const drizzle_binlog_rbr_st *binlog_rbr);
  * Read a row event from a binlog event group
  *
  * @param      binlog_rbr  A binlog rbr structure
- * @param[in]  <unnamed>   Optional table name
+ * @param[in]  ...         Optional table name
  *
  * @return     a row event struct, or NULL if there are no more rows events
  */
@@ -48,7 +48,7 @@ drizzle_binlog_rows_event_st *drizzle_binlog_rbr_rows_event_next_(
  * @brief      Get the previous row event
  *
  * @param      binlog_rbr  a binlog rbr structure
- * @param[in]  <unnamed>   table name optional.
+ * @param[in]  ...         table name optional.
  *
  * @return     Pointer to a row event struct, or NULL if there are no more rows
  *             events
@@ -104,7 +104,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_event(
  *
  * @param      binlog_rbr  A binlog rbr struct
  * @param[in]  table_name  The table name
- * @param[in]  <unnamed>   schema name, optional
+ * @param[in]  ...         schema name, optional
  *
  * @return     Pointer to a tablemap event struct or NULL if not found
  */
@@ -115,7 +115,8 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_tablemap_by_tablename(
 /**
  * @brief      Get a tablemap event from the associated rows event
  *
- * @param      event  a rows event
+ * @param      binlog_rbr  The binlog rbr
+ * @param      event       a rows event
  *
  * @return     Pointer to a tablemap event struct or NULL if not found
  */
@@ -129,7 +130,7 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_rbr_rows_event_tablemap(
  *
  * @param      binlog_rbr  binlog rbr struct
  * @param[in]  pos         The position to seek
- * @param[in]  <unnamed>   Optional table name
+ * @param[in]  ...         Optional table name
  *
  * @return     { description_of_the_return_value }
  */

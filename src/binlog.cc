@@ -111,17 +111,6 @@ drizzle_binlog_st *drizzle_binlog_init(drizzle_st *con,
   return binlog;
 }
 
-/**
- * @brief      Initialize binlog with row based replication
- *
- * @param      con               The con
- * @param      binlog_fn         The binlog function
- * @param      error_fn          The error function
- * @param      context           The context
- * @param[in]  verify_checksums  The verify checksums
- *
- * @return     { description_of_the_return_value }
- */
 drizzle_binlog_st *drizzle_binlog_rbr_init(drizzle_st *con,
                                        drizzle_binlog_rbr_fn *binlog_rbr_fn,
                                        drizzle_binlog_error_fn *error_fn,

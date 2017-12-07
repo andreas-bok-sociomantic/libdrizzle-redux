@@ -47,7 +47,6 @@ extern "C" {
 /**
  * @brief      tablemap_event struct definition
  *
- * @description
  * The first event used in Row Based Replication which declares how a table
  * that is about to be changed is defined
  *

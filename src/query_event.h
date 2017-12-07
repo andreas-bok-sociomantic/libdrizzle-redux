@@ -36,8 +36,7 @@
 
 /**
  * @brief       QUERY_EVENT
- *
- * @detailed
+
  * Written when an updating statement is done
  *
  * @verbatim

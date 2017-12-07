@@ -27,10 +27,11 @@ drizzle_binlog_column_value_st *get_column_value_st(drizzle_binlog_row_st *row,
                                                     drizzle_return_t ret_ptr);
 
 /**
- * @brief      Assigns the value of
+ * @brief      Assigns the value of a column
  *
  * @param      column_value  The column value struct
  * @param      dest          The destination
+ * @param[in]  is_unsigned   Indicates if unsigned
  *
  * @tparam     T             The type
  *
@@ -44,7 +45,7 @@ drizzle_return_t assign_field_value(
     T *dest, bool is_unsigned);
 
 /**
- * @brief      { function_description }
+ * @brief      Gets the value of a column
  *
  * @param      row           Pointer to drizzle binlog row struct
  * @param      column_value  Pointer to column value struct
@@ -53,6 +54,7 @@ drizzle_return_t assign_field_value(
  * @param      after         The variable to save after value into
  * @param[in]  type1         The original column type
  * @param[in]  type2         The expected column type
+ * @param[in]  is_unsigned   Indicates if unsigned
  *
  * @tparam     T             The datatype of the field to assign
  * @tparam     U             The enum type to do check the column type

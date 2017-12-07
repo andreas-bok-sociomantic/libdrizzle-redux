@@ -20,6 +20,8 @@ drizzle_binlog_tablemap_event_st *drizzle_binlog_get_tablemap_event(
 /**
  * @brief      Unique id assigned to a table by the MySQL server
  *
+ * @param      event  Pointer to a table map event struct
+ *
  * @return     a table id
  */
 DRIZZLE_API
@@ -28,6 +30,8 @@ uint64_t drizzle_binlog_tablemap_event_table_id(
 
 /**
  * @brief      A database schema name
+ *
+ * @param      event  Pointer to a table map event struct
  *
  * @return     database name
  */
@@ -38,6 +42,8 @@ const char* drizzle_binlog_tablemap_event_schema_name(
 /**
  * @brief      A database table name
  *
+ * @param      event  Pointer to a table map event struct
+ *
  * @return     table name
  */
 DRIZZLE_API
@@ -46,6 +52,8 @@ const char* drizzle_binlog_tablemap_event_table_name(
 
 /**
  * @brief      The number of columns in the table
+ *
+ * @param      event  Pointer to a table map event struct
  *
  * @return     number of columns
  */
@@ -70,20 +78,22 @@ drizzle_column_type_t* drizzle_binlog_tablemap_event_column_type_def(
  *
  * @param      event         A tablemap event
  * @param[in]  column_index  The column index
+ * @param ret_ptr A pointer to a drizzle_return_t to store the return status
  *
  * @return     a column type
  */
 DRIZZLE_API
 drizzle_column_type_t drizzle_binlog_tablemap_event_column_type(
     drizzle_binlog_tablemap_event_st* event, uint32_t column_index,
-    drizzle_return_t* ret);
-
+    drizzle_return_t* ret_ptr);
 
 /**
  * @brief      Metadata for table columns
  *
- *             \see log_event.h in the MySQL source code for contents and
- *             format.
+ *
+ * @see        log_event.h in the MySQL source code for contents and format.
+ *
+ * @param      event  Pointer to a table map event struct
  *
  * @return     array of metadata
  */
@@ -94,6 +104,8 @@ uint8_t* drizzle_binlog_tablemap_event_field_metadata(
 /**
  * @brief      Length of the field_metadata array.
  *
+ * @param      event  Pointer to a table map event struct
+ *
  * @return     Size of the field_metadata array in bytes
  */
 DRIZZLE_API
@@ -101,8 +113,10 @@ uint64_t drizzle_binlog_tablemap_event_field_metadata_len(
 	drizzle_binlog_tablemap_event_st* event);
 
 /**
- * @brief      Bit-field indicating whether each column can be NULL, one bit
- *             per column
+ * @brief      Bit-field indicating whether each column can be NULL, one bit per
+ *             column
+ *
+ * @param      event  Pointer to a table map event struct
  *
  * @return     A bitmap
  */
