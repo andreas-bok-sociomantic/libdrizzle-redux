@@ -138,7 +138,6 @@ struct drizzle_binlog_row_st
 /**
  * @brief      Rows_event event
  *
- * @detailed
  * Implementation of rows events version 4 which is written by MySQL 5.0 and up
  *
  * Three basic kinds of ROWS_EVENT exist:

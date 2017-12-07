@@ -245,7 +245,6 @@ bool drizzle_binlog_is_rows_event(const drizzle_binlog_event_types_t event_type)
  *
  * @param      ptr             Pointer to start of bitfield
  * @param      current_column  Zero indexed column number
- * @param      columns  Number of columns (bits)
  *
  * @return     True if the bit is set
  */

@@ -98,12 +98,6 @@ uint64_t drizzle_binlog_tablemap_event_column_count(
     return event->column_count;
 }
 
-/*drizzle_column_type_t *drizzle_binlog_tablemap_event_column_type_def(
-	drizzle_binlog_tablemap_event_st* event)
-{
-    return event->column_type_def;
-}*/
-
 drizzle_column_type_t drizzle_binlog_tablemap_event_column_type(
     drizzle_binlog_tablemap_event_st* event, uint32_t column_index,
     drizzle_return_t* ret)

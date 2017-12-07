@@ -286,7 +286,7 @@ struct tableid_rows_events_map
     /**
      * @brief      Determines if a mapping for a table exists
      *
-     * @param[in]  tablename  A tablename
+     * @param[in]  _table_id  The table identifier
      *
      * @return     True if has a mapping exists, False otherwise.
      */
@@ -298,7 +298,8 @@ struct tableid_rows_events_map
     /**
      * @brief      Sets the rows events iterator.
      *
-     * @param[in]  tablename  A tablename
+     * @param[in]  _table_id  The table identifier
+     * @param[in]  pos        The position to set iterator
      *
      * @return     True if the table was found, False otherwise
      */
@@ -326,10 +327,10 @@ struct tableid_rows_events_map
     /**
      * @brief      Get the next row event from a table
      *
-     * @param[in]  tablename  The tablename
+     * @param[in]  _table_id  The table identifier
      *
-     * @return     A pointer to a event struct, False if no more
-     *             events are available
+     * @return     A pointer to a event struct, False if no more events are
+     *             available
      */
     drizzle_binlog_rows_event_st *next_row_event(uint64_t _table_id)
     {
@@ -388,7 +389,7 @@ struct tableid_rows_events_map
     /**
      * @brief      Reset the state
      *
-     * @detailed   Clears the mapping from table to parsed row events
+     * Clears the mapping from table to parsed row events
      */
     void reset()
     {
@@ -602,7 +603,6 @@ struct drizzle_binlog_rbr_st
      *             duplicate tables.
      *
      * @param[in]  table_name  The table name
-     * @param[in]  <unnamed>   schema name, optional
      *
      * @return     The tablemap event.
      */
@@ -686,7 +686,7 @@ struct drizzle_binlog_rbr_st
      * @brief      Returns a string of a table name with its schema in the
      *             format <schema.table>
      *
-     * @param[in]  table_name  The table name
+     * @param[in]  table_name_  The table name
      *
      * @return     string consisting of schema.table
      */
