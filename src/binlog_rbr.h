@@ -92,13 +92,31 @@
 //    |         |
 // +--------------------------+---------------------+--------+-------+-----------+---------+
 
+/**
+ * @brief      Information about a columns definition in the database
+ */
 struct information_schema_column_st
 {
+    //** the name of the column */
     char column[DRIZZLE_MAX_COLUMN_NAME_SIZE];
+
+    //** the zero-based index of the column in the db table */
     size_t index;
+
+    //** for numeric values indicated if the column is defined as unsigned */
     bool is_unsigned;
+
+    //** indicates if the column is defined as nullable */
     bool is_nullable;
 
+    /**
+     * @brief      Constructor
+     *
+     * @param[in]  column_name   The column name
+     * @param[in]  column_index  The column index
+     * @param[in]  _is_unsigned  Indicates if unsigned
+     * @param[in]  _is_nullable  Indicates if nullable
+     */
     information_schema_column_st(const char *column_name = '\0',
                                  size_t column_index = 0,
                                  bool _is_unsigned = false,
@@ -110,15 +128,32 @@ struct information_schema_column_st
     }
 };
 
+/**
+ * @brief      Information about all tables in on the MySQL server
+ */
 struct db_information_schema_columns_st
 {
-    char fmt_buffer[1024];
-
     typedef std::vector<information_schema_column_st> vec_schema_columns;
-    typedef std::unordered_map<const char *, vec_schema_columns> map_schema_table_columns;
+    typedef std::unordered_map<const char *, vec_schema_columns>
+        map_schema_table_columns;
+
+    //** mapping between table name and its columns */
     map_schema_table_columns schema_table_columns;
+
+    //** iterator for schema_table_columns */
     map_schema_table_columns::iterator it;
 
+    //** buffer used for string formatting */
+    char fmt_buffer[1024];
+
+    /**
+     * @brief      Get the list of columns in a specific schema and table
+     *
+     * @param[in]  schema_name  The schema name
+     * @param[in]  table_name   The table name
+     *
+     * @return     list of schema column structs
+     */
     std::vector<information_schema_column_st>* get(const char *schema_name,
         const char *table_name)
     {
@@ -130,6 +165,15 @@ struct db_information_schema_columns_st
         return &it->second;
     }
 
+    /**
+     * @brief      Get column struct in a specific schema and table by index
+     *
+     * @param[in]  schema_name  The schema name
+     * @param[in]  table_name   The table name
+     * @param[in]  index        The zero-based column index
+     *
+     * @return     Pointer to a schema column struct
+     */
     information_schema_column_st* get(const char *schema_name, const char
     *table_name, size_t index)
     {
@@ -141,6 +185,16 @@ struct db_information_schema_columns_st
         return &it->second.at(index);
     }
 
+    /**
+     * @brief      Add a schema column struct to the map schema_table_columns
+     *
+     * @param[in]  schema_name   The schema name
+     * @param[in]  table_name    The table name
+     * @param[in]  column_name   The column name
+     * @param[in]  column_index  The zero based column index
+     * @param[in]  _is_unsigned  Indicates if column is unsigned
+     * @param[in]  _is_nullable  Indicates if column is nullable
+     */
     void add(const char *schema_name, const char *table_name,
             const char *column_name,
              size_t column_index,
@@ -180,6 +234,11 @@ struct db_information_schema_columns_st
 db_information_schema_columns_st *drizzle_information_schema_create(
     drizzle_st *con);
 
+
+/**
+ * @brief      Hold the mappings between table id and its associated rows event
+ *             structs
+ */
 struct tableid_rows_events_map
 {
     typedef std::vector<drizzle_binlog_rows_event_st *> vec_ptr_row_events;
@@ -312,6 +371,13 @@ struct tableid_rows_events_map
     }
 
 
+    /**
+     * @brief      Get the number of rows event for a table
+     *
+     * @param[in]  _table_id  The table identifier
+     *
+     * @return     The number of rows event
+     */
     size_t row_events_count(uint64_t _table_id) const
     {
 
@@ -338,6 +404,9 @@ struct tableid_rows_events_map
     }
 };
 
+/**
+ * @brief      Wrapper for handling row based replication
+ */
 struct drizzle_binlog_rbr_st
 {
     typedef std::unordered_map<uint64_t, drizzle_binlog_tablemap_event_st *>
@@ -428,8 +497,10 @@ struct drizzle_binlog_rbr_st
     // ** vector of parsed row event structs */
     vec_row_events rows_events;
 
+    //** vector of column value structs */
     vec_column_values column_values;
 
+    //** number of used column value structs */
     size_t column_values_size;
 
     // ** iterator for accessing the vector of row events structs */
@@ -469,7 +540,6 @@ struct drizzle_binlog_rbr_st
         this->fmt_buffer[0] = '\0';
         this->_schema_table = "";
         this->db[0] = '\0';
-
     }
 
     /**
@@ -582,6 +652,12 @@ struct drizzle_binlog_rbr_st
     drizzle_binlog_rows_event_st *create_rows_event();
 
 
+    /**
+     * @brief      Get a column value struct by either creating a new or reusing
+     *             an already created struct
+     *
+     * @return     Pointer to a binlog value struct
+     */
     drizzle_binlog_column_value_st *create_column_value();
 
 
