@@ -120,6 +120,9 @@ struct drizzle_binlog_query_event_st
         this->schema[0] = '\0';
     }
 
+    /**
+     * @brief      Destroys the object.
+     */
     ~drizzle_binlog_query_event_st()
     {
         if (status_vars != NULL)
