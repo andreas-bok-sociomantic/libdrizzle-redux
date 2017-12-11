@@ -37,6 +37,13 @@
 
 #pragma once
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      con   The con
+ *
+ * @return     { description_of_the_return_value }
+ */
 drizzle_return_t drizzle_state_binlog_read(drizzle_st *con);
 
 drizzle_binlog_st *drizzle_binlog_create(drizzle_st *con,
