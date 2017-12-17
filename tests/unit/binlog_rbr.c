@@ -62,6 +62,49 @@ static const uint8_t NULL_BITMAP[1] = { 0xd4 };
 
 #define EXPECTED_COLUMN_COUNT 12
 
+#define FMT_STR_PREFIX "Field #%d %s : "
+
+char fmt_buffer[16];
+
+/**
+ * @brief      Print a column value
+ *
+ *             If the value to print originated from an update rows event both
+ *             the before and after state is printed
+ *
+ * @param[in]  fmt_specifier  The format specifier
+ * @param[in]  col_idx        The column index
+ * @param[in]  column_type    The column type
+ * @param[in]  is_update      Indicates if the db change was an update
+ * @param[in]  ...            Column value(s)
+ */
+void print_column_value(const char *fmt_specifier,
+    uint col_idx, drizzle_column_type_t column_type, bool is_update, ...);
+void print_column_value(const char * fmt_specifier,
+    uint col_idx, drizzle_column_type_t column_type, bool is_update, ...)
+{
+    printf(FMT_STR_PREFIX, col_idx, drizzle_column_type_str(column_type));
+    sprintf(fmt_buffer, "%s%s%s\n", fmt_specifier,
+        is_update ? " -> " : "",
+        is_update ? fmt_specifier : "");
+    va_list args;
+    va_start(args, is_update);
+    vprintf(fmt_buffer, args);
+    va_end(args);
+}
+
+#define PRINT_COLUMN_VALUE(fmt_specifier, col_idx, column_type, is_update, \
+    before_value, after_value) \
+do { \
+    if (is_update) \
+        print_column_value(fmt_specifier, col_idx, column_type, is_update, \
+            before_value, after_value); \
+    else \
+        print_column_value(fmt_specifier, col_idx, column_type, is_update, \
+            before_value); \
+} while (0)
+
+
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {
@@ -175,6 +218,7 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
         ASSERT_NOT_NULL_(rows_event, "Extracted rows event is NULL");
         drizzle_binlog_row_st *row;
         // iterate rows in rows event
+        bool is_update = is_rows_update_event(rows_event);
         while ((row = drizzle_binlog_rbr_get_row(rows_event)) != NULL)
         {
             unsigned cols = drizzle_binlog_rows_event_column_count(rows_event);
@@ -183,26 +227,21 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
             {
                 drizzle_column_type_t column_type;
                 drizzle_field_datatype_t datatype;
+                bool is_unsigned;
                 driz_ret = drizzle_binlog_field_info(
-                        row, col_idx, &column_type, &datatype);
+                        row, col_idx, &column_type, &datatype, &is_unsigned);
 
                 if (driz_ret == DRIZZLE_RETURN_OK)
                 {
                     if (datatype == DRIZZLE_FIELD_DATATYPE_LONG)
                     {
-                        uint32_t int_val_before, int_val_after;
+                        uint32_t uint_val_before, uint_val_after;
                         driz_ret = drizzle_binlog_get_uint(row, col_idx,
-                                                          &int_val_before,
-                                                          &int_val_after);
+                                                          &uint_val_before,
+                                                          &uint_val_after);
 
-                        printf("Field #%d %s : %d", col_idx,
-                               drizzle_column_type_str(column_type),
-                               int_val_before);
-                        if (is_rows_update_event(rows_event))
-                        {
-                            printf(" -> %d", int_val_after);
-                        }
-                        printf("\n");
+                        PRINT_COLUMN_VALUE("%d", col_idx, column_type,
+                            is_update, uint_val_before, uint_val_after);
                     }
                     else if (datatype == DRIZZLE_FIELD_DATATYPE_LONGLONG)
                     {
@@ -211,14 +250,8 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                                                           &int_val_before,
                                                           &int_val_after);
 
-                        printf("Field #%d %s : %" PRId64, col_idx,
-                               drizzle_column_type_str(column_type),
-                               int_val_before);
-                        if (is_rows_update_event(rows_event))
-                        {
-                            printf(" -> %" PRId64, int_val_after);
-                        }
-                        printf("\n");
+                        PRINT_COLUMN_VALUE("%" PRId64, col_idx, column_type,
+                            is_update, int_val_before, int_val_after);
                     }
                     else if (datatype == DRIZZLE_FIELD_DATATYPE_DECIMAL)
                     {
@@ -226,14 +259,8 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                         driz_ret = drizzle_binlog_get_double(row, col_idx,
                             &double_before, &double_after);
 
-                        printf("Field #%d %s : %g", col_idx,
-                               drizzle_column_type_str(column_type),
-                               double_before);
-                        if (is_rows_update_event(rows_event))
-                        {
-                            printf(" -> %g", double_after);
-                        }
-                        printf("\n");
+                        PRINT_COLUMN_VALUE("%g", col_idx, column_type,
+                            is_update, double_before, double_after);
                     }
                     else if (datatype == DRIZZLE_FIELD_DATATYPE_STRING)
                     {
@@ -241,14 +268,8 @@ void binlog_rbr(drizzle_binlog_rbr_st *rbr, void *context)
                         const unsigned char *string_after;
                         driz_ret = drizzle_binlog_get_string(row, col_idx,
                             &string_before, &string_after);
-                        printf("Field #%d %s : %s", col_idx,
-                               drizzle_column_type_str(column_type),
-                               string_before);
-                        if (is_rows_update_event(rows_event))
-                        {
-                            printf(" -> %s", string_after);
-                        }
-                        printf("\n");
+                        PRINT_COLUMN_VALUE("%s", col_idx, column_type,
+                            is_update, string_before, string_after);
                     }
                 }
                 else
@@ -274,6 +295,8 @@ int main(int argc, char *argv[])
 
     set_up_connection();
     set_up_schema("test_binlog_rbr");
+
+    CHECKED_QUERY("flush logs");
 
     CHECKED_QUERY("CREATE TABLE test_binlog_rbr.binlog_rbr_tbl"
                   "(a INT PRIMARY KEY AUTO_INCREMENT, "

@@ -66,20 +66,15 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
     memcpy(&columns_present, event->data_ptr, rows_event->bitmap_size);
     event->data_ptr += rows_event->bitmap_size;
 
-/*    auto schema_name = schema_name_from_tableid(event->binlog_rbr,
-        rows_event->table_id);
-    auto schema_columns = event->binlog_rbr->schema_columns->get(schema_name,
-        rows_event->table_name);*/
+    auto schema_columns = event->binlog_rbr->schema_columns->get(table_map_event->schema_name,
+        rows_event->table_name);
 
-    drizzle_binlog_column_value_st *column_value;
     while ( drizzle_binlog_event_available_bytes(event) >=
             DRIZZLE_BINLOG_CRC32_LEN )
     {
-        column_value = event->binlog_rbr->create_column_value();
-
         drizzle_binlog_row_st row(is_rows_update_event(rows_event));
-        drizzle_binlog_parse_row(rows_event, event->data_ptr, columns_present,
-                                 &row.values_before, column_value);
+        drizzle_binlog_parse_row(event->binlog_rbr, rows_event, event->data_ptr, columns_present,
+                                 &row.values_before, schema_columns);
         rows_event->rows.push_back(row);
         event->data_ptr += drizzle_binlog_event_available_bytes(event);
     }
@@ -107,11 +102,10 @@ const char *drizzle_binlog_rows_event_table_name(
 }
 
 drizzle_return_t drizzle_binlog_parse_row(
+    drizzle_binlog_rbr_st *binlog_rbr,
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
     unsigned char *columns_present, vec_column_values *row,
-    drizzle_binlog_column_value_st *column_value)
-    /*,
-    std::vector<information_schema_column_st> *schema_columns)*/
+    std::vector<information_schema_column_st> *schema_columns)
 {
     unsigned metadata_offset = 0;
     const unsigned char *null_bitmap = ptr;
@@ -132,12 +126,13 @@ drizzle_return_t drizzle_binlog_parse_row(
             continue;
         }
 
+        auto column_value = binlog_rbr->create_column_value();
         auto column_type = (drizzle_column_type_t) event->column_type_def[i];
         printf("drizzle_binlog_parse_row: %s \n",
                drizzle_column_type_str(column_type));
 
         column_value->type = column_type;
-        //column_value.is_unsigned = schema_columns->at(i).is_unsigned;
+        column_value->is_unsigned = schema_columns->at(i).is_unsigned;
 
         // parse the column value
         if (bit_is_set(null_bitmap, idx_null_bitmap++))

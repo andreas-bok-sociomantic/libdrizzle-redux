@@ -184,7 +184,7 @@ DRIZZLE_API
  */
 drizzle_return_t drizzle_binlog_field_info(drizzle_binlog_row_st *row,
     size_t field_idx, drizzle_column_type_t *type,
-    drizzle_field_datatype_t *datatype);
+    drizzle_field_datatype_t *datatype, bool *is_unsigned);
 
 #ifdef __cplusplus
 }

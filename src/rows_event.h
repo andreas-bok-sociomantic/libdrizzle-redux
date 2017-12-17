@@ -56,6 +56,8 @@ struct drizzle_binlog_column_value_st
     //** metadata for the value */
     unsigned char metadata[2];
 
+    bool is_unsigned;
+
     /**
      * @brief      Constructor
      *
@@ -66,7 +68,8 @@ struct drizzle_binlog_column_value_st
         unsigned char *_raw_value=NULL) :
         type(_type),
         raw_value(_raw_value),
-        is_null(false)
+        is_null(false),
+        is_unsigned(false)
     {}
 
 
@@ -371,7 +374,8 @@ drizzle_binlog_rows_event_st *drizzle_binlog_parse_rows_event(
  *
  * @return     { description_of_the_return_value }
  */
-drizzle_return_t drizzle_binlog_parse_row(
+drizzle_return_t drizzle_binlog_parse_row(drizzle_binlog_rbr_st *rbr,
     drizzle_binlog_rows_event_st *event, unsigned char *ptr,
     unsigned char *columns_present, vec_column_values *row,
-    drizzle_binlog_column_value_st *column_value);
+    std::vector<information_schema_column_st> *schema_columns);
+    //drizzle_binlog_column_value_st *column_value);
