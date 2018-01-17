@@ -44,6 +44,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef bool (bool_result_fn)(drizzle_stmt_st *stmt, const char * column_name,
+  drizzle_return_t *ret_ptr);
+void test_bool_result(bool_result_fn *fn, drizzle_stmt_st *stmt,
+  const char * column_name, drizzle_return_t expected);
+void test_bool_result(bool_result_fn *fn, drizzle_stmt_st *stmt,
+  const char * column_name, drizzle_return_t expected)
+{
+  drizzle_return_t actual;
+  fn(stmt, column_name, &actual);
+  ASSERT_EQ(expected, actual);
+}
+
 int main(int argc, char *argv[])
 {
   (void)argc;
@@ -150,8 +162,10 @@ int main(int argc, char *argv[])
     ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_is_null");
 
     // drizzle_stmt_get_is_null_from_name
-    res_bool = drizzle_stmt_get_is_null_from_name(NULL, "c", &ret);
-    ASSERT_EQ_(DRIZZLE_RETURN_INVALID_ARGUMENT, ret, "drizzle_stmt_get_is_null_from_name");
+    //res_bool = drizzle_stmt_get_is_null_from_name(NULL, "c", &ret);
+    //ASSERT_EQ_(DRIZZLE_RETURN_INVALID_ARGUMENT, ret, "drizzle_stmt_get_is_null_from_name");
+    test_bool_result(&drizzle_stmt_get_is_null_from_name, NULL, "c",
+      DRIZZLE_RETURN_INVALID_ARGUMENT);
     res_bool = drizzle_stmt_get_is_null_from_name(stmt, "c", &ret);
     ASSERT_NEQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_is_null_from_name");
     res_bool = drizzle_stmt_get_is_null_from_name(stmt, "a", &ret);
