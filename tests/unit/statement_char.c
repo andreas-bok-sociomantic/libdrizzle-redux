@@ -131,6 +131,8 @@ int main(int argc, char *argv[])
     size_t len;
     char_val = drizzle_stmt_get_string(stmt, 0, &len, &ret);
     ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_string");
+    drizzle_stmt_get_string_from_name(stmt, "a", &len, &ret);
+    ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_string_from_name");
     i++;
     if (strncmp(val, char_val, len) != 0)
     {
