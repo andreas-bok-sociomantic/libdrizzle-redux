@@ -44,17 +44,32 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef bool (bool_result_fn)(drizzle_stmt_st *stmt, const char * column_name,
-  drizzle_return_t *ret_ptr);
-void test_bool_result(bool_result_fn *fn, drizzle_stmt_st *stmt,
-  const char * column_name, drizzle_return_t expected);
-void test_bool_result(bool_result_fn *fn, drizzle_stmt_st *stmt,
-  const char * column_name, drizzle_return_t expected)
-{
-  drizzle_return_t actual;
-  fn(stmt, column_name, &actual);
-  ASSERT_EQ(expected, actual);
-}
+drizzle_return_t actual;
+#define CHECK_FROM_NAME_API(__api_func, __stmt, __name, __exp_res) \
+do \
+{ \
+  __api_func(NULL, __name, &actual); \
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, actual); \
+  __api_func(__stmt, "__name", &actual); \
+  ASSERT_NEQ(DRIZZLE_RETURN_OK, actual); \
+  res_val = __api_func(__stmt, __name, &actual); \
+  ASSERT_EQ(DRIZZLE_RETURN_OK, actual); \
+  ASSERT_EQ(__exp_res, res_val); \
+} \
+while (0)
+
+#define CHECK_STMT_API(__api_func, __stmt, __int, __exp_res) \
+do \
+{ \
+  __api_func(NULL, __int, &actual); \
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, actual); \
+  __api_func(__stmt, 999, &actual); \
+  ASSERT_NEQ(DRIZZLE_RETURN_OK, actual); \
+  res_val = __api_func(__stmt, __int, &actual); \
+  ASSERT_EQ(DRIZZLE_RETURN_OK, actual); \
+  ASSERT_EQ(__exp_res, res_val); \
+} \
+while (0)
 
 int main(int argc, char *argv[])
 {
@@ -139,7 +154,6 @@ int main(int argc, char *argv[])
   {
     uint32_t res_val;
     const char *char_val;
-    bool res_bool;
     char comp_val[3];
     size_t len;
     res_val = drizzle_stmt_get_int(stmt, 0, &ret);
@@ -153,26 +167,16 @@ int main(int argc, char *argv[])
       return EXIT_FAILURE;
     }
 
-    res_bool = drizzle_stmt_get_is_unsigned_from_name(stmt, "a", &ret);
-    ASSERT_EQ_(false, res_bool, "drizzle_stmt_get_is_unsigned_from_name");
+    // drizzle_stmt_get_is_unsigned_from_name
+    CHECK_FROM_NAME_API(drizzle_stmt_get_is_unsigned_from_name, stmt, "a", false);
 
-    res_bool = drizzle_stmt_get_is_null(stmt, 999, &ret);
-    ASSERT_EQ_(DRIZZLE_RETURN_INVALID_ARGUMENT, ret, "drizzle_stmt_get_is_null");
-    res_bool = drizzle_stmt_get_is_null(stmt, 0, &ret);
-    ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_is_null");
+    // drizzle_stmt_get_is_null
+    CHECK_STMT_API(drizzle_stmt_get_is_null, stmt, 0, false);
 
     // drizzle_stmt_get_is_null_from_name
-    //res_bool = drizzle_stmt_get_is_null_from_name(NULL, "c", &ret);
-    //ASSERT_EQ_(DRIZZLE_RETURN_INVALID_ARGUMENT, ret, "drizzle_stmt_get_is_null_from_name");
-    test_bool_result(&drizzle_stmt_get_is_null_from_name, NULL, "c",
-      DRIZZLE_RETURN_INVALID_ARGUMENT);
-    res_bool = drizzle_stmt_get_is_null_from_name(stmt, "c", &ret);
-    ASSERT_NEQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_is_null_from_name");
-    res_bool = drizzle_stmt_get_is_null_from_name(stmt, "a", &ret);
-    ASSERT_EQ_(false, res_bool, "drizzle_stmt_get_is_null_from_name");
-
-    res_val = drizzle_stmt_get_int_from_name(stmt, "a", &ret);
-    ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_int (char col name)");
+    CHECK_FROM_NAME_API(drizzle_stmt_get_is_null_from_name, stmt, "a", false);
+    // drizzle_stmt_get_is_null_from_name
+    CHECK_FROM_NAME_API(drizzle_stmt_get_int_from_name, stmt, "a", i);
 
     if (res_val != i)
     {
