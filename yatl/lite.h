@@ -107,6 +107,20 @@ static inline int yatl_strcmp(const char *s1, const char *s2, size_t *s1_length,
   return strcmp(s1, s2);
 }
 
+#define SKIP_(__expression, ...) \
+do \
+{ \
+  if ((__expression)) { \
+    size_t ask= snprintf(0, 0, __VA_ARGS__); \
+    ask++; \
+    char *buffer= (char*)malloc(sizeof(char) * ask); \
+    snprintf(buffer, ask, __VA_ARGS__); \
+    fprintf(stdout, "\n[1;34mSKIP[m [ %s ]\n", buffer); \
+    free(buffer); \
+    exit(EXIT_SUCCESS); \
+  } \
+} while (0)
+
 #define SKIP_IF(__expression) \
 do \
 { \
