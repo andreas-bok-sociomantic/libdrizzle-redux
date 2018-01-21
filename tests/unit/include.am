@@ -238,3 +238,15 @@ noinst_PROGRAMS+= tests/unit/drizzle_options
 
 check-drizzle_options: tests/unit/drizzle_options
 	tests/unit/drizzle_options
+
+tests_unit_ssl_SOURCES= tests/unit/ssl.c
+tests_unit_ssl_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_ssl_SOURCES= dummy.cxx
+check_PROGRAMS+= tests/unit/ssl
+noinst_PROGRAMS+= tests/unit/ssl
+
+gdb-ssl: tests/unit/ssl
+	@$(GDB_COMMAND) tests/unit/ssl
+
+check-ssl: tests/unit/ssl
+	tests/unit/ssl
