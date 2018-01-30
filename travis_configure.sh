@@ -39,6 +39,9 @@ before_install()
             curl -XGET -L -k 'https://api.bintray.com/content/jfrog/jfrog-cli-go/$latest/jfrog-cli-linux-amd64/jfrog?bt_package=jfrog-cli-linux-amd64' > $HOME/bin/jfrog ;
             chmod a+x $HOME/bin/jfrog ;
         fi
+
+        # install coveralls.io utility
+        gem install coveralls-lcov
     elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         brew update
         brew install gnu-sed
