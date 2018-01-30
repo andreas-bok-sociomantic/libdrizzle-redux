@@ -98,6 +98,11 @@ jobs:
         - if [[ -n "$TRAVIS_TAG" ]]; then cp build/pkg/deb/*.deb $CACHE_DIR/; fi
     - <<: *linux-build
       env:
+        MAKE_TARGET="$MAKE_TARGET:code-coverage-capture" CONFIGURE_ARGS=--enable-code-coverage
+      before_cache:
+        - cp libdrizzle-redux-coverage.info $CACHE_DIR/
+    - <<: *linux-build
+      env:
         CXX=clang++ CC=clang COMPILER_VERSION=3.9
     - <<: *linux-build
       env:
@@ -117,3 +122,13 @@ jobs:
       before_script: skip
       script:
         - beaver bintray upload -D $DIST_VERSION -N $CACHE_DIR/*.deb
+    - <<: *deploy
+      # Build code coverage for major branches and upload to coveralls.io
+      stage: deploy
+      if: branch =~ ^v[0-9]+\.[0-9]+\.x$
+#          AND repo = sociomantic-tsunami/libdrizzle-redux
+      env:
+          MAKE_TARGET="$MAKE_TARGET:code-coverage-capture" CONFIGURE_ARGS=--enable-code-coverage
+      before_script: skip
+      script:
+        - ./travis_configure.sh upload_coverage "$CACHE_DIR/libdrizzle-redux-coverage.info"

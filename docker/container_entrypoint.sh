@@ -13,6 +13,14 @@ install_dependencies()
         apt-fast install -y --no-install-recommends $COMPILER
     fi
 
+    # install dependencies for lcov code coverage
+    if [[ "$MAKE_TARGET" =~ "code-coverage" ]]; then
+        apt-fast install -y lcov
+
+        # Delete all .da files in . and subdirectories
+        lcov --directory . --zerocounters
+    fi
+
     if [[ "$DIST_NAME" == "centos" ]]; then
         # install compiler
         if [[ "$CC" == "clang" ]]; then
@@ -32,7 +40,7 @@ cd build
 
 if [[ ! -e Makefile ]]; then
     autoreconf -fi ..
-    ../configure
+    ../configure ${CONFIGURE_ARGS}
 fi
 
 make ${MAKE_TARGET//:/ }

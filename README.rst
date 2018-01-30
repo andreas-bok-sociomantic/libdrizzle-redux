@@ -1,5 +1,5 @@
-Description |travis|
-====================
+Description |travis| |coveralls|
+================================
 
 **Drizzle Redux** is a project which aims to breathe new life into the **libdrizzle**
 C connector. It is designed to allow you to syn- or asynchronously connect to and query a
@@ -176,3 +176,6 @@ the `Tsunami programme`_ created by `sociomantic labs GmbH`_.
 .. _Tsunami programme: https://github.com/sociomantic-tsunami
 .. _sociomantic labs GmbH: https://www.sociomantic.com
 .. _Neptune: https://github.com/sociomantic-tsunami/neptune/blob/master/doc/library-user.rst#contributing-to-a-neptune-versioned-library
+.. |coveralls| image:: https://coveralls.io/repos/github/bokchan/libdrizzle-redux/badge.svg?branch=v6.1.x
+   :alt: Coveralls Build Status v6.1.x
+   :target: https://coveralls.io/github/bokchan/libdrizzle-redux?branch=v6.1.x
