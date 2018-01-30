@@ -185,6 +185,8 @@ int main(int argc, char *argv[])
   int cxt = 1;
   drizzle_set_log_fn(con, log_fn_callback, (void*)&cxt);
   drizzle_set_verbose(con, DRIZZLE_VERBOSE_DEBUG);
+  ASSERT_EQ(DRIZZLE_VERBOSE_DEBUG, drizzle_verbose(con));
+
   driz_ret = drizzle_quit(con);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "%s", drizzle_strerror(driz_ret));
 
