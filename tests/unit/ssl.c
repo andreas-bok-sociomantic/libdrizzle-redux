@@ -83,6 +83,10 @@ int main(int argc, char *argv[]) {
   sprintf(ssl_cert, "%s/%s", ca_path ,"server-cert.pem");
   sprintf(ssl_ca, "%s/%s", ca_path ,"ca.pem");
 
+  printf("ssl_key: %s\n", ssl_key);
+  printf("ssl_cert: %s\n", ssl_cert);
+  printf("ssl_ca: %s\n", ssl_ca);
+
   driz_ret = drizzle_set_ssl(con, "invalid_ssl_key", ssl_cert, ssl_ca, ca_path,
     NULL);
   ASSERT_EQ_(DRIZZLE_RETURN_SSL_ERROR, driz_ret, "drizzle_set_ssl(): %s(%s)",
@@ -106,6 +110,8 @@ int main(int argc, char *argv[]) {
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "drizzle_set_ssl(): %s(%s)",
              drizzle_error(con), drizzle_strerror(driz_ret));
 
+  ASSERT_EQ_(DRIZZLE_RETURN_OK, drizzle_connect(con), "drizzle_connect() %d, %s(%s)",
+    drizzle_error_code(con), drizzle_error(con), drizzle_strerror(driz_ret));
   // SELECT to test that the connection works
   set_up_schema("test_ssl");
   CHECKED_QUERY("CREATE TABLE test_ssl.t1 (a INT)");
