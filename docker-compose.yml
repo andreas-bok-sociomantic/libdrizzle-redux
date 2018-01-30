@@ -32,6 +32,7 @@ services:
       DIST_NAME: $DIST_NAME
       CXX: $DOCKER_CXX
       CC: $DOCKER_CC
+      CONFIGURE_ARGS: $CONFIGURE_ARGS
     build:
       dockerfile: ./docker/Dockerfile.$DIST_NAME.$DIST_VERSION
       context: ./
