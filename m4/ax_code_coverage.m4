@@ -82,17 +82,17 @@ AC_DEFUN([AX_CODE_COVERAGE],[
 	dnl Check for --enable-code-coverage
 	AC_REQUIRE([AC_PROG_SED])
 
-	# allow to override coverage tool location
+	dnl allow to override coverage tool location
 	AC_ARG_WITH([cov-tool],
-	  [AS_HELP_STRING([--with-cov-tool[=COV_TOOL]], [use given COV_TOOL for coverage (COV_TOOL=gcov).])],
-	  [_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH=$with_cov_tool],
-	  [_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH=gcov])
+		[AS_HELP_STRING([--with-cov-tool[=COV_TOOL]], [use given COV_TOOL for coverage (COV_TOOL=gcov).])],
+		[_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH=$with_cov_tool],
+		[_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH=gcov])
 
 	AC_MSG_CHECKING([whether to build with code coverage support])
 	AC_ARG_ENABLE([code-coverage],
-	  AS_HELP_STRING([--enable-code-coverage],
-	  [Whether to enable code coverage support]),,
-	  enable_code_coverage=no)
+		AS_HELP_STRING([--enable-code-coverage],
+		[Whether to enable code coverage support]),,
+		enable_code_coverage=no)
 
 	AM_CONDITIONAL([CODE_COVERAGE_ENABLED], [test x$enable_code_coverage = xyes])
 	AC_SUBST([CODE_COVERAGE_ENABLED], [$enable_code_coverage])
