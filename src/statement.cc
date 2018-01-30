@@ -141,11 +141,11 @@ drizzle_return_t drizzle_stmt_execute(drizzle_stmt_st *stmt)
              + param_lengths; /* Parameter data */
 
   buffer = new (std::nothrow) unsigned char[buffer_size];
-  if (buffer == NULL)
+  if (buffer == NULL) // LCOV_EXCL_START
   {
     drizzle_set_error(stmt->con, __FILE_LINE_FUNC__, "new");
     return DRIZZLE_RETURN_MEMORY;
-  }
+  } // LCOV_EXCL_STOP
   buffer_pos= buffer;
 
   /* Statement ID */
