@@ -78,6 +78,105 @@
 
 #serial 25
 
+# SYNOPSIS
+#
+#   AX_LLVM_COVERAGE([coverage tool])
+#
+# DESCRIPTION
+#
+#   Checks for clang compatible code coverage tools either llvm-cov or a
+#   user-specified tool (via --with-cov-tool).
+#   Tests whether --coverage compile flag works and the code-coverage info file
+#   can be generated. Sets
+#
+#     COV_TOOL to path of a wrapper script for the llvm coverage tool
+
+AC_DEFUN([AX_LLVM_COVERAGE], [
+	_COV_TOOL_BASENAME=$(basename $1)
+
+	AS_IF([ [[[ $_COV_TOOL_BASENAME =~ ^llvm-cov ]]] ],
+		dnl check if the executable specified with --with-cov-tool is in PATH
+		[AC_CHECK_PROG([_LCOV_TOOL],
+			[$_COV_TOOL_BASENAME],
+			[$_COV_TOOL_BASENAME])
+		dnl check if the full path to the llvm-cov tool is executable
+		AS_IF([test -z "$_LCOV_TOOL"],
+			[AS_IF([AS_EXECUTABLE_P("$1")],
+				[AC_SUBST([_LCOV_TOOL], [$1])])
+			])],
+		dnl check if the default llvm-cov
+		[AC_CHECK_PROG([_LCOV_TOOL], [llvm-cov], [llvm-cov], [])
+	])
+
+	AS_IF([test -z "$_LCOV_TOOL"],
+		[AC_MSG_ERROR([Found no valid llvm coverage tool])
+	])
+
+	# try to compile with the found llvm cov tool
+	AC_MSG_CHECKING([coverage support with coverage tool: $_LCOV_TOOL])
+	AC_LANG_PUSH([C++])dnl
+	AC_LANG_CONFTEST([AC_LANG_SOURCE([LLVM_COVERAGE_TEST])])
+
+		dnl generate wrapper script for using the coverage tool on gcov compatible
+		dnl output
+	AX_PRINT_TO_FILE([llvm-gcov.sh],
+[#!/bin/bash
+exec $_LCOV_TOOL gcov "\$\@"
+		])
+	chmod +x llvm-gcov.sh
+
+	dnl compile with code coverage
+	$CXX -g -O0 --coverage conftest.cpp -o conftest >/dev/null 2>&1
+	./conftest >/dev/null 2>&1
+
+	dnl capture the code-coverage
+	lcov --directory ./ \
+			--base-directory ./ \
+			--gcov-tool "./llvm-gcov.sh" \
+			--capture -o conftest.info >/dev/null 2>&1
+	ls -la conftest.info >/dev/null 2>&1
+	generated_file_cov_info="$?"
+	AC_LANG_POP([C++])
+
+	dnl check that the coverage info file was generated
+	AS_IF([test "$generated_file_cov_info" != "0"],
+		[AC_MSG_ERROR([coverage for clang not supported])
+	])
+	AC_MSG_RESULT([yes]);
+
+	AC_SUBST([COV_TOOL], "\${abs_builddir}/llvm-gcov.sh")
+	m4_define([_CODE_COVERAGE_CFLAGS], ["--coverage"])
+	m4_define([_CODE_COVERAGE_CXXFLAGS], ["--coverage"])
+])
+
+# SYNOPSIS
+#
+#   AX_GCC_COVERAGE([coverage tool])
+#
+# DESCRIPTION
+#
+#   Checks for gcc compatible coverage tools gcov or a user-specified tool
+#   (via --with-cov-tool). Sets
+#
+#     COV_TOOL to name/path of the gcov tool
+
+AC_DEFUN([AX_GCC_COVERAGE], [
+	_LCOV_TOOL=$(basename $1)
+	AC_CHECK_TOOL([COV_TOOL],
+	[$_LCOV_TOOL])
+	AS_IF([test -z "$COV_TOOL"],
+		[AS_IF([AS_EXECUTABLE_P("$1")],
+			[AC_SUBST([COV_TOOL], [$1])])
+		])
+
+	AS_IF([test -z "$COV_TOOL"],
+		[AC_MSG_ERROR([gcov is needed to do coverage])
+		])
+	m4_define([_CODE_COVERAGE_LIBS], ["-lgcov"])
+	m4_define([_CODE_COVERAGE_CFLAGS], ["-fprofile-arcs -ftest-coverage"])
+	m4_define([_CODE_COVERAGE_CXXFLAGS], ["-fprofile-arcs -ftest-coverage"])
+])
+
 AC_DEFUN([AX_CODE_COVERAGE],[
 	dnl Check for --enable-code-coverage
 	AC_REQUIRE([AC_PROG_SED])
@@ -99,25 +198,22 @@ AC_DEFUN([AX_CODE_COVERAGE],[
 	AC_MSG_RESULT($enable_code_coverage)
 
 	AS_IF([ test "$enable_code_coverage" = "yes" ], [
-		# check for gcov
-		AC_CHECK_TOOL([COV_TOOL],
-		  [$_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH],
-		  [:])
-		AS_IF([test "X$COV_TOOL" = "X:"],
-		  [AC_MSG_ERROR([gcov is needed to do coverage])])
-		AC_SUBST([COV_TOOL])
-
-		dnl Check if gcc is being used
-		AS_IF([ test "$GCC" = "no" ], [
-			AC_MSG_ERROR([not compiling with gcc, which is required for gcov code coverage])
-		])
-
 		AC_CHECK_PROG([LCOV], [lcov], [lcov])
-		AC_CHECK_PROG([GENHTML], [genhtml], [genhtml])
 
 		AS_IF([ test -z "$LCOV" ], [
 			AC_MSG_ERROR([To enable code coverage reporting you must have lcov installed])
 		])
+
+		# check for gcov
+		AS_IF([ [[[ "$CC" =~ "gcc" ]]] ], [
+			AX_GCC_COVERAGE([$_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH])
+		])
+
+		AS_IF([ [[[ "$CC" =~ "clang" ]]] ], [
+			AX_LLVM_COVERAGE([$_AX_CODE_COVERAGE_COV_TOOL_PROG_WITH])
+		])
+
+		AC_CHECK_PROG([GENHTML], [genhtml], [genhtml])
 
 		AS_IF([ test -z "$GENHTML" ], [
 			AC_MSG_ERROR([Could not find genhtml from the lcov package])
@@ -126,9 +222,9 @@ AC_DEFUN([AX_CODE_COVERAGE],[
 		dnl Build the code coverage flags
 		dnl Define CODE_COVERAGE_LDFLAGS for backwards compatibility
 		CODE_COVERAGE_CPPFLAGS="-DNDEBUG"
-		CODE_COVERAGE_CFLAGS="-O0 -g -fprofile-arcs -ftest-coverage"
-		CODE_COVERAGE_CXXFLAGS="-O0 -g -fprofile-arcs -ftest-coverage"
-		CODE_COVERAGE_LIBS="-lgcov"
+		CODE_COVERAGE_CFLAGS="-O0 -g _CODE_COVERAGE_CFLAGS"
+		CODE_COVERAGE_CXXFLAGS="-O0 -g _CODE_COVERAGE_CXXFLAGS"
+		CODE_COVERAGE_LIBS="_CODE_COVERAGE_LIBS"
 		CODE_COVERAGE_LDFLAGS="$CODE_COVERAGE_LIBS"
 
 		AC_SUBST([CODE_COVERAGE_CPPFLAGS])
@@ -263,3 +359,15 @@ A''M_DISTCHECK_CONFIGURE_FLAGS += --disable-code-coverage
 	AC_SUBST([CODE_COVERAGE_RULES])
 	m4_ifdef([_AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE([CODE_COVERAGE_RULES])])
 ])
+
+m4_define([LLVM_COVERAGE_TEST], [[
+
+	#include <stdio.h>
+	int main(int argc, char **argv) {
+		if (argc > 1) {
+			printf("GOT: %s\n", argv[1]);
+		}
+		return 0;
+	}
+
+]])
