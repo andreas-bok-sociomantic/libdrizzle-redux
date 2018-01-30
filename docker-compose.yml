@@ -32,6 +32,7 @@ services:
       DIST_NAME: $DIST_NAME
       CXX: $CXX
       CC: $CC
+      CONFIGURE_ARGS: $CONFIGURE_ARGS
     build:
       context: ./
     depends_on:
