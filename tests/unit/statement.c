@@ -117,6 +117,11 @@ int main(int argc, char *argv[])
   drizzle_query(con, "INSERT INTO test_stmt.t1 VALUES (1),(2),(3)", 0, &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
 
+  // Query with invalid SQL syntax
+  stmt = drizzle_stmt_prepare(con, "SELECT * FROM no_schema.t1 where a > ?",
+    0, &ret);
+  ASSERT_NULL_(stmt, "%s", drizzle_error(con));
+
   const char *query = "SELECT * FROM test_stmt.t1 where a > ?";
   stmt = drizzle_stmt_prepare(con, query, strlen(query), &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
