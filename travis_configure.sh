@@ -145,7 +145,8 @@ run_tests()
 upload_coverage()
 {
     sudo ln -sf $PWD /home/libdrizzle-redux
-    ls -sf ./
+    echo "PWD: ";  ls -sf ./;
+    echo "/home/libdrizzle-redux: "; ls -la /home/libdrizzle-redux;
     coveralls-lcov -t "$COVERALLS_REPO_TOKEN" "$1" > coveralls_response
     cat coveralls_response
     eval 'grep -q "HTTPOK 200 OK" coveralls_response' || exit 1
