@@ -132,5 +132,7 @@ jobs:
       before_script: skip
       script:
         - ls -la $CACHE_DIR
-        - cp $CACHE_DIR/libdrizzle-redux-coverage.info ./
-        - ./travis_configure.sh upload_coverage "libdrizzle-redux-coverage.info"
+        - sudo ln -sf $PWD /home/libdrizzle-redux
+        - coveralls-lcov -t "$COVERALLS_REPO_TOKEN" "$CACHE_DIR/libdrizzle-redux-coverage.info"
+#        - cp $CACHE_DIR/libdrizzle-redux-coverage.info ./
+#        - ./travis_configure.sh upload_coverage "libdrizzle-redux-coverage.info"
