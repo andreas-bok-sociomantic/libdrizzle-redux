@@ -131,5 +131,6 @@ jobs:
           MAKE_TARGET="$MAKE_TARGET:code-coverage-capture" CONFIGURE_ARGS=--enable-code-coverage
       before_script: skip
       script:
+        - ls -la $CACHE_DIR
         - cp $CACHE_DIR/libdrizzle-redux-coverage.info ./
         - ./travis_configure.sh upload_coverage "libdrizzle-redux-coverage.info"
