@@ -100,7 +100,7 @@ jobs:
       env:
         MAKE_TARGET="$MAKE_TARGET:code-coverage-capture" CONFIGURE_ARGS=--enable-code-coverage
       before_cache:
-        - cp libdrizzle-redux-coverage.info $CACHE_DIR/
+        - cp build/libdrizzle-redux-coverage.info $CACHE_DIR/
     - <<: *linux-build
       env:
         CXX=clang++ CC=clang COMPILER_VERSION=3.9
