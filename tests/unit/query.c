@@ -95,7 +95,13 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  drizzle_result_st *result = drizzle_query(con, "select * from test_query.t1", 0, &ret);
+  drizzle_result_st *result = drizzle_query(con,
+    "SELECT * FROM test_query.no_such_table", 0, &ret);
+  ASSERT_EQ(1146, drizzle_error_code(con));
+  drizzle_result_free(result);
+
+  result = drizzle_query(con, "select * from test_query.t1", 0, &ret);
+
   if (ret != DRIZZLE_RETURN_OK)
   {
     printf("Select failure\n");
