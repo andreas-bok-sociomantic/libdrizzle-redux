@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
 
   // Check MySQL server version string
   result = drizzle_query(con, "SHOW variables like 'version'", 0, &driz_ret);
-  drizzle_result_buffer(result);
+
+  CHECK(drizzle_result_buffer(result));
   ASSERT_EQ(1, drizzle_result_row_count(result));
   row = drizzle_row_next(result);
   ASSERT_STREQ(row[1], drizzle_server_version(con));
@@ -65,6 +66,14 @@ int main(int argc, char *argv[])
   ASSERT_NEQ(-1, drizzle_fd(con));
 
   // Check server charset
-  printf("charset %d\n", drizzle_charset(con));
   ASSERT_NEQ(DRIZZLE_CHARSET_NONE, drizzle_charset(con));
+
+  // Connection status
+  drizzle_status(con);
+
+  // Check max allowed packet size: <= 0xFFFFFFFF
+  ASSERT_TRUE(drizzle_max_packet_size(con) <= UINT32_MAX);
+
+  const unsigned char *scramble = drizzle_scramble(con);
+  ASSERT_NOT_NULL(scramble);
 }
