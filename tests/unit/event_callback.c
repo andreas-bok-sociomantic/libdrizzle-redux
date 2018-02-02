@@ -81,12 +81,25 @@ extern drizzle_return_t drizzle_event_callback(drizzle_st *con, short events,
   return DRIZZLE_RETURN_OK;
 }
 
+extern void drizzle_free_context(drizzle_st *con, void *context);
+extern void drizzle_free_context(drizzle_st *con, void *context)
+{
+  (void)con;
+
+  if ( context != NULL)
+  {
+    free(context);
+  }
+}
+
+
 int main(int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
 
-  char cxt_a[] = "Context is everything";
+  char *cxt_a = (char*) malloc(256);
+  strcpy(cxt_a, "Context is everything");
   int cxt_b = 0;
 
   drizzle_st *con = drizzle_create(getenv("MYSQL_SERVER"),
@@ -98,7 +111,8 @@ int main(int argc, char *argv[])
   ASSERT_NOT_NULL_(con, "Drizzle connection object creation error");
 
   // Set drizzle dummy context
-  drizzle_set_context(con, (void *)&cxt_a);
+  drizzle_set_context(con, (void *)cxt_a);
+  drizzle_set_context_free_fn(con, drizzle_free_context);
   ASSERT_NOT_NULL_(drizzle_context(con), "Drizzle context is null");
 
   // Set user defined callback function event_watch_fn
