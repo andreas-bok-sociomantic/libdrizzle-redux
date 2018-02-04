@@ -95,6 +95,8 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
+  // https://dev.mysql.com/doc/refman/5.7/en/show-warnings.html
+  // test warnings
   drizzle_result_st *result = drizzle_query(con,
     "SELECT * FROM test_query.no_such_table", 0, &ret);
   ASSERT_EQ(1146, drizzle_error_code(con));
