@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 
   opts = drizzle_options_create();
   drizzle_options_set_socket_owner(opts, DRIZZLE_SOCKET_OWNER_NATIVE);
+  ASSERT_EQ(DRIZZLE_SOCKET_OWNER_NATIVE, drizzle_options_get_socket_owner(opts));
 
   set_up_connection();
 
