@@ -39,6 +39,7 @@
 
 #include "tests/unit/common.h"
 #include <libdrizzle-redux/libdrizzle.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
