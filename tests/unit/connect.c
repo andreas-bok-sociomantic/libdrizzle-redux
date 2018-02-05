@@ -39,6 +39,7 @@
 
 #include "tests/unit/common.h"
 #include <libdrizzle-redux/libdrizzle.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,13 +125,34 @@ int main(int argc, char *argv[])
     DRIZZLE_RETURN_HANDSHAKE_FAILED, -1);
 
   opts = drizzle_options_create();
-  drizzle_socket_set_options(opts, 10, 5, 3, 3);
+  drizzle_socket_set_options(NULL, 999, 5, 3, 3);
+  ASSERT_NEQ(999, drizzle_socket_get_option(con, DRIZZLE_SOCKET_OPTION_TIMEOUT));
 
+  drizzle_socket_set_option(NULL, DRIZZLE_SOCKET_OPTION_TIMEOUT, 999);
+  drizzle_socket_get_option(NULL, DRIZZLE_SOCKET_OPTION_TIMEOUT);
+  ASSERT_EQ(-1, drizzle_socket_get_option(con, 999));
+
+  drizzle_socket_set_option(con, DRIZZLE_SOCKET_OPTION_TIMEOUT, 999);
+  ASSERT_EQ(999, drizzle_socket_get_option(con, DRIZZLE_SOCKET_OPTION_TIMEOUT));
+
+  drizzle_socket_set_option(con, DRIZZLE_SOCKET_OPTION_KEEPIDLE  , 999);
+  ASSERT_EQ(999, drizzle_socket_get_option(con, DRIZZLE_SOCKET_OPTION_KEEPIDLE));
+
+  drizzle_socket_set_option(con, DRIZZLE_SOCKET_OPTION_KEEPCNT, 999);
+  ASSERT_EQ(999, drizzle_socket_get_option(con, DRIZZLE_SOCKET_OPTION_KEEPCNT));
+
+  drizzle_socket_set_option(con, DRIZZLE_SOCKET_OPTION_KEEPINTVL, 999);
+  ASSERT_EQ(999, drizzle_socket_get_option(con, DRIZZLE_SOCKET_OPTION_KEEPINTVL));
+  drizzle_socket_set_options(opts, 10, 5, 3, 3);
   con = drizzle_create(host, port, user, pass, db, opts);
   ASSERT_NOT_NULL_(con, "Drizzle connection object creation error");
 
+  // test timeout set and get api
   drizzle_set_timeout(con, 30000);
   ASSERT_EQ_(30000, drizzle_timeout(con), "unexpected value for timeout");
+  drizzle_set_timeout(NULL, 3);
+  ASSERT_EQ_(drizzle_timeout(con), 30000, "can't set timeout with con=NULL %d", drizzle_timeout(con));
+  ASSERT_EQ_(-1, drizzle_timeout(NULL), "can't get timeout for con=NULL");
 
   int opt_val = drizzle_socket_get_option(con, DRIZZLE_SOCKET_OPTION_TIMEOUT);
   ASSERT_EQ_(10, opt_val, "unexpected value for socket option TIMEOUT: %d != 10",
@@ -153,6 +175,7 @@ int main(int argc, char *argv[])
   ASSERT_EQ_(20, opt_val, "unexpected value for socket option KEEPALIVE: %d != 20",
     opt_val);
 
+  ASSERT_EQ_(DRIZZLE_RETURN_INVALID_ARGUMENT, drizzle_connect(NULL), "con is NULL");
   driz_ret= drizzle_connect(con);
   if (driz_ret == DRIZZLE_RETURN_COULD_NOT_CONNECT)
   {
@@ -165,10 +188,27 @@ int main(int argc, char *argv[])
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "drizzle_connect() : %s",
              drizzle_error(con));
 
+  ASSERT_NULL_(drizzle_host(NULL), "con is NULL");
+  ASSERT_STREQ(host, drizzle_host(con));
+  ASSERT_EQ(0, drizzle_port(NULL));
+  ASSERT_EQ(port, drizzle_port(con));
+  ASSERT_NULL_(drizzle_user(NULL), "con is NULL");
+  ASSERT_STREQ(user, drizzle_user(con));
+  ASSERT_NULL_(drizzle_db(NULL), "con is NULL");
+  ASSERT_STREQ(db, drizzle_db(con));
+
+  ASSERT_NULL_(drizzle_scramble(NULL), "con is NULL");
+  ASSERT_NOT_NULL_(drizzle_scramble(con), "scramble buffer not initialized");
+
   drizzle_query(con, "SELECT 1", 0, &driz_ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "SELECT 1 (%s)", drizzle_error(con));
 
+  ASSERT_EQ_(0, drizzle_thread_id(NULL), "Connection object is NULL");
+  ASSERT_NEQ_(0, drizzle_thread_id(con), "Invalid thread id");
+
   // Now that we know everything is good... lets push it.
+  drizzle_close(NULL);
+  ASSERT_NEQ(-1, drizzle_fd(con));
   drizzle_close(con);
 
   int limit = 20;
@@ -187,8 +227,18 @@ int main(int argc, char *argv[])
 
   int cxt = 1;
   drizzle_set_log_fn(con, log_fn_callback, (void*)&cxt);
+
+  drizzle_set_verbose(NULL, DRIZZLE_VERBOSE_DEBUG);
+  ASSERT_EQ(DRIZZLE_VERBOSE_NEVER, drizzle_verbose(con));
+  ASSERT_EQ(DRIZZLE_VERBOSE_NEVER, drizzle_verbose(NULL));
   drizzle_set_verbose(con, DRIZZLE_VERBOSE_DEBUG);
   ASSERT_EQ(DRIZZLE_VERBOSE_DEBUG, drizzle_verbose(con));
+  ASSERT_STREQ("UNKNOWN", drizzle_verbose_name(DRIZZLE_VERBOSE_MAX));
+
+  ASSERT_EQ(con, drizzle_ready(con));
+
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, drizzle_quit(NULL));
+
   driz_ret = drizzle_quit(con);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "%s", drizzle_strerror(driz_ret));
 
