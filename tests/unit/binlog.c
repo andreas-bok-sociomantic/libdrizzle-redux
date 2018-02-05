@@ -41,6 +41,86 @@
 
 #include "tests/unit/common.h"
 
+const drizzle_binlog_event_types_t binlog_event_types[] = {
+    DRIZZLE_EVENT_TYPE_UNKNOWN,
+    DRIZZLE_EVENT_TYPE_START,
+    DRIZZLE_EVENT_TYPE_QUERY,
+    DRIZZLE_EVENT_TYPE_STOP,
+    DRIZZLE_EVENT_TYPE_ROTATE,
+    DRIZZLE_EVENT_TYPE_INTVAR,
+    DRIZZLE_EVENT_TYPE_LOAD,
+    DRIZZLE_EVENT_TYPE_SLAVE,
+    DRIZZLE_EVENT_TYPE_CREATE_FILE,
+    DRIZZLE_EVENT_TYPE_APPEND_BLOCK,
+    DRIZZLE_EVENT_TYPE_EXEC_LOAD,
+    DRIZZLE_EVENT_TYPE_DELETE_FILE,
+    DRIZZLE_EVENT_TYPE_NEW_LOAD,
+    DRIZZLE_EVENT_TYPE_RAND,
+    DRIZZLE_EVENT_TYPE_USER_VAR,
+    DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION,
+    DRIZZLE_EVENT_TYPE_XID,
+    DRIZZLE_EVENT_TYPE_BEGIN_LOAD_QUERY,
+    DRIZZLE_EVENT_TYPE_EXECUTE_LOAD_QUERY,
+    DRIZZLE_EVENT_TYPE_TABLE_MAP,
+    DRIZZLE_EVENT_TYPE_OBSOLETE_WRITE_ROWS,
+    DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS,
+    DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS,
+    DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS,
+    DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS,
+    DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS,
+    DRIZZLE_EVENT_TYPE_INCIDENT,
+    DRIZZLE_EVENT_TYPE_HEARTBEAT,
+    DRIZZLE_EVENT_TYPE_IGNORABLE,
+    DRIZZLE_EVENT_TYPE_ROWS_QUERY,
+    DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS,
+    DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS,
+    DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS,
+    DRIZZLE_EVENT_TYPE_GTID,
+    DRIZZLE_EVENT_TYPE_ANONYMOUS_GTID,
+    DRIZZLE_EVENT_TYPE_PREVIOUS_GTIDS,
+    DRIZZLE_EVENT_TYPE_END
+  };
+
+const char* binlog_event_types_str[37] = {
+    "DRIZZLE_EVENT_TYPE_UNKNOWN",
+    "DRIZZLE_EVENT_TYPE_START",
+    "DRIZZLE_EVENT_TYPE_QUERY",
+    "DRIZZLE_EVENT_TYPE_STOP",
+    "DRIZZLE_EVENT_TYPE_ROTATE",
+    "DRIZZLE_EVENT_TYPE_INTVAR",
+    "DRIZZLE_EVENT_TYPE_LOAD",
+    "DRIZZLE_EVENT_TYPE_SLAVE",
+    "DRIZZLE_EVENT_TYPE_CREATE_FILE",
+    "DRIZZLE_EVENT_TYPE_APPEND_BLOCK",
+    "DRIZZLE_EVENT_TYPE_EXEC_LOAD",
+    "DRIZZLE_EVENT_TYPE_DELETE_FILE",
+    "DRIZZLE_EVENT_TYPE_NEW_LOAD",
+    "DRIZZLE_EVENT_TYPE_RAND",
+    "DRIZZLE_EVENT_TYPE_USER_VAR",
+    "DRIZZLE_EVENT_TYPE_FORMAT_DESCRIPTION",
+    "DRIZZLE_EVENT_TYPE_XID",
+    "DRIZZLE_EVENT_TYPE_BEGIN_LOAD_QUERY",
+    "DRIZZLE_EVENT_TYPE_EXECUTE_LOAD_QUERY",
+    "DRIZZLE_EVENT_TYPE_TABLE_MAP",
+    "DRIZZLE_EVENT_TYPE_OBSOLETE_WRITE_ROWS",
+    "DRIZZLE_EVENT_TYPE_OBSOLETE_UPDATE_ROWS",
+    "DRIZZLE_EVENT_TYPE_OBSOLETE_DELETE_ROWS",
+    "DRIZZLE_EVENT_TYPE_V1_WRITE_ROWS",
+    "DRIZZLE_EVENT_TYPE_V1_UPDATE_ROWS",
+    "DRIZZLE_EVENT_TYPE_V1_DELETE_ROWS",
+    "DRIZZLE_EVENT_TYPE_INCIDENT",
+    "DRIZZLE_EVENT_TYPE_HEARTBEAT",
+    "DRIZZLE_EVENT_TYPE_IGNORABLE",
+    "DRIZZLE_EVENT_TYPE_ROWS_QUERY",
+    "DRIZZLE_EVENT_TYPE_V2_WRITE_ROWS",
+    "DRIZZLE_EVENT_TYPE_V2_UPDATE_ROWS",
+    "DRIZZLE_EVENT_TYPE_V2_DELETE_ROWS",
+    "DRIZZLE_EVENT_TYPE_GTID",
+    "DRIZZLE_EVENT_TYPE_ANONYMOUS_GTID",
+    "DRIZZLE_EVENT_TYPE_PREVIOUS_GTIDS",
+    "DRIZZLE_EVENT_TYPE_END"
+  };
+
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
 void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {
@@ -66,6 +146,8 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
    * new events or type is corrupted */
   ASSERT_FALSE_((drizzle_binlog_event_type(event) >= DRIZZLE_EVENT_TYPE_END),
                 "Bad event type: %d", drizzle_binlog_event_type(event));
+
+  ASSERT_EQ(1, drizzle_binlog_event_server_id(event));
 }
 
 int main(int argc, char *argv[])
@@ -77,19 +159,18 @@ int main(int argc, char *argv[])
 
   // Test initialization of binlog with socket owner as client
   opts = drizzle_options_create();
-  drizzle_options_set_socket_owner(opts, DRIZZLE_SOCKET_OWNER_CLIENT);
-
+  drizzle_options_set_socket_owner(opts, DRIZZLE_SOCKET_OWNER_NATIVE);
   set_up_connection();
 
   binlog = drizzle_binlog_init(NULL, binlog_event, binlog_error, NULL, true);
   ASSERT_NULL_(binlog, "Drizzle connection is null");
 
   binlog = drizzle_binlog_init(con, NULL, binlog_error, NULL, true);
-  ASSERT_NOT_NULL_(binlog, "Binlog event callback function is NULL");
+  ASSERT_NULL_(binlog, "Binlog event callback function is NULL");
   drizzle_binlog_free(binlog);
 
   binlog = drizzle_binlog_init(con, binlog_event, NULL, NULL, true);
-  ASSERT_NOT_NULL_(binlog, "Binlog error callback function is NULL");
+  ASSERT_NULL_(binlog, "Binlog error callback function is NULL");
   drizzle_binlog_free(binlog);
 
   // Quit the drizzle connection and test binlog initialization with socket
@@ -98,23 +179,38 @@ int main(int argc, char *argv[])
 
   opts = drizzle_options_create();
   drizzle_options_set_socket_owner(opts, DRIZZLE_SOCKET_OWNER_NATIVE);
+  ASSERT_EQ(DRIZZLE_SOCKET_OWNER_NATIVE, drizzle_options_get_socket_owner(opts));
 
   set_up_connection();
 
   char *binlog_file;
   uint32_t end_position;
+  ret = drizzle_binlog_get_filename(con, &binlog_file, &end_position, -2);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
   ret = drizzle_binlog_get_filename(con, &binlog_file, &end_position, -1);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "Couldn't retrieve binlog filename: %s(%s)",
              drizzle_error(con), drizzle_strerror(ret));
 
   binlog = drizzle_binlog_init(con, binlog_event, binlog_error, NULL, true);
   ASSERT_NOT_NULL_(binlog, "Binlog object creation error");
+  ret = drizzle_binlog_start(NULL, 0, binlog_file, 0);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
   ret = drizzle_binlog_start(binlog, 0, binlog_file, 0);
 
   SKIP_IF_(ret == DRIZZLE_RETURN_ERROR_CODE, "Binlog is not open?: %s(%s)",
            drizzle_error(con), drizzle_strerror(ret));
   ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "Drizzle binlog start failure: %s(%s)",
              drizzle_error(con), drizzle_strerror(ret));
+
+  ASSERT_EQ(DRIZZLE_EVENT_TYPE_UNKNOWN, drizzle_binlog_event_type(NULL));
+  ASSERT_EQ(0, drizzle_binlog_event_timestamp(NULL));
+
+  // string representation of binlog event types
+  for (uint i=0; i < 37; i++)
+  {
+    ASSERT_STREQ(binlog_event_types_str[i],
+      drizzle_binlog_event_type_str(binlog_event_types[i]));
+  }
 
   free(binlog_file);
   return EXIT_SUCCESS;
