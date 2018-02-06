@@ -145,6 +145,7 @@ int main(int argc, char *argv[])
   ret = drizzle_stmt_buffer(stmt);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
 
+  // Read the same buffer again and fail
   ret = drizzle_stmt_buffer(stmt);
   ASSERT_EQ_(DRIZZLE_RETURN_UNEXPECTED_DATA, ret, "%s", drizzle_error(con));
 

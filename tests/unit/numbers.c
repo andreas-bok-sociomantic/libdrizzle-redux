@@ -94,9 +94,24 @@ int main(int argc, char *argv[])
   set_up_connection();
   set_up_schema("test_numbers");
 
-  CHECKED_QUERY("CREATE TABLE test_numbers.t1 (a INT PRIMARY KEY AUTO_INCREMENT, "
+  /*CHECKED_QUERY("CREATE TABLE test_numbers.t1 (a INT PRIMARY KEY AUTO_INCREMENT, "
                 "b TINYINT, c SMALLINT, d MEDIUMINT, e INT, f BIGINT, g FLOAT, "
                 "h DOUBLE(16,13))");
+*/
+  CHECKED_QUERY(
+    "CREATE TABLE test_numbers.t1 (a INT PRIMARY KEY AUTO_INCREMENT,"
+    "b   TINYINT,"
+    "c   SMALLINT,"
+    "d   SMALLINT UNSIGNED,"
+    "e   MEDIUMINT,"
+    "f   MEDIUMINT UNSIGNED,"
+    "g   INT,"
+    "h   INT UNSIGNED,"
+    "i   BIGINT,"
+    "j   BIGINT UNSIGNED,"
+    "k   FLOAT,"
+    "l   DOUBLE(16,13)"
+    ")");
 
   /* Insert rows with pk 1 and 2 */
   CHECKED_QUERY("INSERT INTO test_numbers.t1 (b,c,d,e,f,g,h) VALUES "
