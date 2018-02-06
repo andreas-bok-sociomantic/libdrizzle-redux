@@ -114,6 +114,12 @@ int main(int argc, char *argv[])
   ASSERT_EQ(drizzle_result_affected_rows(result), 2);
   rows_in_table += 2;
 
+  /* Insert query with wrong number of placeholders */
+  query = "INSERT INTO test_datetime.dt1 (a,b,c,d,e,f,g,h,i) "
+          "VALUES (?,?,?,?,?,?,?,?,?,?)";
+  sth = drizzle_stmt_prepare(con, query, strlen(query), &driz_ret);
+  ASSERT_NULL_(sth, "Expected wrong parameter count: %s", drizzle_error(con));
+
   /* Insert row with pk 3 and 4 - test marshaling values we transmit */
   query = "INSERT INTO test_datetime.dt1 (a,b,c,d,e,f,g,h,i) "
           "VALUES (?,?,?,?,?,?,?,?,?)";
