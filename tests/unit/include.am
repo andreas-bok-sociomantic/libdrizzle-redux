@@ -40,6 +40,9 @@ nodist_EXTRA_tests_unit_escape_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/escape
 noinst_PROGRAMS+= tests/unit/escape
 
+gdb-escape: tests/unit/escape
+	@$(GDB_COMMAND) tests/unit/escape
+
 tests_unit_insert_id_SOURCES= tests/unit/insert_id.c
 tests_unit_insert_id_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_insert_id_SOURCES = dummy.cxx
@@ -80,13 +83,16 @@ nodist_EXTRA_tests_unit_datetypes_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/datetypes
 noinst_PROGRAMS+= tests/unit/datetypes
 
+check-datetypes: tests/unit/datetypes
+	tests/unit/datetypes
+
 tests_unit_nulls_SOURCES= tests/unit/nulls.c tests/unit/common.c
 tests_unit_nulls_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_nulls_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/nulls
 noinst_PROGRAMS+= tests/unit/nulls
 
-tests_unit_row_SOURCES= tests/unit/row.c
+tests_unit_row_SOURCES= tests/unit/row.c tests/unit/common.c
 tests_unit_row_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_row_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/row
@@ -137,6 +143,12 @@ nodist_EXTRA_tests_unit_statement_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/statement
 noinst_PROGRAMS+= tests/unit/statement
 
+gdb-statement: tests/unit/statement
+	@$(GDB_COMMAND) tests/unit/statement
+
+check-statement: tests/unit/statement
+	tests/unit/statement
+
 tests_unit_statement_char_SOURCES= tests/unit/statement_char.c
 tests_unit_statement_char_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_statement_char_SOURCES = dummy.cxx
@@ -148,3 +160,18 @@ tests_unit_statement_nulls_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_statement_nulls_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/statement_nulls
 noinst_PROGRAMS+= tests/unit/statement_nulls
+
+tests_unit_mysql_properties_SOURCES= tests/unit/mysql_properties.c tests/unit/common.c
+tests_unit_mysql_properties_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_mysql_properties_SOURCES = dummy.cxx
+check_PROGRAMS+= tests/unit/mysql_properties
+noinst_PROGRAMS+= tests/unit/mysql_properties
+
+tests_unit_connect_async_SOURCES= tests/unit/connect_async.c tests/unit/common.c
+tests_unit_connect_async_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_connect_async_SOURCES = dummy.cxx
+check_PROGRAMS+= tests/unit/connect_async
+noinst_PROGRAMS+= tests/unit/connect_async
+
+check-connect_async: tests/unit/connect_async
+	tests/unit/connect_async

@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
   driz_ret = drizzle_stmt_buffer(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, buffering \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
+  ASSERT_NEQ(drizzle_stmt_insert_id(sth), 0);
   CHECK(drizzle_stmt_close(sth));
 
   /* TODO: Also send some negative values of each type */
