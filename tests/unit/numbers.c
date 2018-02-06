@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
   driz_ret = drizzle_stmt_execute(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, executing \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
+  ASSERT_NEQ(drizzle_stmt_insert_id(sth), 0);
   driz_ret = drizzle_stmt_buffer(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, buffering \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
