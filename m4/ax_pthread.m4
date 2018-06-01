@@ -193,6 +193,10 @@ for flag in $ax_pthread_flags; do
         save_LIBS="$LIBS"
         save_CFLAGS="$CFLAGS"
         LIBS="$PTHREAD_LIBS $LIBS"
+        if [[[ "$CC" =~ clang ]]]; then
+            PTHREAD_CFLAGS=""
+        fi
+
         CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 
         # Check for various functions.  We must include pthread.h,
@@ -267,7 +271,9 @@ if test "x$ax_pthread_ok" = xyes; then
         esac
         AC_MSG_RESULT(${flag})
         if test "x$flag" != xno; then
-            PTHREAD_CFLAGS="$flag $PTHREAD_CFLAGS"
+            if [[[ ! "$CC" =~ ^clang ]]]; then
+                PTHREAD_CFLAGS="$flag $PTHREAD_CFLAGS"
+            fi
         fi
 
         AC_CACHE_CHECK([for PTHREAD_PRIO_INHERIT],
