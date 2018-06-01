@@ -24,9 +24,11 @@
 #include "config.h"
 #include "src/common.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunsafe-loop-optimizations"
+#if defined(__GNUC__) && !defined(__clang__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+	#pragma GCC diagnostic ignored "-Wunsafe-loop-optimizations"
+#endif
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
@@ -183,4 +185,7 @@ SHA1Final(uint8_t digest[SHA1_DIGEST_LENGTH], SHA1_CTX *context)
 	}
 }
 
+#if defined(__GNUC__) && !defined __clang__
 #pragma GCC diagnostic pop
+#endif
+
