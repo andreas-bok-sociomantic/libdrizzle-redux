@@ -282,6 +282,8 @@ int drizzle_socket_get_option(drizzle_st *con, drizzle_socket_option_t option)
 
     case DRIZZLE_SOCKET_OPTION_KEEPINTVL:
       return con->options.keepintvl;
+    default:
+      return -1;
   }
 }
 
