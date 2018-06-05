@@ -268,8 +268,6 @@ const char *drizzle_column_type_str(drizzle_column_type_t type)
             return "STRING";
         case DRIZZLE_COLUMN_TYPE_GEOMETRY:
             return "GEOMETRY";
-        default:
-            return "NONE";
     }
 }
 
