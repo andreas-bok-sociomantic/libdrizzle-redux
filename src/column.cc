@@ -269,9 +269,8 @@ const char *drizzle_column_type_str(drizzle_column_type_t type)
         case DRIZZLE_COLUMN_TYPE_GEOMETRY:
             return "GEOMETRY";
         default:
-            break;
+            return "NONE";
     }
-    return "UNKNOWN";
 }
 
 drizzle_column_flags_t drizzle_column_flags(drizzle_column_st *column)
