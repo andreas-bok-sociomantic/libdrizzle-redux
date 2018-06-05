@@ -277,7 +277,6 @@ drizzle_return_t drizzle_stmt_execute(drizzle_stmt_st *stmt)
         drizzle_set_error(stmt->con, __FILE_LINE_FUNC__, "unknown type when filling buffer");
         delete[] buffer;
         return DRIZZLE_RETURN_UNEXPECTED_DATA;
-        break;
     }
   }
   /* Copy NULL bitmap */
