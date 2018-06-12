@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
   set_up_connection();
 
   // Check MySQL server version string
+  ASSERT_NULL_(drizzle_server_version(NULL), "con is NULL");
   result = drizzle_query(con, "SHOW variables like 'version'", 0, &driz_ret);
   drizzle_result_buffer(result);
   ASSERT_EQ(1, drizzle_result_row_count(result));
@@ -62,9 +63,41 @@ int main(int argc, char *argv[])
   ASSERT_EQ(DRIZZLE_RETURN_OK, driz_ret);
 
   // Check file descriptor for the connection
+  ASSERT_EQ(-1, drizzle_fd(NULL));
   ASSERT_NEQ(-1, drizzle_fd(con));
 
+  ASSERT_EQ(DRIZZLE_CAPABILITIES_NONE, drizzle_capabilities(NULL));
+  ASSERT_NEQ(DRIZZLE_CAPABILITIES_NONE, drizzle_capabilities(con));
+
+  ASSERT_EQ(DRIZZLE_CON_STATUS_NONE, drizzle_status(NULL));
+  ASSERT_NEQ(DRIZZLE_CON_STATUS_NONE, drizzle_status(con));
+
+  ASSERT_EQ(0, drizzle_max_packet_size(NULL));
+  ASSERT_EQ(UINT32_MAX, drizzle_max_packet_size(con));
+
+  ASSERT_NULL_( drizzle_sqlstate(NULL), "can't get sql state for con=NULL");
+  driz_ret = drizzle_select_db(con, "invalid_database");
+  ASSERT_STREQ("42000", drizzle_sqlstate(con));
+
   // Check server charset
-  printf("charset %d\n", drizzle_charset(con));
+  ASSERT_EQ(DRIZZLE_CHARSET_NONE, drizzle_charset(NULL));
   ASSERT_NEQ(DRIZZLE_CHARSET_NONE, drizzle_charset(con));
+
+  ASSERT_EQ(0, drizzle_protocol_version(NULL));
+  result = drizzle_query(con, "SHOW VARIABLES LIKE 'protocol_version'", 0, &driz_ret);
+  drizzle_result_buffer(result);
+  row = drizzle_row_next(result);
+  uint32_t protocol_version = atoi(row[1]);
+  ASSERT_EQ(protocol_version, drizzle_protocol_version(con));
+
+  result = drizzle_query(con, "SELECT CONNECTION_ID()", 0, &driz_ret);
+  drizzle_result_buffer(result);
+  row = drizzle_row_next(result);
+
+  uint32_t conn_id = atoi(row[0]);
+  result = drizzle_kill(con, conn_id, &driz_ret);
+  ASSERT_EQ(0, drizzle_result_row_count(result));
+  drizzle_result_free(result);
+
+  close_connection_on_exit();
 }
