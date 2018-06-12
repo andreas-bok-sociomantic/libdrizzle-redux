@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
   CHECKED_QUERY("INSERT INTO test_column.t1 (b) VALUES ('this'),('is'),('war')");
 
-  CHECKED_QUERY("SELECT * FROM test_column.t1");
+  CHECKED_QUERY("SELECT * FROM test_column.t1 table1");
 
   drizzle_result_buffer(result);
   num_fields = drizzle_result_column_count(result);
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
       cur_column++;
       ASSERT_EQ_(strcmp(drizzle_column_db(column), "test_column"), 0,
                  "Column has bad DB name");
-      ASSERT_EQ_(strcmp(drizzle_column_table(column), "t1"), 0,
+      ASSERT_EQ_(strcmp(drizzle_column_table(column), "table1"), 0,
                  "Column had bad table name");
       switch (cur_column) {
       case 1:
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
                    "Column type wrong");
         break;
       }
-
+      ASSERT_STREQ_("t1", drizzle_column_orig_table(column), "Original table wrong");
     }
 
     ASSERT_EQ_(cur_column, 3, "Wrong column count");
