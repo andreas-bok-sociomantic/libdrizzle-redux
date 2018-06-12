@@ -102,7 +102,6 @@ int main(int argc, char *argv[])
 
   int i = 0;
   drizzle_column_st *column;
-  size_t column_size;
   while ((row = drizzle_row_next(result)))
   {
     drizzle_column_seek(result, 0);
