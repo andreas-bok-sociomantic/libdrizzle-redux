@@ -38,9 +38,7 @@
 #include <yatl/lite.h>
 
 #include <libdrizzle-redux/libdrizzle.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "tests/unit/common.h"
 
 int main(int argc, char *argv[])
 {
@@ -48,58 +46,17 @@ int main(int argc, char *argv[])
   (void)argv;
   drizzle_row_t row;
   int num_fields;
+  drizzle_result_st *result;
+  drizzle_return_t driz_ret;
 
-  drizzle_st *con = drizzle_create(getenv("MYSQL_SERVER"),
-                                   getenv("MYSQL_PORT") ? atoi(getenv("MYSQL_PORT"))
-                                                        : DRIZZLE_DEFAULT_TCP_PORT,
-                                   getenv("MYSQL_USER"),
-                                   getenv("MYSQL_PASSWORD"),
-                                   getenv("MYSQL_SCHEMA"), 0);
-  ASSERT_NOT_NULL_(con, "Drizzle connection object creation error");
+  set_up_connection();
+  set_up_schema("test_row");
 
-  drizzle_return_t ret = drizzle_connect(con);
-  if (ret == DRIZZLE_RETURN_COULD_NOT_CONNECT)
-  {
-    char error[DRIZZLE_MAX_ERROR_SIZE];
-    strncpy(error, drizzle_error(con), DRIZZLE_MAX_ERROR_SIZE);
-    drizzle_quit(con);
-    SKIP_IF_(ret == DRIZZLE_RETURN_COULD_NOT_CONNECT, "%s(%s)", error,
-             drizzle_strerror(ret));
-  }
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_connect(): %s(%s)",
-             drizzle_error(con), drizzle_strerror(ret));
+  CHECKED_QUERY("CREATE TABLE test_row.t1 (a INT)");
 
-  drizzle_query(con, "DROP SCHEMA IF EXISTS test_row", 0, &ret);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "CREATE SCHEMA test_row (%s)",
-             drizzle_error(con));
+  CHECKED_QUERY("INSERT INTO test_row.t1 VALUES (1),(2),(3)");
 
-  drizzle_query(con, "CREATE SCHEMA test_row", 0, &ret);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "CREATE SCHEMA test_row (%s)",
-             drizzle_error(con));
-
-  ret = drizzle_select_db(con, "test_row");
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "USE test_row");
-
-  drizzle_query(con, "CREATE TABLE test_row.t1 (a INT)", 0, &ret);
-  if (ret != DRIZZLE_RETURN_OK)
-  {
-    printf("Create table failure\n");
-    return EXIT_FAILURE;
-  }
-
-  drizzle_query(con, "INSERT INTO test_row.t1 VALUES (1),(2),(3)", 0, &ret);
-  if (ret != DRIZZLE_RETURN_OK)
-  {
-    printf("Insert failure\n");
-    return EXIT_FAILURE;
-  }
-
-  drizzle_result_st *result = drizzle_query(con, "SELECT * FROM test_row.t1", 0, &ret);
-  if (ret != DRIZZLE_RETURN_OK)
-  {
-    printf("Select failure\n");
-    return EXIT_FAILURE;
-  }
+  CHECKED_QUERY("SELECT * FROM test_row.t1");
   drizzle_result_buffer(result);
   num_fields = drizzle_result_column_count(result);
 
@@ -109,6 +66,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
   row = drizzle_row_next(result);
+  ASSERT_NULL_(drizzle_row_next(NULL), "Could not get next row");
   if (row == NULL)
   {
     printf("Could not get the next row\n");
@@ -120,7 +78,9 @@ int main(int argc, char *argv[])
     printf("Retrieved bad next row value\n");
     return EXIT_FAILURE;
   }
+  drizzle_row_seek(NULL, 3);
   drizzle_row_seek(result, 3);
+  ASSERT_NULL_(drizzle_row_prev(NULL), "Could not get prev row");
   row = drizzle_row_prev(result);
   if (row == NULL)
   {
@@ -132,6 +92,8 @@ int main(int argc, char *argv[])
     printf("Retrieved bad prev row value: %s\n", row[0]);
     return EXIT_FAILURE;
   }
+  ASSERT_NULL_(drizzle_row_index(NULL, 1), "result set is NULL");
+  ASSERT_NULL_(drizzle_row_index(result, 999), "row index out of bounds");
   row = drizzle_row_index(result, 1);
   if (row == NULL)
   {
@@ -143,25 +105,25 @@ int main(int argc, char *argv[])
     printf("Retrieved bad indexed row value: %s\n", row[0]);
     return EXIT_FAILURE;
   }
+
+  ASSERT_EQ(0, drizzle_row_current(NULL));
   if (drizzle_row_current(result) != 2)
   {
     printf("Index at wrong pos\n");
     return EXIT_FAILURE;
   }
+  ASSERT_NULL_(drizzle_row_field_sizes(NULL), "Could not get field sizes");
   size_t *sizes = drizzle_row_field_sizes(result);
   ASSERT_EQ(sizes[0], 1);
 
+  drizzle_row_seek(result, 0);
+  ASSERT_NULL_(drizzle_row_prev(result), "Could not get prev row");
+
   drizzle_result_free(result);
 
-  drizzle_query(con, "DROP TABLE test_row.t1", 0, &ret);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "DROP TABLE test_row.t1");
+  CHECKED_QUERY("DROP TABLE test_row.t1");
 
-  drizzle_query(con, "DROP SCHEMA IF EXISTS test_row", 0, &ret);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "DROP SCHEMA test_row (%s)",
-             drizzle_error(con));
-
-  ret = drizzle_quit(con);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_strerror(ret));
+  tear_down_schema("test_row");
 
   return EXIT_SUCCESS;
 }
