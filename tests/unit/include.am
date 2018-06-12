@@ -175,3 +175,9 @@ noinst_PROGRAMS+= tests/unit/connect_async
 
 check-connect_async: tests/unit/connect_async
 	tests/unit/connect_async
+
+tests_unit_error_SOURCES= tests/unit/error.c
+tests_unit_error_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_error_SOURCES = dummy.cxx
+check_PROGRAMS+= tests/unit/error
+noinst_PROGRAMS+= tests/unit/error
