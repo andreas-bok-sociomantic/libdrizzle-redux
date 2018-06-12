@@ -70,6 +70,10 @@ const char *column_type_names[] = {
     "NEWDECIMAL", "ENUM", "SET",        "TINY_BLOB", "MEDIUM_BLOB",
     "LONG_BLOB",  "BLOB", "VAR_STRING", "STRING",    "GEOMETRY"};
 
+const char *column_names[4] = {
+  "NULL", "a", "b", "c"
+};
+
 int main(int argc, char *argv[])
 {
   (void)argc;
@@ -89,7 +93,7 @@ int main(int argc, char *argv[])
 
   CHECKED_QUERY("INSERT INTO test_column.t1 (b) VALUES ('this'),('is'),('war')");
 
-  CHECKED_QUERY("SELECT * FROM test_column.t1 table1");
+  CHECKED_QUERY("SELECT a column_1, b column_2, c column_3 FROM test_column.t1 table1");
 
   drizzle_result_buffer(result);
   num_fields = drizzle_result_column_count(result);
@@ -98,6 +102,7 @@ int main(int argc, char *argv[])
 
   int i = 0;
   drizzle_column_st *column;
+  size_t column_size;
   while ((row = drizzle_row_next(result)))
   {
     drizzle_column_seek(result, 0);
@@ -134,7 +139,12 @@ int main(int argc, char *argv[])
         break;
       }
       ASSERT_STREQ_("t1", drizzle_column_orig_table(column), "Original table wrong");
+      sprintf(buf, "column_%d", cur_column);
+      ASSERT_STREQ_(buf, drizzle_column_name(column), "Wrong column alias");
+      ASSERT_STREQ_(column_names[cur_column], drizzle_column_orig_name(column),
+        "Wrong column name");
     }
+
 
     ASSERT_EQ_(cur_column, 3, "Wrong column count");
     column = drizzle_column_prev(result);
