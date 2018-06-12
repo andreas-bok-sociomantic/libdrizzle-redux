@@ -131,6 +131,12 @@ int main(int argc, char *argv[])
   ASSERT_EQ_(DRIZZLE_RETURN_STMT_ERROR, ret, "%s", drizzle_error(con));
 
   uint32_t val = 1;
+  ret = drizzle_stmt_set_int(NULL, 0, val, false);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
+
+  ret = drizzle_stmt_set_int(stmt, 1, val, false);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
+
   ret = drizzle_stmt_set_int(stmt, 0, val, false);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
 
@@ -141,6 +147,10 @@ int main(int argc, char *argv[])
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
   ASSERT_EQ(1, drizzle_stmt_column_count(stmt));
   ASSERT_EQ(0, drizzle_stmt_affected_rows(stmt));
+  drizzle_stmt_get_is_unsigned(NULL, 0, &ret);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
+
+  ASSERT_EQ(false, drizzle_stmt_get_is_unsigned(stmt, 0, &ret));
 
   ret = drizzle_stmt_buffer(stmt);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
@@ -167,6 +177,11 @@ int main(int argc, char *argv[])
     ASSERT_NULL_(char_val, "drizzle_stmt_get_string: out of bounds column number");
     ASSERT_NEQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_string");
 
+    // test drizzle_stmt_get_string_from_name
+    drizzle_stmt_get_string_from_name(NULL, "a", &len, &ret);
+    ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
+    drizzle_stmt_get_string_from_name(stmt, "z", &len, &ret);
+    ASSERT_EQ(DRIZZLE_RETURN_NOT_FOUND, ret);
     char_val = drizzle_stmt_get_string_from_name(stmt, "a", &len, &ret);
     ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_string_from_name");
     i++;
