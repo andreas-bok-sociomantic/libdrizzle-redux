@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
   while ((row = drizzle_row_next(result)))
   {
     drizzle_column_seek(result, 0);
+    ASSERT_NULL_(drizzle_column_prev(result), "Can't retrieve column at index -1");
     int cur_column = 0;
     i++;
     char buf[10];
@@ -132,8 +133,14 @@ int main(int argc, char *argv[])
                    "Column type wrong");
         break;
       }
+
     }
+
     ASSERT_EQ_(cur_column, 3, "Wrong column count");
+    column = drizzle_column_prev(result);
+    ASSERT_EQ(2, drizzle_column_current(result));
+    column = drizzle_column_prev(NULL);
+    ASSERT_NULL_(column, "Result set is NULL");
   }
   /* Should have had 3 rows */
   ASSERT_EQ_(i, 3, "Retrieved bad number of rows");
