@@ -137,6 +137,12 @@ nodist_EXTRA_tests_unit_statement_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/statement
 noinst_PROGRAMS+= tests/unit/statement
 
+gdb-statement: tests/unit/statement
+	@$(GDB_COMMAND) tests/unit/statement
+
+check-statement: tests/unit/statement
+	tests/unit/statement
+
 tests_unit_statement_char_SOURCES= tests/unit/statement_char.c
 tests_unit_statement_char_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_statement_char_SOURCES = dummy.cxx
