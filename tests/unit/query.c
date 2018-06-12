@@ -78,8 +78,17 @@ int main(int argc, char *argv[])
 
   CHECKED_QUERY("CREATE SCHEMA test_query");
 
+  ret = drizzle_select_db(con, "invalid_schema");
+  ASSERT_EQ_(1049, drizzle_error_code(con), "Can't select invalid schema name");
+  ret = drizzle_select_db(con, NULL);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
   ret = drizzle_select_db(con, "test_query");
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "USE test_query");
+
+  ASSERT_NULL_(
+    drizzle_query(NULL, "CREATE TABLE test_query.t1 (a INT)", 0, &ret),
+    "Can't query with con=NULL");
+  ASSERT_EQ(ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
 
   drizzle_query(con, "CREATE TABLE test_query.t1 (a INT)", 0, &ret);
   if (ret != DRIZZLE_RETURN_OK)
@@ -95,7 +104,16 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  drizzle_result_st *result = drizzle_query(con, "select * from test_query.t1", 0, &ret);
+  // https://dev.mysql.com/doc/refman/5.7/en/show-warnings.html
+  // test warnings
+  drizzle_result_st *result = drizzle_query(con,
+    "SELECT * FROM test_query.no_such_table", 0, &ret);
+  ASSERT_EQ(1146, drizzle_error_code(con));
+  ASSERT_STREQ("42S02", drizzle_result_sqlstate(result));
+  drizzle_result_free(result);
+
+  result = drizzle_query(con, "select * from test_query.t1", 0, &ret);
+
   if (ret != DRIZZLE_RETURN_OK)
   {
     printf("Select failure\n");
@@ -127,6 +145,17 @@ int main(int argc, char *argv[])
     printf("Retrieved bad number of rows\n");
     return EXIT_FAILURE;
   }
+
+  drizzle_result_free(result);
+
+  result = drizzle_query(con,
+    "DROP TABLE IF EXISTS test_query.no_such_table", 0, &ret);
+  uint result_error_code = drizzle_result_error_code(result);
+  printf("Test: %s, %s, %d, %s, %d, %d, %s\n",
+    drizzle_error(con), drizzle_strerror(ret),
+    drizzle_error_code(con), drizzle_result_sqlstate(result),
+    result_error_code, drizzle_result_warning_count(result),
+    drizzle_result_message(result));
 
   drizzle_result_free(result);
 
