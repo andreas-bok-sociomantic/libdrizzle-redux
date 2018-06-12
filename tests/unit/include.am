@@ -40,6 +40,9 @@ nodist_EXTRA_tests_unit_escape_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/escape
 noinst_PROGRAMS+= tests/unit/escape
 
+gdb-escape: tests/unit/escape
+	@$(GDB_COMMAND) tests/unit/escape
+
 tests_unit_insert_id_SOURCES= tests/unit/insert_id.c
 tests_unit_insert_id_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_insert_id_SOURCES = dummy.cxx
