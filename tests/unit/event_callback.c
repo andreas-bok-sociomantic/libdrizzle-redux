@@ -81,6 +81,19 @@ extern drizzle_return_t drizzle_event_callback(drizzle_st *con, short events,
   return DRIZZLE_RETURN_OK;
 }
 
+extern drizzle_return_t drizzle_event_callback_invalid(drizzle_st *con,
+    short events, void *context);
+extern drizzle_return_t drizzle_event_callback_invalid(drizzle_st *con,
+    short events, void *context)
+{
+  (void)con;
+  ASSERT_NEQ(-1, events);
+  ASSERT_NOT_NULL_(context, "context is NULL");
+  //VARIABLE_IS_NOT_USED short* _events = &events;
+  //void VARIABLE_IS_NOT_USED *_context = context;
+  return DRIZZLE_RETURN_PAUSE;
+}
+
 extern void drizzle_free_context(drizzle_st *con, void *context);
 extern void drizzle_free_context(drizzle_st *con, void *context)
 {
@@ -129,6 +142,26 @@ int main(int argc, char *argv[])
   printf("\nEvent callback was invoked %d times\n", cxt_b);
 
   ASSERT_STREQ("Context is dead", cxt_a);
+
+  con = drizzle_create(getenv("MYSQL_SERVER"),
+                       getenv("MYSQL_PORT") ? atoi(getenv("MYSQL_PORT"))
+                                            : DRIZZLE_DEFAULT_TCP_PORT,
+                       getenv("MYSQL_USER"), getenv("MYSQL_PASSWORD"),
+                       getenv("MYSQL_SCHEMA"), 0);
+  // Set user defined callback function event_watch_fn
+  drizzle_set_event_watch_fn(con, drizzle_event_callback_invalid, (void *)&cxt_b);
+  drizzle_set_events(con, (short)0x0008);
+
+  con = drizzle_create(getenv("MYSQL_SERVER"),
+                       getenv("MYSQL_PORT") ? atoi(getenv("MYSQL_PORT"))
+                                            : DRIZZLE_DEFAULT_TCP_PORT,
+                       getenv("MYSQL_USER"), getenv("MYSQL_PASSWORD"),
+                       getenv("MYSQL_SCHEMA"), 0);
+  // Set user defined callback function event_watch_fn
+  drizzle_set_event_watch_fn(con, drizzle_event_callback_invalid, (void *)&cxt_b);
+  drizzle_set_revents(con, (short)0x0004);
+
+  drizzle_quit(con);
 
   return EXIT_SUCCESS;
 }
