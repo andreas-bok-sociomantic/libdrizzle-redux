@@ -55,6 +55,9 @@ nodist_EXTRA_tests_unit_query_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/query
 noinst_PROGRAMS+= tests/unit/query
 
+gdb-query: tests/unit/query
+	@$(GDB_COMMAND) tests/unit/query
+
 tests_unit_column_SOURCES= tests/unit/column.c tests/unit/common.c
 tests_unit_column_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_column_SOURCES = dummy.cxx
@@ -166,6 +169,9 @@ tests_unit_mysql_properties_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_mysql_properties_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/mysql_properties
 noinst_PROGRAMS+= tests/unit/mysql_properties
+
+gdb-mysql_properties: tests/unit/mysql_properties
+	@$(GDB_COMMAND) tests/unit/mysql_properties
 
 tests_unit_connect_async_SOURCES= tests/unit/connect_async.c tests/unit/common.c
 tests_unit_connect_async_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
