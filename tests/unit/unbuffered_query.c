@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, drizzle_column_buffer(NULL));
   if (drizzle_column_buffer(result) != DRIZZLE_RETURN_OK)
   {
     printf("Column buffer failure\n");
@@ -117,6 +118,8 @@ int main(int argc, char *argv[])
 
   int i = 0;
   char buf[10];
+  row = drizzle_row_buffer(NULL, &ret);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
   while(1)
   {
     row = drizzle_row_buffer(result, &ret);
