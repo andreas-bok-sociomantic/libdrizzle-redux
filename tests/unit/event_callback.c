@@ -121,7 +121,12 @@ int main(int argc, char *argv[])
   ASSERT_NOT_NULL_(con, "Drizzle connection object creation error");
 
   // Set drizzle dummy context
+  drizzle_set_context(NULL, (void *)&cxt_a);
+  ASSERT_NULL_(drizzle_context(con), "Can't set context when con = NULL");
+
   drizzle_set_context(con, (void *)&cxt_a);
+  ASSERT_NULL_(drizzle_context(NULL), "Can't get context when con = NULL");
+
   drizzle_set_context_free_fn(con, drizzle_free_context);
   ASSERT_NOT_NULL_(drizzle_context(con), "Drizzle context is null");
 
@@ -159,7 +164,9 @@ int main(int argc, char *argv[])
                        getenv("MYSQL_SCHEMA"), 0);
   // Set user defined callback function event_watch_fn
   drizzle_set_event_watch_fn(con, drizzle_event_callback_invalid, (void *)&cxt_b);
-  drizzle_set_revents(con, (short)0x0004);
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, drizzle_set_revents(NULL, (short)0x0004));
+  ASSERT_EQ(DRIZZLE_RETURN_PAUSE, drizzle_set_revents(con, (short)0x0004));
+  printf("drizzle_set_revents: %d\n", driz_ret);
 
   drizzle_quit(con);
 
