@@ -110,11 +110,11 @@ int main(int argc, char *argv[])
   ret = drizzle_select_db(con, "test_stmt");
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "USE test_stmt");
 
-  drizzle_query(con, "CREATE TABLE test_stmt.t1 (a INT)", 0, &ret);
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "CREATE TABLE test_stmt.t1 (a INT): %s",
+  drizzle_query(con, "CREATE TABLE test_stmt.t1 (a INT, b INT UNSIGNED)", 0, &ret);
+  ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "CREATE TABLE test_stmt.t1 (a INT, b INT UNSIGNED): %s",
              drizzle_error(con));
 
-  drizzle_query(con, "INSERT INTO test_stmt.t1 VALUES (1),(2),(3)", 0, &ret);
+  drizzle_query(con, "INSERT INTO test_stmt.t1 VALUES (1, 4),(2, 5),(3, 6)", 0, &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
 
   const char *query = "SELECT * FROM test_stmt.t1 where a > ?";
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
   ret = drizzle_stmt_set_int(NULL, 0, val, false);
   ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
 
-  ret = drizzle_stmt_set_int(stmt, 1, val, false);
+  ret = drizzle_stmt_set_int(stmt, 2, val, false);
   ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
 
   ret = drizzle_stmt_set_int(stmt, 0, val, false);
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 
   ret = drizzle_stmt_execute(stmt);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
-  ASSERT_EQ(1, drizzle_stmt_column_count(stmt));
+  ASSERT_EQ(2, drizzle_stmt_column_count(stmt));
   ASSERT_EQ(0, drizzle_stmt_affected_rows(stmt));
   drizzle_stmt_get_is_unsigned(NULL, 0, &ret);
   ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, ret);
