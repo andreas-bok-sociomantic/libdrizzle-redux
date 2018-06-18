@@ -100,6 +100,9 @@ drizzle_return_t drizzle_stmt_set_tparam(drizzle_stmt_st *stmt,
 
 
 drizzle_return_t drizzle_stmt_set_tiny(drizzle_stmt_st *stmt, uint16_t param_num, int8_t value)
+{
+  return drizzle_stmt_set_tparam<int8_t>(stmt, param_num, DRIZZLE_COLUMN_TYPE_TINY, value, 1, false);
+}
 
 drizzle_return_t drizzle_stmt_set_utiny(drizzle_stmt_st *stmt, uint16_t param_num, uint8_t value)
 {
