@@ -70,6 +70,9 @@ nodist_EXTRA_tests_unit_query_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/query
 noinst_PROGRAMS+= tests/unit/query
 
+check-query: tests/unit/query
+	tests/unit/query
+
 gdb-query: tests/unit/query
 	@$(GDB_COMMAND) tests/unit/query
 
