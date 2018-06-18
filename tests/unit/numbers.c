@@ -115,11 +115,11 @@ int main(int argc, char *argv[])
   sth = drizzle_stmt_prepare(con, query, strlen(query), &driz_ret);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, preparing \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
-  CHECK(drizzle_stmt_set_tiny(sth, 0, 127, 0));
-  CHECK(drizzle_stmt_set_short(sth, 1, 32687, 0));
-  CHECK(drizzle_stmt_set_int(sth, 2, 8388351, 0));
-  CHECK(drizzle_stmt_set_int(sth, 3, 2147352575, 0));
-  CHECK(drizzle_stmt_set_bigint(sth, 4, 9222246136947920895, 0));
+  CHECK(drizzle_stmt_set_tiny(sth, 0, 127));
+  CHECK(drizzle_stmt_set_short(sth, 1, 32687));
+  CHECK(drizzle_stmt_set_int(sth, 2, 8388351));
+  CHECK(drizzle_stmt_set_int(sth, 3, 2147352575));
+  CHECK(drizzle_stmt_set_bigint(sth, 4, 9222246136947920895));
   CHECK(drizzle_stmt_set_float(sth, 5, 443664.0f));
   CHECK(drizzle_stmt_set_double(sth, 6, 291.2711110711098l));
   driz_ret = drizzle_stmt_execute(sth);

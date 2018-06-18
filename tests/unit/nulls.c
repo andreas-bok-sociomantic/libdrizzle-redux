@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
   else \
     SETALWAYS(cn);
 #define SETALWAYS(cn) \
-  driz_ret = drizzle_stmt_set_short(sth, cn, sym * NCOLS + cn + 1000, 0)
+  driz_ret = drizzle_stmt_set_short(sth, cn, sym * NCOLS + cn + 1000)
     ASSERT_EQ(driz_ret, DRIZZLE_RETURN_OK);
     SETMAYBE(0, 0x01);
     SETMAYBE(1, 0x02);

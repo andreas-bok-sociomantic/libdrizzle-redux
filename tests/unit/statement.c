@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
   ASSERT_EQ_(1, drizzle_stmt_param_count(stmt), "Retrieved bad param count");
 
   uint32_t val = 1;
-  ret = drizzle_stmt_set_int(stmt, 0, val, false);
+  ret = drizzle_stmt_set_int(stmt, 0, val);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
 
   ret = drizzle_stmt_execute(stmt);

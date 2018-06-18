@@ -122,9 +122,9 @@ int main(int argc, char *argv[])
              drizzle_strerror(driz_ret), drizzle_error(con), query);
 
   /* Row 3 should be the same as row 1, above */
-  CHECK(drizzle_stmt_set_short(sth, 0, 3, 0));
+  CHECK(drizzle_stmt_set_short(sth, 0, 3));
   CHECK(drizzle_stmt_set_timestamp(sth, 1, 1970, 1, 1, 0, 0, 0, 0));
-  CHECK(drizzle_stmt_set_int(sth, 2, 2112, 0));
+  CHECK(drizzle_stmt_set_int(sth, 2, 2112));
   CHECK(drizzle_stmt_set_timestamp(sth, 3, 2013, 3, 13, 9, 22, 0, 1000));
   CHECK(drizzle_stmt_set_timestamp(sth, 4, 2013, 3, 13, 9, 22, 0, 1000));
   CHECK(drizzle_stmt_set_time(sth, 5, 0, 6, 15, 3, 0, 0));
@@ -142,10 +142,10 @@ int main(int argc, char *argv[])
 
   /* Row 4 is similar to row 2, above. But 2-digit years aren't automatically
    * y2k-promoted if we send them raw. */
-  CHECK(drizzle_stmt_set_short(sth, 0, 4, 0));
+  CHECK(drizzle_stmt_set_short(sth, 0, 4));
   CHECK(drizzle_stmt_set_timestamp(sth, 1, 84, 2, 9, 0, 0, 0, 0));
   /* 12 will become 2012 because we're sending an int, not a YEAR */
-  CHECK(drizzle_stmt_set_int(sth, 2, 12, 0));
+  CHECK(drizzle_stmt_set_int(sth, 2, 12));
   CHECK(drizzle_stmt_set_timestamp(sth, 3, 2013, 3, 13, 9, 22, 0, 1000));
   CHECK(drizzle_stmt_set_timestamp(sth, 4, 2013, 3, 13, 9, 22, 0, 1000));
   CHECK(drizzle_stmt_set_time(sth, 5, 3, 6, 15, 3, 0, 0));
