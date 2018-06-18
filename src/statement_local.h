@@ -63,4 +63,11 @@ DST_TYPE signedness_cast(const unsigned char *src, bool is_unsigned);
 
 template<typename U>
 U drizzle_get_integer(drizzle_stmt_st *stmt, uint16_t column_number, drizzle_return_t *ret_ptr);
+
+template<typename DST_TYPE>
+drizzle_return_t drizzle_stmt_set_tparam(drizzle_stmt_st *stmt, uint16_t param_num,
+    drizzle_column_type_t type, DST_TYPE *data, size_t length, bool is_unsigned);
+
+
 #endif
+

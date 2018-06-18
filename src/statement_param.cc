@@ -72,6 +72,32 @@ drizzle_return_t drizzle_stmt_set_param(drizzle_stmt_st *stmt, uint16_t param_nu
   return DRIZZLE_RETURN_OK;
 }
 
+template<typename DST_TYPE>
+drizzle_return_t drizzle_stmt_set_tparam(drizzle_stmt_st *stmt,
+  uint16_t param_num, drizzle_column_type_t type, DST_TYPE value, size_t length,
+  bool is_unsigned)
+{
+  if ((stmt == NULL) || (param_num >= stmt->param_count))
+  {
+    return DRIZZLE_RETURN_INVALID_ARGUMENT;
+  }
+  if (stmt->state < DRIZZLE_STMT_PREPARED)
+  {
+    drizzle_set_error(stmt->con, __FILE_LINE_FUNC__, "stmt object has not been prepared");
+    return DRIZZLE_RETURN_STMT_ERROR;
+  }
+  DST_TYPE *val_ptr;
+  val_ptr = (DST_TYPE *) stmt->query_params[param_num].data_buffer;
+  *val_ptr = value;
+  stmt->query_params[param_num].type= type;
+  stmt->query_params[param_num].data= (void*)val_ptr;
+  stmt->query_params[param_num].length= length;
+  stmt->query_params[param_num].options.is_unsigned= is_unsigned;
+  stmt->query_params[param_num].is_bound= true;
+
+  return DRIZZLE_RETURN_OK;
+}
+
 
 drizzle_return_t drizzle_stmt_set_tiny(drizzle_stmt_st *stmt, uint16_t param_num, int8_t value)
 
