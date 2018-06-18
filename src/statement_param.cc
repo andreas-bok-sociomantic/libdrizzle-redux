@@ -87,7 +87,7 @@ drizzle_return_t drizzle_stmt_set_tparam(drizzle_stmt_st *stmt,
     return DRIZZLE_RETURN_STMT_ERROR;
   }
   DST_TYPE *val_ptr;
-  val_ptr = (DST_TYPE *) stmt->query_params[param_num].data_buffer;
+  val_ptr = (DST_TYPE*) stmt->query_params[param_num].data_buffer;
   *val_ptr = value;
   stmt->query_params[param_num].type= type;
   stmt->query_params[param_num].data= (void*)val_ptr;
