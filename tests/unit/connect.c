@@ -52,8 +52,11 @@ extern void log_fn_callback(const char *file, uint line, const char *func,
 
   void VARIABLE_IS_NOT_USED *cxt = context;
 
-  printf("%-6s[%s:%d] : %s %s%s\n", drizzle_verbose_name(verbose), file, line, func,
-      strlen(msg) > 0 ? "- " : "" , msg);
+  if (verbose > DRIZZLE_VERBOSE_NEVER)
+  {
+    printf("(log_fn_callback) %-6s[%s:%d] : %s %s%s \n", drizzle_verbose_name(verbose), file, line, func,
+        strlen(msg) > 0 ? "- " : "" , msg);
+  }
 }
 
 
@@ -200,8 +203,10 @@ int main(int argc, char *argv[])
   ASSERT_NULL_(drizzle_scramble(NULL), "con is NULL");
   ASSERT_NOT_NULL_(drizzle_scramble(con), "scramble buffer not initialized");
 
+  drizzle_set_verbose(con, DRIZZLE_VERBOSE_DEBUG);
   drizzle_query(con, "SELECT 1", 0, &driz_ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "SELECT 1 (%s)", drizzle_error(con));
+  drizzle_set_verbose(con, DRIZZLE_VERBOSE_NEVER);
 
   ASSERT_EQ_(0, drizzle_thread_id(NULL), "Connection object is NULL");
   ASSERT_NEQ_(0, drizzle_thread_id(con), "Invalid thread id");
@@ -225,9 +230,14 @@ int main(int argc, char *argv[])
     drizzle_close(con);
   }
 
+  // set log callback
   int cxt = 1;
+  drizzle_set_log_fn(NULL, log_fn_callback, (void*)&cxt);
   drizzle_set_log_fn(con, log_fn_callback, (void*)&cxt);
 
+  CHECK(drizzle_connect(con));
+
+  // set log level
   drizzle_set_verbose(NULL, DRIZZLE_VERBOSE_DEBUG);
   ASSERT_EQ(DRIZZLE_VERBOSE_NEVER, drizzle_verbose(con));
   ASSERT_EQ(DRIZZLE_VERBOSE_NEVER, drizzle_verbose(NULL));
@@ -235,9 +245,15 @@ int main(int argc, char *argv[])
   ASSERT_EQ(DRIZZLE_VERBOSE_DEBUG, drizzle_verbose(con));
   ASSERT_STREQ("UNKNOWN", drizzle_verbose_name(DRIZZLE_VERBOSE_MAX));
 
+  drizzle_query(con, "SELECT 1", 0, &driz_ret);
+  ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "SELECT 1 (%s)", drizzle_error(con));
+  drizzle_set_verbose(con, DRIZZLE_VERBOSE_NEVER);
+
   ASSERT_EQ(con, drizzle_ready(con));
 
   ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, drizzle_quit(NULL));
+
+  drizzle_close(con);
 
   driz_ret = drizzle_quit(con);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "%s", drizzle_strerror(driz_ret));
