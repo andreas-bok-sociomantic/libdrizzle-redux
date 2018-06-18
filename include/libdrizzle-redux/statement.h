@@ -220,7 +220,7 @@ drizzle_return_t drizzle_stmt_set_ushort(drizzle_stmt_st *stmt, uint16_t param_n
  */
 DRIZZLE_API
 drizzle_return_t drizzle_stmt_set_int(drizzle_stmt_st *stmt, uint16_t param_num,
-                                      uint32_t value);
+                                      int32_t value);
 
 /**
  * Sets a parameter of a prepared statement to an int value

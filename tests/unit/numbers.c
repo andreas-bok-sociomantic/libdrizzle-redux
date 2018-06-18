@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, preparing \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
   CHECK(drizzle_stmt_set_tiny(sth, 0, 127));
-  CHECK(drizzle_stmt_set_short(sth, -1, 32687));
+  CHECK(drizzle_stmt_set_short(sth, 1, 32687));
   CHECK(drizzle_stmt_set_int(sth, 2, 8388351));
   CHECK(drizzle_stmt_set_int(sth, 3, 2147352575));
   CHECK(drizzle_stmt_set_bigint(sth, 4, 9222246136947920895));
