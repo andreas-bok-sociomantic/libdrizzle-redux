@@ -116,12 +116,12 @@ drizzle_return_t drizzle_stmt_set_utiny(drizzle_stmt_st *stmt, uint16_t param_nu
 
 drizzle_return_t drizzle_stmt_set_short(drizzle_stmt_st *stmt, uint16_t param_num, int16_t value)
 {
-  uint16_t *val;
+  /*uint16_t *val;
   CHECK_PARAM_NUM;
   val= (uint16_t*) stmt->query_params[param_num].data_buffer;
-  *val= value;
+  *val= value;*/
 
-  return drizzle_stmt_set_param(stmt, param_num, DRIZZLE_COLUMN_TYPE_SHORT, val, 2, false);
+  return drizzle_stmt_set_tparam<int16_t>(stmt, param_num, DRIZZLE_COLUMN_TYPE_SHORT, value, 2, false);
 }
 
 drizzle_return_t drizzle_stmt_set_ushort(drizzle_stmt_st *stmt, uint16_t param_num,
