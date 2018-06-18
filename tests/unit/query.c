@@ -147,17 +147,7 @@ int main(int argc, char *argv[])
   }
 
   drizzle_result_free(result);
-
-  result = drizzle_query(con,
-    "DROP TABLE IF EXISTS test_query.no_such_table", 0, &ret);
-  uint result_error_code = drizzle_result_error_code(result);
-  printf("Test: %s, %s, %d, %s, %d, %d, %s\n",
-    drizzle_error(con), drizzle_strerror(ret),
-    drizzle_error_code(con), drizzle_result_sqlstate(result),
-    result_error_code, drizzle_result_warning_count(result),
-    drizzle_result_message(result));
-
-  drizzle_result_free(result);
+  drizzle_close(con);
 
   drizzle_query(con, "DROP TABLE test_query.t1", 0, &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "DROP TABLE test_query.t1");
