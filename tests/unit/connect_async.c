@@ -61,4 +61,7 @@ int main(int argc, char *argv[]) {
   ASSERT_EQ_(DRIZZLE_RETURN_IO_WAIT, driz_ret,
     "drizzle non blocking query: %s(%s)",
     drizzle_error(con), drizzle_strerror(driz_ret));
+
+  ASSERT_EQ(DRIZZLE_RETURN_INVALID_ARGUMENT, drizzle_wait(NULL));
+  CHECK(drizzle_wait(con));
 }
