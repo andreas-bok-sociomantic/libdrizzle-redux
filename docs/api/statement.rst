@@ -30,67 +30,72 @@ Functions
    :param ret_ptr: A pointer to a :c:type:`drizzle_return_t` to store the return status into
    :returns: A newly allocated and prepared statement object (or NULL on error)
 
-.. c:function:: drizzle_return_t drizzle_stmt_set_tiny(drizzle_stmt_st *stmt, uint16_t param_num, uint8_t value, bool is_unsigned)
+.. c:function:: drizzle_return_t drizzle_stmt_set_tiny(drizzle_stmt_st *stmt, uint16_t param_num, int8_t value)
 
    Sets a parameter of a prepared statement to a tinyint value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
    :param value: The value to set the parameter
-   :param is_unsigned: Set to true if the parameter is unsigned
    :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
 
-.. c:function:: drizzle_return_t drizzle_stmt_set_short(drizzle_stmt_st *stmt, uint16_t param_num, uint16_t value, bool is_unsigned)
+.. c:function:: drizzle_return_t drizzle_stmt_set_tiny(drizzle_stmt_st *stmt, uint16_t param_num, uint8_t value)
+
+   Sets a parameter of a prepared statement to am unsigned tinyint value
+
+   :param stmt: A prepared statement object
+   :param param_num: The parameter number to set (starting at 0)
+   :param value: The value to set the parameter
+   :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
+
+.. c:function:: drizzle_return_t drizzle_stmt_set_short(drizzle_stmt_st *stmt, uint16_t param_num, uint16_t value)
 
    Sets a parameter of a prepared statement to a short int value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
    :param value: The value to set the parameter
-   :param is_unsigned: Set to true if the parameter is unsigned
    :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
 
 .. c:function:: drizzle_return_t drizzle_stmt_set_ushort(drizzle_stmt_st *stmt, uint16_t param_num, uint16_t value)
 
-   Sets a parameter of a prepared statement to a short int value
+   Sets a parameter of a prepared statement to a short unsigned int value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
    :param value: The value to set the parameter
    :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
 
-.. c:function:: drizzle_return_t drizzle_stmt_set_int(drizzle_stmt_st *stmt, uint16_t param_num, uint32_t value, bool is_unsigned)
+.. c:function:: drizzle_return_t drizzle_stmt_set_int(drizzle_stmt_st *stmt, uint16_t param_num, uint32_t value)
 
    Sets a parameter of a prepared statement to an int value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
    :param value: The value to set the parameter
-   :param is_unsigned: Set to true if the parameter is unsigned
    :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
 
 .. c:function:: drizzle_return_t drizzle_stmt_set_uint(drizzle_stmt_st *stmt, uint16_t param_num, uint32_t value)
 
-   Sets a parameter of a prepared statement to an int value
+   Sets a parameter of a prepared statement to an unsigned int value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
    :param value: The value to set the parameter
    :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
 
-.. c:function:: drizzle_return_t drizzle_stmt_set_bigint(drizzle_stmt_st *stmt, uint16_t param_num, uint64_t value, bool is_unsigned)
+.. c:function:: drizzle_return_t drizzle_stmt_set_bigint(drizzle_stmt_st *stmt, uint16_t param_num, uint64_t value)
 
    Sets a parameter of a prepared statement to a bigint value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
    :param value: The value to set the parameter
-   :param is_unsigned: Set to true if the parameter is unsigned
    :returns: A return status code, :py:const:`DRIZZLE_RETURN_OK` upon success
 
 .. c:function:: drizzle_return_t drizzle_stmt_set_biguint(drizzle_stmt_st *stmt, uint16_t param_num, uint64_t value)
 
-   Sets a parameter of a prepared statement to a bigint value
+   Sets a parameter of a prepared statement to an unsigned bigint value
 
    :param stmt: A prepared statement object
    :param param_num: The parameter number to set (starting at 0)
