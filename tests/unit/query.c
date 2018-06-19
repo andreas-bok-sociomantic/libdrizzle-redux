@@ -110,6 +110,7 @@ int main(int argc, char *argv[])
     "SELECT * FROM test_query.no_such_table", 0, &ret);
   ASSERT_EQ(1146, drizzle_error_code(con));
   ASSERT_STREQ("42S02", drizzle_result_sqlstate(result));
+  ASSERT_EQ(1146, drizzle_result_error_code(result));
   drizzle_result_free(result);
 
   result = drizzle_query(con, "select * from test_query.t1", 0, &ret);
@@ -119,6 +120,9 @@ int main(int argc, char *argv[])
     printf("Select failure\n");
     return EXIT_FAILURE;
   }
+
+  ASSERT_NULL_(drizzle_result_drizzle_con(NULL), "Result object is NULL");
+  ASSERT_EQ(con, drizzle_result_drizzle_con(result));
   drizzle_result_buffer(result);
   num_fields = drizzle_result_column_count(result);
 
