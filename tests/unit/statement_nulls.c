@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
                 "VALUES ('never', '1492672507', 'question', 'the',"
                 "0, 'answer', 'd7f15abb-a482-43be-99c2-c175408c1bd9')");
 
+  ASSERT_EQ(drizzle_result_affected_rows(NULL), 0);
   ASSERT_EQ(drizzle_result_affected_rows(result), 1);
 
   const char *query= "SELECT * FROM t1";

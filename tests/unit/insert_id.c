@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
              "INSERT INTO test_insert.t1 (b) VALUES (4),(5),(6): %s",
              drizzle_error(con));
 
+  ASSERT_EQ(0, drizzle_result_insert_id(NULL));
   ASSERT_EQ_(drizzle_result_insert_id(result), 4,
              "Got bad insert_id (expected 4, got %" PRIu64 ")",
              drizzle_result_insert_id(result));

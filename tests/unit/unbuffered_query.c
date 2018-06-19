@@ -140,6 +140,7 @@ int main(int argc, char *argv[])
       printf("Retrieved bad row data\n");
       return EXIT_FAILURE;
     }
+    drizzle_row_free(NULL, row);
     drizzle_row_free(result, row);
   }
   /* we should have had 3 rows */
@@ -148,6 +149,8 @@ int main(int argc, char *argv[])
     printf("Retrieved bad number of rows\n");
     return EXIT_FAILURE;
   }
+
+
 
   drizzle_result_free(result);
 

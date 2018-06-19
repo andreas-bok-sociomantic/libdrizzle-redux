@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
 
   /* Read the table back, with values sent over the wire in text form */
   CHECKED_QUERY("SELECT * FROM test_datetime.dt1 ORDER BY a");
+  printf("warning_count %d\n", drizzle_result_warning_count(result));
 
   drizzle_result_buffer(result);
   num_fields = drizzle_result_column_count(result);

@@ -456,6 +456,7 @@ drizzle_return_t drizzle_state_result_read(drizzle_st *con)
   }
   else if (con->buffer_ptr[0] == 254)
   {
+    printf("ERROR DEPRECATED DRIZZLE_RESULT_EOF_PACKET\n");
     con->result->options= DRIZZLE_RESULT_EOF_PACKET;
     con->result->warning_count= drizzle_get_byte2(con->buffer_ptr + 1);
     con->status= (drizzle_status_t)drizzle_get_byte2(con->buffer_ptr + 3);
@@ -469,6 +470,7 @@ drizzle_return_t drizzle_state_result_read(drizzle_st *con)
     memcpy(con->result->sqlstate, con->sqlstate,
            DRIZZLE_MAX_SQLSTATE_SIZE);
     con->result->sqlstate[DRIZZLE_MAX_SQLSTATE_SIZE]= 0;
+    con->result->error_code=con->error_code;
     ret= DRIZZLE_RETURN_ERROR_CODE;
   }
   else

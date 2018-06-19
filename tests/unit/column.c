@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
   CHECKED_QUERY("SELECT a column_1, b column_2, c column_3 FROM test_column.t1 table1");
 
   drizzle_result_buffer(result);
+  ASSERT_EQ(0, drizzle_result_column_count(NULL));
   num_fields = drizzle_result_column_count(result);
 
   ASSERT_EQ_(num_fields, 3, "Retrieved bad number of fields");
