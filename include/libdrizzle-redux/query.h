@@ -117,6 +117,18 @@ ssize_t drizzle_escape_string(drizzle_st *con, char **to, const char *from, cons
 DRIZZLE_API
 ssize_t drizzle_escape_str(drizzle_st *con, char **to, const char *from, const size_t from_size, bool is_pattern);
 
+/*
+ * Convert a char array to hex
+ *
+ * @param[out] to the destination string
+ * @param[in] from the source string
+ * @param[in] from_size the length of the source string
+ *
+ * @return true if the conversion succeeded, false if 'to' or 'from' are NULL or
+ * from_size = 0
+ */
+DRIZZLE_API
+bool drizzle_hex_string(char *to, const unsigned char *from, const size_t from_size);
 /** @} */
 
 #ifdef __cplusplus

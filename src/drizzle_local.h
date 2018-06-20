@@ -103,18 +103,6 @@ bool drizzle_library_init(drizzle_st*);
 drizzle_result_st *drizzle_result_create(drizzle_st *con);
 
 /*
- * Convert a char array to hex
- *
- * @param[out] to the destination string
- * @param[in] from the source string
- * @param[in] from_size the length of the source string
- *
- * @return true if the conversion succeeded, false if 'to' or 'from' are NULL or
- * from_size = 0
- */
-bool drizzle_hex_string(char *to, const unsigned char *from, const size_t from_size);
-
-/*
  * Create the hash of a password
  *
  * @param[out] to the destination string
