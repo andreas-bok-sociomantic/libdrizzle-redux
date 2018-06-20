@@ -62,14 +62,24 @@
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, in \"%s\"", \
              drizzle_strerror(driz_ret), drizzle_error(con), #s);
 
+#define DECIMAL_EQ_EPSILON(_actual, _expected, column_type) \
+  do \
+  { \
+  double _epsilon = fabs(_actual - _expected); \
+  ASSERT_TRUE(column_type == DRIZZLE_COLUMN_TYPE_FLOAT ? \
+              _epsilon < FLT_EPSILON : _epsilon < DBL_EPSILON); \
+} while (0);
+
+// Helper struct for storing column information
 struct test_column_st
 {
   const char name[1024];
   const char value[128];
   const drizzle_column_type_t type;
 };
-
 typedef struct test_column_st test_column_st;
+
+// Array of expected columns
 test_column_st test_columns[] = {
   {"varchar", "varchar", DRIZZLE_COLUMN_TYPE_VAR_STRING},
   {"tinyint", "0", DRIZZLE_COLUMN_TYPE_TINY},
@@ -135,29 +145,26 @@ void CHECK_PARAM(drizzle_stmt_st *stmt, int col_idx)
           actual_bigintval = drizzle_stmt_get_bigint(stmt, col_idx, &driz_ret);
           expected_bigintval = strtoull(expected.value, NULL, 10);
           ASSERT_EQ(actual_bigintval, expected_bigintval);
-          actual_bigintval = drizzle_stmt_get_bigint_from_name(stmt, expected.name, &driz_ret);
+          actual_bigintval = drizzle_stmt_get_bigint_from_name(stmt,
+            expected.name, &driz_ret);
           ASSERT_EQ(actual_bigintval, expected_bigintval);
           break;
         case DRIZZLE_COLUMN_TYPE_FLOAT:
         case DRIZZLE_COLUMN_TYPE_DOUBLE: {
           actual_floatval = drizzle_stmt_get_double(stmt, col_idx, &driz_ret);
           expected_floatval = strtod(expected.value, NULL);
-          double epsilon = fabs(actual_floatval-expected_floatval);
-          bool isequal = expected.type == DRIZZLE_COLUMN_TYPE_FLOAT ?
-              epsilon < FLT_EPSILON :epsilon < DBL_EPSILON;
-          ASSERT_TRUE(isequal);
-          actual_floatval = drizzle_stmt_get_double_from_name(stmt, expected.name, &driz_ret);
-          epsilon = fabs(actual_floatval-expected_floatval);
-          isequal = expected.type == DRIZZLE_COLUMN_TYPE_FLOAT ?
-              epsilon < FLT_EPSILON :epsilon < DBL_EPSILON;
-          ASSERT_TRUE(isequal);
+          DECIMAL_EQ_EPSILON(actual_floatval, expected_floatval, expected.type);
+
+          actual_floatval = drizzle_stmt_get_double_from_name(stmt,
+            expected.name, &driz_ret);
+          DECIMAL_EQ_EPSILON(actual_floatval, expected_floatval, expected.type);
 
           actual_intval = drizzle_stmt_get_int(stmt, col_idx, &driz_ret);
           ASSERT_EQ(driz_ret, DRIZZLE_RETURN_TRUNCATED);
           }
           break;
         case DRIZZLE_COLUMN_TYPE_NEWDECIMAL:
-          printf("Skipping unsupported column of type: DRIZZLE_COLUMN_TYPE_NEWDECIMAL\n");
+          printf("Skipping unsupported type: DRIZZLE_COLUMN_TYPE_NEWDECIMAL\n");
           break;
         case DRIZZLE_COLUMN_TYPE_BLOB:
         case DRIZZLE_COLUMN_TYPE_DATE:
@@ -168,15 +175,19 @@ void CHECK_PARAM(drizzle_stmt_st *stmt, int col_idx)
         case DRIZZLE_COLUMN_TYPE_VAR_STRING:
           col_strval = drizzle_stmt_get_string(stmt, col_idx, &len, &driz_ret);
           ASSERT_STREQ_(col_strval, expected.value,
-          "Retrieved bad column[%d] %s value %s - expected %s", col_idx, drizzle_column_type_str(expected.type), col_strval,
+          "Retrieved bad column[%d] %s value %s - expected %s", col_idx,
+            drizzle_column_type_str(expected.type), col_strval,
           expected.value);
-          col_strval = drizzle_stmt_get_string_from_name(stmt, expected.name, &len, &driz_ret);
+          col_strval = drizzle_stmt_get_string_from_name(stmt, expected.name,
+            &len, &driz_ret);
           ASSERT_STREQ_(col_strval, expected.value,
-          "Retrieved bad column[%d] %s value %s - expected %s", col_idx, drizzle_column_type_str(expected.type), col_strval,
+          "Retrieved bad column[%d] %s value %s - expected %s", col_idx,
+            drizzle_column_type_str(expected.type), col_strval,
           expected.value);
           break;
         default:
-          printf("Retrieved bad column[%d] %s value %s - expected %s\n", col_idx, drizzle_column_type_str(expected.type), col_strval,
+          printf("Retrieved bad column[%d] %s value %s - expected %s\n",
+            col_idx, drizzle_column_type_str(expected.type), col_strval,
           expected.value);
           break;
       }
@@ -279,8 +290,9 @@ int main(int argc, char *argv[])
   drizzle_result_buffer(result);
 
   ASSERT_EQ_(drizzle_result_column_count(result), 28,
-    "Invalid number of columns in resultset");
+    "Invalid number of columns in result set");
 
+  // Check the inserted values
   while ((row = drizzle_row_next(result)))
   {
     int col_idx = 0;
@@ -297,15 +309,12 @@ int main(int argc, char *argv[])
       "Column type 'DRIZZLE_COLUMN_TYPE_%s' resolved to wrong name: '%s'",
       drizzle_column_type_str(drizzle_column_type(column)),
       drizzle_column_type_str(expected->type));
-
-      /*CHECK_INSERT_QUERY(row[col_idx], test_columns[col_idx], column);*/
       col_idx++;
     }
   }
   drizzle_result_free(result);
 
-  //CHECKED_QUERY("DELETE FROM test_datatypes.t1");
-
+  // INSERT statement with bound parameters
   query = "INSERT INTO t1 ("
           "`varchar`,"
           "`tinyint`,"
@@ -339,11 +348,10 @@ int main(int argc, char *argv[])
           "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
   sth = drizzle_stmt_prepare(con, query, strlen(query), &driz_ret);
-
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, preparing \"%s\"",
   drizzle_strerror(driz_ret), drizzle_error(con), query);
 
-  // Set all statement parameters;
+  // Set all bound parameters in statement
   CHECK(drizzle_stmt_set_string(sth, 0, "varchar", strlen("varchar")));
   CHECK(drizzle_stmt_set_tiny(sth, 1, 0, 0));
   CHECK(drizzle_stmt_set_string(sth, 2, "text", strlen("text")));
@@ -381,61 +389,34 @@ int main(int argc, char *argv[])
   driz_ret = drizzle_stmt_execute(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, executing \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
+
   driz_ret = drizzle_stmt_buffer(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, buffering \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
 
+  ASSERT_EQ(drizzle_stmt_affected_rows(NULL), 0);
   ASSERT_EQ(drizzle_stmt_affected_rows(sth), 1);
-
-  ASSERT_EQ_(DRIZZLE_RETURN_OK, driz_ret, "%s", drizzle_error(con));
 
   CHECK(drizzle_stmt_close(sth));
 
-  query = "SELECT "
-          "`varchar`,"
-          "`tinyint`,"
-          "`text`,"
-          "`date`,"
-          "`smallint`,"
-          "`mediumint`,"
-          "`int`,"
-          "`bigint`,"
-          "`float`,"
-          "`double`,"
-          "`decimal`,"
-          "`datetime`,"
-          "`timestamp`,"
-          "`time`,"
-          "`year`,"
-          "`char`,"
-          "`tinyblob`,"
-          "`tinytext`,"
-          "`blob`,"
-          "`mediumblob`,"
-          "`mediumtext`,"
-          "`longblob`,"
-          "`longtext`,"
-          "`enum`,"
-          "`set`,"
-          "`bool`,"
-          "`binary`,"
-          "`varbinary`"
-          "FROM test_datatypes.t1";
+  // SELECT statement
+  query = "SELECT * FROM test_datatypes.t1";
 
   sth = drizzle_stmt_prepare(con, query, strlen(query), &driz_ret);
-
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, preparing \"%s\"",
   drizzle_strerror(driz_ret), drizzle_error(con), query);
 
   driz_ret = drizzle_stmt_execute(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, executing \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
+
   driz_ret = drizzle_stmt_buffer(sth);
   ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, buffering \"%s\"",
              drizzle_strerror(driz_ret), drizzle_error(con), query);
-  int column_count= drizzle_stmt_column_count(sth);
 
-  ASSERT_EQ(column_count, 28);
+  ASSERT_EQ(drizzle_stmt_column_count(NULL), 0);
+  int column_count = drizzle_stmt_column_count(sth);
+  ASSERT_EQ_(column_count, 28, "Invalid number of columns in result set");
 
   while (drizzle_stmt_fetch(sth) != DRIZZLE_RETURN_ROW_END) {
     int col_idx = 0;

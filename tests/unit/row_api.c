@@ -93,6 +93,8 @@ int main(int argc, char *argv[])
   {
     while (1)
     {
+      drizzle_field_read(NULL, &offset, &size, &total, &ret);
+      ASSERT_EQ(ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
       drizzle_field_t field = drizzle_field_read(result, &offset, &size, &total, &ret);
       if (ret == DRIZZLE_RETURN_ROW_END)
       {
