@@ -315,12 +315,27 @@ int main(int argc, char *argv[])
                cur_row);
     ASSERT_FLOATEQEXACT((float)col_val, trunc(expect_floatval));
 
+    drizzle_stmt_get_bigint(NULL, 6, &driz_ret);
+    ASSERT_EQ(driz_ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
+    drizzle_stmt_get_bigint_from_name(NULL, "f", &driz_ret);
+    ASSERT_EQ(driz_ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
+    drizzle_stmt_get_bigint_from_name(sth, "invalid_column", &driz_ret);
+    ASSERT_EQ(driz_ret, DRIZZLE_RETURN_NOT_FOUND);
+    col_val = drizzle_stmt_get_int(sth, 5, &driz_ret);
+
     col_val = drizzle_stmt_get_bigint(sth, 6, &driz_ret);
     ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_TRUNCATED,
                "Error (%s): %s, column %d of row %d",
                drizzle_strerror(driz_ret), drizzle_error(con), cur_column,
                cur_row);
     ASSERT_FLOATEQEXACT((float)col_val, trunc(expect_floatval));
+
+    drizzle_stmt_get_double(NULL, 0, &driz_ret);
+    ASSERT_EQ(driz_ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
+    drizzle_stmt_get_double_from_name(NULL, "h", &driz_ret);
+    ASSERT_EQ(driz_ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
+    drizzle_stmt_get_double_from_name(sth, "invalid_column", &driz_ret);
+    ASSERT_EQ(driz_ret, DRIZZLE_RETURN_NOT_FOUND);
 
     col_dblval = drizzle_stmt_get_double(sth, 6, &driz_ret);
     ASSERT_EQ_(driz_ret, DRIZZLE_RETURN_OK, "Error (%s): %s, column %d of row %d",

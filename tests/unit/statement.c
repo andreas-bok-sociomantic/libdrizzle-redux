@@ -121,8 +121,9 @@ int main(int argc, char *argv[])
   stmt = drizzle_stmt_prepare(con, query, strlen(query), &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "%s", drizzle_error(con));
 
-  /* drizzle_stmt_param_count with stmt object=NULL  */
+  /* drizzle_stmt_param_count with stmt object=NULL */
   ASSERT_EQ(0, drizzle_stmt_param_count(NULL));
+
   /* Query should have 1 param */
   ASSERT_EQ_(1, drizzle_stmt_param_count(stmt), "Retrieved bad param count");
 
@@ -168,6 +169,9 @@ int main(int argc, char *argv[])
     const char *char_val;
     char comp_val[3];
     size_t len;
+    res_val = drizzle_stmt_get_int(NULL, 0, &ret);
+    ASSERT_EQ_(DRIZZLE_RETURN_INVALID_ARGUMENT, ret, "drizzle_stmt_get_int");
+
     res_val = drizzle_stmt_get_int(stmt, 0, &ret);
     ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "drizzle_stmt_get_int");
     char_val = drizzle_stmt_get_string(stmt, 0, &len, &ret);
@@ -227,8 +231,6 @@ int main(int argc, char *argv[])
 
   drizzle_query(con, "DROP TABLE test_stmt.t1", 0, &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "DROP TABLE test_stmt.t1");
-
-
 
   drizzle_query(con, "DROP SCHEMA IF EXISTS test_stmt", 0, &ret);
   ASSERT_EQ_(DRIZZLE_RETURN_OK, ret, "DROP SCHEMA test_stmt (%s)",
