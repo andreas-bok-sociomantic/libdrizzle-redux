@@ -108,6 +108,19 @@ int main(int argc, char *argv[])
     printf("Column buffer failure\n");
     return EXIT_FAILURE;
   }
+
+  drizzle_column_st *column = drizzle_column_index(result, 0);
+  ASSERT_NOT_NULL_(column, "Couldn't get column from buffered result set");
+  ASSERT_NULL_(drizzle_column_drizzle_result(NULL), "Column object is NULL");
+  ASSERT_EQ_(drizzle_column_drizzle_result(column), result,
+    "Wrong result set for read column");
+
+  ASSERT_NULL_(drizzle_column_catalog(NULL), "No catalog defined for column=NULL");
+  ASSERT_STREQ_(drizzle_column_catalog(column), "def", "Wrong TABLE_CATALOG name");
+
+  ASSERT_NULL_(drizzle_column_table(NULL), "No table name found for column=NULL");
+  ASSERT_STREQ_(drizzle_column_table(column), "t1", "Column had bad table name");
+
   num_fields = drizzle_result_column_count(result);
 
   if (num_fields != 1)
@@ -149,8 +162,6 @@ int main(int argc, char *argv[])
     printf("Retrieved bad number of rows\n");
     return EXIT_FAILURE;
   }
-
-
 
   drizzle_result_free(result);
 

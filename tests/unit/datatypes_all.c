@@ -70,45 +70,114 @@
               _epsilon < FLT_EPSILON : _epsilon < DBL_EPSILON); \
 } while (0);
 
+#define COLUMN_FLAG_DEFAULT DRIZZLE_COLUMN_FLAGS_NOT_NULL | DRIZZLE_COLUMN_FLAGS_NO_DEFAULT_VALUE
+#define COLUMN_FLAG_ENUM DRIZZLE_COLUMN_FLAGS_ENUM
+#define COLUMN_FLAG_SET DRIZZLE_COLUMN_FLAGS_SET
+#define COLUMN_FLAG_BINARY COLUMN_FLAG_DEFAULT | DRIZZLE_COLUMN_FLAGS_BINARY
+#define COLUMN_FLAG_NUMBER COLUMN_FLAG_DEFAULT | DRIZZLE_COLUMN_FLAGS_NUM | DRIZZLE_COLUMN_FLAGS_GROUP
+#define COLUMN_FLAG_STRING COLUMN_FLAG_DEFAULT | DRIZZLE_COLUMN_FLAGS_BLOB
+#define COLUMN_FLAG_BLOB COLUMN_FLAG_DEFAULT | DRIZZLE_COLUMN_FLAGS_BLOB | DRIZZLE_COLUMN_FLAGS_BINARY
+#define COLUMN_FLAG_TEXTBLOB COLUMN_FLAG_DEFAULT | DRIZZLE_COLUMN_FLAGS_BLOB
+#define COLUMN_FLAG_TIMESTAMP DRIZZLE_COLUMN_FLAGS_NOT_NULL | \
+                              DRIZZLE_COLUMN_FLAGS_BINARY | \
+                              DRIZZLE_COLUMN_FLAGS_TIMESTAMP | \
+                              DRIZZLE_COLUMN_FLAGS_ON_UPDATE_NOW
+#define COLUMN_FLAG_YEAR COLUMN_FLAG_DEFAULT | DRIZZLE_COLUMN_FLAGS_ZEROFILL | DRIZZLE_COLUMN_FLAGS_UNSIGNED
+
 // Helper struct for storing column information
 struct test_column_st
 {
   const char name[1024];
   const char value[128];
   const drizzle_column_type_t type;
+  drizzle_column_flags_t flags;
 };
 typedef struct test_column_st test_column_st;
 
 // Array of expected columns
 test_column_st test_columns[] = {
-  {"varchar", "varchar", DRIZZLE_COLUMN_TYPE_VAR_STRING},
-  {"tinyint", "0", DRIZZLE_COLUMN_TYPE_TINY},
-  {"text", "text", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"date", "2017-04-28", DRIZZLE_COLUMN_TYPE_DATE},
-  {"smallint", "32687", DRIZZLE_COLUMN_TYPE_SHORT},
-  {"mediumint", "8388351", DRIZZLE_COLUMN_TYPE_INT24},
-  {"int", "2147352575", DRIZZLE_COLUMN_TYPE_LONG},
-  {"bigint", "9222246136947920895", DRIZZLE_COLUMN_TYPE_LONGLONG},
-  {"float", "1.23", DRIZZLE_COLUMN_TYPE_FLOAT},
-  {"double", "2.3456", DRIZZLE_COLUMN_TYPE_DOUBLE},
-  {"decimal", "123.46", DRIZZLE_COLUMN_TYPE_NEWDECIMAL},
-  {"datetime", "2017-04-28 13:54:05", DRIZZLE_COLUMN_TYPE_DATETIME},
-  {"timestamp", "2018-03-12 00:00:00", DRIZZLE_COLUMN_TYPE_TIMESTAMP},
-  {"time", "13:54:05", DRIZZLE_COLUMN_TYPE_TIME},
-  {"year", "2017", DRIZZLE_COLUMN_TYPE_YEAR},
-  {"char", "char", DRIZZLE_COLUMN_TYPE_STRING},
-  {"tinyblob", "1100", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"tinytext", "tinytext", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"blob", "11001100", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"mediumblob", "110011001100", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"mediumtext", "mediumtext", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"longblob", "1100110011001100", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"longtext", "longtext", DRIZZLE_COLUMN_TYPE_BLOB},
-  {"enum", "1", DRIZZLE_COLUMN_TYPE_STRING},
-  {"set", "2,3", DRIZZLE_COLUMN_TYPE_STRING},
-  {"bool", "1", DRIZZLE_COLUMN_TYPE_TINY},
-  {"binary", "1100110011001100", DRIZZLE_COLUMN_TYPE_STRING},
-  {"varbinary", "1100110011001100", DRIZZLE_COLUMN_TYPE_VAR_STRING}
+  {"varchar", "varchar", DRIZZLE_COLUMN_TYPE_VAR_STRING, DRIZZLE_COLUMN_FLAGS_NONE},
+  {"tinyint", "0", DRIZZLE_COLUMN_TYPE_TINY, COLUMN_FLAG_NUMBER},
+  {"text", "text", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_STRING},
+  {"date", "2017-04-28", DRIZZLE_COLUMN_TYPE_DATE, COLUMN_FLAG_BINARY},
+  {"smallint", "32687", DRIZZLE_COLUMN_TYPE_SHORT, COLUMN_FLAG_NUMBER},
+  {"mediumint", "8388351", DRIZZLE_COLUMN_TYPE_INT24, COLUMN_FLAG_NUMBER},
+  {"int", "2147352575", DRIZZLE_COLUMN_TYPE_LONG, COLUMN_FLAG_NUMBER},
+  {"bigint", "9222246136947920895", DRIZZLE_COLUMN_TYPE_LONGLONG, COLUMN_FLAG_NUMBER},
+  {"float", "1.2300", DRIZZLE_COLUMN_TYPE_FLOAT, COLUMN_FLAG_NUMBER},
+  {"double", "2.3456", DRIZZLE_COLUMN_TYPE_DOUBLE, COLUMN_FLAG_NUMBER},
+  {"decimal", "123.46", DRIZZLE_COLUMN_TYPE_NEWDECIMAL, COLUMN_FLAG_DEFAULT},
+  {"datetime", "2017-04-28 13:54:05", DRIZZLE_COLUMN_TYPE_DATETIME, COLUMN_FLAG_BINARY},
+  {"timestamp", "2018-03-12 00:00:00", DRIZZLE_COLUMN_TYPE_TIMESTAMP, COLUMN_FLAG_TIMESTAMP},
+  {"time", "13:54:05", DRIZZLE_COLUMN_TYPE_TIME, COLUMN_FLAG_BINARY},
+  {"year", "2017", DRIZZLE_COLUMN_TYPE_YEAR, COLUMN_FLAG_YEAR},
+  {"char", "char", DRIZZLE_COLUMN_TYPE_STRING, COLUMN_FLAG_DEFAULT},
+  {"tinyblob", "1100", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_BLOB},
+  {"tinytext", "tinytext", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_TEXTBLOB},
+  {"blob", "11001100", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_BLOB},
+  {"mediumblob", "110011001100", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_BLOB},
+  {"mediumtext", "mediumtext", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_TEXTBLOB},
+  {"longblob", "1100110011001100", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_BLOB},
+  {"longtext", "longtext", DRIZZLE_COLUMN_TYPE_BLOB, COLUMN_FLAG_TEXTBLOB},
+  {"enum", "1", DRIZZLE_COLUMN_TYPE_STRING, COLUMN_FLAG_ENUM},
+  {"set", "2,3", DRIZZLE_COLUMN_TYPE_STRING, COLUMN_FLAG_SET},
+  {"bool", "1", DRIZZLE_COLUMN_TYPE_TINY, COLUMN_FLAG_NUMBER},
+  {"binary", "1100110011001100", DRIZZLE_COLUMN_TYPE_STRING, COLUMN_FLAG_BINARY},
+  {"varbinary", "1100110011001100", DRIZZLE_COLUMN_TYPE_VAR_STRING, COLUMN_FLAG_BINARY}
+};
+
+const drizzle_column_flags_t column_flags[] = {
+  DRIZZLE_COLUMN_FLAGS_NONE,
+  DRIZZLE_COLUMN_FLAGS_NOT_NULL,
+  DRIZZLE_COLUMN_FLAGS_PRI_KEY,
+  DRIZZLE_COLUMN_FLAGS_UNIQUE_KEY,
+  DRIZZLE_COLUMN_FLAGS_MULTIPLE_KEY,
+  DRIZZLE_COLUMN_FLAGS_BLOB,
+  DRIZZLE_COLUMN_FLAGS_UNSIGNED,
+  DRIZZLE_COLUMN_FLAGS_ZEROFILL,
+  DRIZZLE_COLUMN_FLAGS_BINARY,
+  DRIZZLE_COLUMN_FLAGS_ENUM,
+  DRIZZLE_COLUMN_FLAGS_AUTO_INCREMENT,
+  DRIZZLE_COLUMN_FLAGS_TIMESTAMP,
+  DRIZZLE_COLUMN_FLAGS_SET,
+  DRIZZLE_COLUMN_FLAGS_NO_DEFAULT_VALUE,
+  DRIZZLE_COLUMN_FLAGS_ON_UPDATE_NOW,
+  DRIZZLE_COLUMN_FLAGS_PART_KEY,
+  DRIZZLE_COLUMN_FLAGS_NUM,
+  DRIZZLE_COLUMN_FLAGS_GROUP,
+  DRIZZLE_COLUMN_FLAGS_UNIQUE,
+  DRIZZLE_COLUMN_FLAGS_BINCMP,
+  DRIZZLE_COLUMN_FLAGS_GET_FIXED_FIELDS,
+  DRIZZLE_COLUMN_FLAGS_IN_PART_FUNC,
+  DRIZZLE_COLUMN_FLAGS_IN_ADD_INDEX,
+  DRIZZLE_COLUMN_FLAGS_RENAMED
+};
+
+const char *flags_str[] = {
+  "DRIZZLE_COLUMN_FLAGS_NONE",
+  "DRIZZLE_COLUMN_FLAGS_NOT_NULL",
+  "DRIZZLE_COLUMN_FLAGS_PRI_KEY",
+  "DRIZZLE_COLUMN_FLAGS_UNIQUE_KEY",
+  "DRIZZLE_COLUMN_FLAGS_MULTIPLE_KEY",
+  "DRIZZLE_COLUMN_FLAGS_BLOB",
+  "DRIZZLE_COLUMN_FLAGS_UNSIGNED",
+  "DRIZZLE_COLUMN_FLAGS_ZEROFILL",
+  "DRIZZLE_COLUMN_FLAGS_BINARY",
+  "DRIZZLE_COLUMN_FLAGS_ENUM",
+  "DRIZZLE_COLUMN_FLAGS_AUTO_INCREMENT",
+  "DRIZZLE_COLUMN_FLAGS_TIMESTAMP",
+  "DRIZZLE_COLUMN_FLAGS_SET",
+  "DRIZZLE_COLUMN_FLAGS_NO_DEFAULT_VALUE",
+  "DRIZZLE_COLUMN_FLAGS_ON_UPDATE_NOW",
+  "DRIZZLE_COLUMN_FLAGS_PART_KEY",
+  "DRIZZLE_COLUMN_FLAGS_NUM",
+  "DRIZZLE_COLUMN_FLAGS_GROUP",
+  "DRIZZLE_COLUMN_FLAGS_UNIQUE",
+  "DRIZZLE_COLUMN_FLAGS_BINCMP",
+  "DRIZZLE_COLUMN_FLAGS_GET_FIXED_FIELDS",
+  "DRIZZLE_COLUMN_FLAGS_IN_PART_FUNC",
+  "DRIZZLE_COLUMN_FLAGS_IN_ADD_INDEX",
+  "DRIZZLE_COLUMN_FLAGS_RENAMED"
 };
 
 void CHECK_PARAM(drizzle_stmt_st *stmt, int col_idx);
@@ -213,7 +282,7 @@ int main(int argc, char *argv[])
            "Test requires MySQL 5.6.4 or higher");
 
   CHECKED_QUERY("CREATE TABLE `t1` ("
-                "`varchar` VARCHAR( 20 ) NOT NULL ,"
+                "`varchar` VARCHAR( 20 ) DEFAULT 'default varchar',"
                 "`tinyint` TINYINT NOT NULL ,"
                 "`text` TEXT NOT NULL ,"
                 "`date` DATE NOT NULL ,"
@@ -221,14 +290,14 @@ int main(int argc, char *argv[])
                 "`mediumint` MEDIUMINT NOT NULL ,"
                 "`int` INT NOT NULL ,"
                 "`bigint` BIGINT NOT NULL ,"
-                "`float` FLOAT( 10, 2 ) NOT NULL ,"
-                "`double` DOUBLE NOT NULL ,"
+                "`float` FLOAT( 10, 4 ) NOT NULL ,"
+                "`double` DOUBLE PRECISION( 24, 4 ) NOT NULL ,"
                 "`decimal` DECIMAL( 10, 2 ) NOT NULL ,"
                 "`datetime` DATETIME NOT NULL ,"
                 "`timestamp` TIMESTAMP NOT NULL ,"
                 "`time` TIME NOT NULL ,"
                 "`year` YEAR NOT NULL ,"
-                "`char` CHAR( 10 ) NOT NULL ,"
+                "`char` CHAR( 10 ) NOT NULL,"
                 "`tinyblob` TINYBLOB NOT NULL,"
                 "`tinytext` TINYTEXT NOT NULL ,"
                 "`blob` BLOB NOT NULL ,"
@@ -301,14 +370,27 @@ int main(int argc, char *argv[])
     {
       char *actual = row[col_idx];
       expected = &test_columns[col_idx];
+      drizzle_column_type_t column_type = drizzle_column_type(column);
+      const char *column_type_str = drizzle_column_type_str(column_type);
 
+      // check retrieved value
       ASSERT_STREQ_(actual, expected->value,
-        "Retrieved bad row value %s - expected %s", actual,
-        expected->value);
-      ASSERT_EQ_(drizzle_column_type(column), expected->type,
+        "Retrieved bad row value %s - expected %s", actual, expected->value);
+      ASSERT_EQ_(column_type, expected->type,
       "Column type 'DRIZZLE_COLUMN_TYPE_%s' resolved to wrong name: '%s'",
-      drizzle_column_type_str(drizzle_column_type(column)),
-      drizzle_column_type_str(expected->type));
+      column_type_str, drizzle_column_type_str(expected->type));
+
+      // check column flags
+      ASSERT_EQ_(drizzle_column_flags(column), expected->flags, "%d != %d ",
+        drizzle_column_flags(column), expected->flags);
+
+      // check precision for floating point types
+      if ( drizzle_column_type(column) == DRIZZLE_COLUMN_TYPE_FLOAT ||
+      drizzle_column_type(column) == DRIZZLE_COLUMN_TYPE_DOUBLE )
+      {
+        ASSERT_EQ_(drizzle_column_decimals(column), 4,
+          "Invalid number of decimals for column type %s", column_type_str);
+      }
       col_idx++;
     }
   }

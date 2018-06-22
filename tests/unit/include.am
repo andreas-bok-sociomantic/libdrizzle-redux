@@ -91,6 +91,21 @@ valgrind-column: tests/unit/column
 check-column: tests/unit/column
 	tests/unit/column
 
+tests_unit_column_unbuffered_SOURCES= tests/unit/column_unbuffered.c tests/unit/common.c
+tests_unit_column_unbuffered_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
+nodist_EXTRA_tests_unit_column_unbuffered_SOURCES = dummy.cxx
+check_PROGRAMS+= tests/unit/column_unbuffered
+noinst_PROGRAMS+= tests/unit/column_unbuffered
+
+gdb-column_unbuffered: tests/unit/column_unbuffered
+	@$(GDB_COMMAND) tests/unit/column_unbuffered
+
+valgrind-column_unbuffered: tests/unit/column_unbuffered
+	@$(VALGRIND_COMMAND) tests/unit/column_unbuffered
+
+check-column_unbuffered: tests/unit/column_unbuffered
+	tests/unit/column_unbuffered
+
 tests_unit_numbers_SOURCES= tests/unit/numbers.c tests/unit/common.c
 tests_unit_numbers_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 tests_unit_numbers_LDADD+= -lm
@@ -181,6 +196,12 @@ tests_unit_unbuffered_query_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la
 nodist_EXTRA_tests_unit_unbuffered_query_SOURCES = dummy.cxx
 check_PROGRAMS+= tests/unit/unbuffered_query
 noinst_PROGRAMS+= tests/unit/unbuffered_query
+
+gdb-unbuffered_query: tests/unit/unbuffered_query
+	@$(GDB_COMMAND) tests/unit/unbuffered_query
+
+check-unbuffered_query: tests/unit/unbuffered_query
+	tests/unit/unbuffered_query
 
 tests_unit_statement_SOURCES= tests/unit/statement.c
 tests_unit_statement_LDADD= src/libdrizzle-redux@LIBDRIZZLE_MAJOR@.la

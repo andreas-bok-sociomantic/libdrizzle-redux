@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
   set_up_schema("test_column");
 
   CHECKED_QUERY("CREATE TABLE test_column.t1 (a INT PRIMARY KEY AUTO_INCREMENT, "
-		"b VARCHAR(255), c TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+		"b VARCHAR(255) NOT NULL, c TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
   CHECKED_QUERY("INSERT INTO test_column.t1 (b) VALUES ('this'),('is'),('war')");
 
@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
 
   int i = 0;
   drizzle_column_st *column;
+  drizzle_column_flags_t flags;
   while ((row = drizzle_row_next(result)))
   {
     drizzle_column_seek(result, 0);
@@ -115,6 +116,7 @@ int main(int argc, char *argv[])
     while ((column= drizzle_column_next(result)))
     {
       cur_column++;
+      ASSERT_NULL_(drizzle_column_db(NULL), "Retrieved DB name for column NULL object");
       ASSERT_EQ_(strcmp(drizzle_column_db(column), "test_column"), 0,
                  "Column has bad DB name");
       ASSERT_EQ_(strcmp(drizzle_column_table(column), "table1"), 0,
@@ -124,8 +126,14 @@ int main(int argc, char *argv[])
 
       switch (cur_column) {
       case 1:
-        ASSERT_EQ_(drizzle_column_type(column), DRIZZLE_COLUMN_TYPE_LONG,
-                   "Column type wrong");
+        {
+          ASSERT_EQ_(drizzle_column_type(column), DRIZZLE_COLUMN_TYPE_LONG,
+                           "Column type wrong");
+          flags = drizzle_column_flags(column);
+          ASSERT_TRUE((flags & DRIZZLE_COLUMN_FLAGS_PRI_KEY) &&
+            (flags & DRIZZLE_COLUMN_FLAGS_AUTO_INCREMENT));
+        }
+
         break;
       case 2:
         ASSERT_EQ(0, drizzle_column_max_size(NULL));
@@ -137,12 +145,15 @@ int main(int argc, char *argv[])
         ASSERT_EQ_(drizzle_column_charset(column), DRIZZLE_CHARSET_LATIN1_SWEDISH_CI,
                    "Column charset wrong, %d != %d", drizzle_column_charset(column),
                    DRIZZLE_CHARSET_LATIN1_SWEDISH_CI);
+        flags = drizzle_column_flags(column);
+          ASSERT_TRUE(flags & DRIZZLE_COLUMN_FLAGS_NOT_NULL );
         break;
       case 3:
         ASSERT_EQ_(drizzle_column_type(column), DRIZZLE_COLUMN_TYPE_TIMESTAMP,
                    "Column type wrong");
         break;
       }
+      ASSERT_NULL_(drizzle_column_orig_table(NULL), "No table name for column=NULL");
       ASSERT_STREQ_("t1", drizzle_column_orig_table(column), "Original table wrong");
       sprintf(buf, "column_%d", cur_column);
       ASSERT_STREQ_(buf, drizzle_column_name(column), "Wrong column alias");
@@ -170,6 +181,9 @@ int main(int argc, char *argv[])
   /* Should have had 3 rows */
   ASSERT_EQ_(i, 3, "Retrieved bad number of rows");
 
+  ASSERT_NULL_(drizzle_column_name(NULL), "Column is NULL");
+  ASSERT_NULL_(drizzle_column_orig_name(NULL), "Column is NULL");
+
   drizzle_result_free(result);
 
   CHECKED_QUERY("DROP TABLE test_column.t1");
@@ -183,6 +197,7 @@ int main(int argc, char *argv[])
                   "Column type 'DRIZZLE_COLUMN_TYPE_%s' resolved to wrong name: '%s'",
                   column_type_names[i], drizzle_column_type_str(column_types[i]));
   }
+  ASSERT_STREQ_(drizzle_column_type_str(999), "UNKNOWN", "Column is type undefined");
 
   return EXIT_SUCCESS;
 }

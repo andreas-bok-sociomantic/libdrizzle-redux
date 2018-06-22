@@ -132,16 +132,16 @@ const char *binlog_event_types_name[] =
     "DRIZZLE_EVENT_TYPE_END"
   };
 
-void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
-void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
+extern void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context);
+extern void binlog_error(drizzle_return_t ret, drizzle_st *connection, void *context)
 {
   (void)context;
   ASSERT_EQ_(DRIZZLE_RETURN_EOF, ret, "%s(%s)", drizzle_error(connection),
              drizzle_strerror(ret));
 }
 
-void binlog_event(drizzle_binlog_event_st *event, void *context);
-void binlog_event(drizzle_binlog_event_st *event, void *context)
+extern void binlog_event(drizzle_binlog_event_st *event, void *context);
+extern void binlog_event(drizzle_binlog_event_st *event, void *context)
 {
   binlog_context *binlog_ctx = context;
   uint32_t timestamp;
@@ -162,6 +162,7 @@ void binlog_event(drizzle_binlog_event_st *event, void *context)
 
   ASSERT_EQ(0, drizzle_binlog_event_next_pos(NULL));
   ASSERT_EQ(0, drizzle_binlog_event_raw_length(NULL));
+
   ASSERT_EQ(0, drizzle_binlog_event_length(NULL));
 
   if ( binlog_ctx->next_pos > 0 )
@@ -227,6 +228,9 @@ int main(int argc, char *argv[])
 
   char *binlog_file;
   uint32_t end_position;
+  drizzle_set_verbose(con, DRIZZLE_VERBOSE_INFO);
+  ret = drizzle_binlog_get_filename(NULL, &binlog_file, &end_position, -1);
+  ASSERT_EQ(ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
   ret = drizzle_binlog_get_filename(con, &binlog_file, &end_position, -999);
   ASSERT_EQ(ret, DRIZZLE_RETURN_INVALID_ARGUMENT);
   ret = drizzle_binlog_get_filename(con, &binlog_file, &end_position, INT32_MAX);
@@ -259,6 +263,7 @@ int main(int argc, char *argv[])
     ASSERT_STREQ_(binlog_event_types_name[i], actual, "%s != %s",
       binlog_event_types_name[i], actual);
   }
+  ASSERT_STREQ_(drizzle_binlog_event_type_str(999), "DRIZZLE_EVENT_TYPE_UNKNOWN", "Unknown event type");
 
   return EXIT_SUCCESS;
 }
