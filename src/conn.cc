@@ -1163,10 +1163,8 @@ drizzle_return_t drizzle_state_connect(drizzle_st *con)
         /* Positive failure. Try the next address, if available. */
         if (con->addrinfo_next == nullptr)
         {
-          drizzle_log_info(con, __FILE_LINE_FUNC__, "refreshing addresses");
-          con->clear_state();
-          con->push_state(drizzle_state_connect);
-          con->push_state(drizzle_state_addrinfo);
+          drizzle_log_error(con, __FILE_LINE_FUNC__, "addrinfo is NULL");
+          return DRIZZLE_RETURN_COULD_NOT_CONNECT;
         }
         else
         {
@@ -1411,9 +1409,8 @@ drizzle_return_t drizzle_state_read(drizzle_st *con)
           if (con->addrinfo_next == nullptr)
           {
             drizzle_log_info(con, __FILE_LINE_FUNC__, "refreshing addresses");
-            con->clear_state();
-            con->push_state(drizzle_state_connect);
             con->push_state(drizzle_state_addrinfo);
+            continue;
           }
           else
           {
@@ -1792,11 +1789,12 @@ static void connect_failed_try_next(drizzle_st *con, const char *file, uint line
   if (con->addrinfo_next == nullptr)
   {
     drizzle_log_info(con, __FILE_LINE_FUNC__, "refreshing addresses");
-    con->clear_state();
     con->push_state(drizzle_state_connect);
     con->push_state(drizzle_state_addrinfo);
   }
-
-  con->addrinfo_next= con->addrinfo_next->ai_next;
-  con->push_state(drizzle_state_connect);
+  else
+  {
+    con->addrinfo_next= con->addrinfo_next->ai_next;
+    con->push_state(drizzle_state_connect);
+  }
 }
